@@ -12,7 +12,7 @@ def edit(name, pairs):
     changed = 0
     for old, new in pairs:
         if old not in text:
-            print(f"Optional text not present in {name}: {old!r}")
+            print(f"Optional UI text not present in {name}; skipping replacement")
             continue
         text = text.replace(old, new)
         changed += 1
