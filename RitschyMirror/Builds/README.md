@@ -1,20 +1,29 @@
 # RitschyMirror English builds
 
-## Latest: 1.3.2 English — Copy Mode 1
+## Latest: 1.3.2 English — Smooth FPS 1
 
-**[Download the ready-to-install Windows setup EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-copymode1/RitschyMirror-English-Setup-1.3.2-CopyMode1.exe)**
+**[Download the Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-smoothfps1/RitschyMirror-English-Setup-1.3.2-SmoothFPS1.exe)**
 
-- [Release details](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-copymode1)
-- [Successful Windows build](https://github.com/Fireworkstars46/App-Builds/actions/runs/35690097779)
-- [Copy-mode source changes](../Source/add_copy_mode.py)
+- [Successful Windows build and logs](https://github.com/Fireworkstars46/App-Builds/actions/runs/35690996755)
+- [GitHub Release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-smoothfps1)
+- [Smooth drag and FPS patch source](../Source/smooth_drag_and_fps.py)
 
-In Settings > Image / Tone mapping, enable **Copy mode (SDR colors, no image adjustments; restart required)**, set Capture mode to **monitor**, and keep Output mode on **windowed**. Click **Restart (display)**. In copy mode the program requests 8-bit SDR BGRA capture from Windows Graphics Capture, uses an 8-bit output swapchain, and bypasses tone mapping, exposure, gamma, saturation and contrast. The alternative DXGI capture fallback remains available outside copy mode.
+Changes beyond the previous Copy Mode build:
 
-**Limitations:** This is an unofficial build tested only by automated Windows compilation and installer packaging. Copy mode aims to preserve SDR colors but cannot guarantee pixel-identical capture through HDMI, the capture card, its preview app and Windows display color management. A 1280x720 preview of a 1920x1080 desktop will still be downscaled, affecting text sharpness. Moving the preview window onto the extended HDMI display prevents the mirror-in-mirror effect.
+- Move the preview window by its title bar **without entering the blocking Windows modal drag loop**. The capture/render thread can continue updating during titlebar dragging. Resize behavior has not been changed.
+- Optional **FPS limit**: 30, 60, 120, or unlimited; VSync is a separate setting. Actual achievable FPS is constrained by the display, capture card, preview app, and workload.
+- **Low latency** setting to prefer the newest frame from Windows Graphics Capture rather than queue stale frames.
+- Newly created **windowed** preview starts on the selected target monitor (HDMI capture display), avoiding initial mirror-in-mirror from previewing the primary display on itself.
+- Existing English UI, 8-bit SDR Copy mode, Windows Extend mode, and fallback for DXGI_ERROR_UNSUPPORTED remain available.
 
-## Previous builds
+Suggested starting settings for a 1920×1080 desktop into a 1280×720 preview: Capture mode = monitor; Source = DISPLAY1; Target = HDMI TO USB; Output mode = windowed; Copy mode = on; FPS limit = 60; Low latency = on; VSync = off if it helps responsiveness (turn on if tearing occurs). Restart (display) after installing or changing structural settings.
 
-- [English capture fix 1](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-capturefix1/RitschyMirror-English-Setup-1.3.2-CaptureFix1.exe)
+This is an **unofficial experimental build**. The installer was compiled and packaged successfully on a Windows GitHub Actions runner, but the actual capture smoothness, live dragging, and FPS were **not tested on the affected laptop**. Low latency can improve freshness without guaranteeing a particular delay. Capture-card preview software can impose its own latency/FPS limitations.
+
+## Earlier builds
+
+- [Copy Mode 1](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-copymode1/RitschyMirror-English-Setup-1.3.2-CopyMode1.exe)
+- [Capture Fix 1](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-capturefix1/RitschyMirror-English-Setup-1.3.2-CaptureFix1.exe)
 - [Initial English version](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2/RitschyMirror-English-Setup-1.3.2.exe)
 
-Build executables are published in GitHub Releases and Actions artifacts, rather than being committed to this repository.
+Installer EXEs are published as GitHub Releases assets and Actions artifacts, rather than committed to Git history.
