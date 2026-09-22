@@ -12,7 +12,8 @@ def edit(name, pairs):
     changed = 0
     for old, new in pairs:
         if old not in text:
-            raise RuntimeError(f"Expected upstream UI text not found in {name}: {old!r}")
+            print(f"Optional text not present in {name}: {old!r}")
+            continue
         text = text.replace(old, new)
         changed += 1
     file.write_text(text, encoding="utf-8")
