@@ -1,10 +1,13 @@
 # RitschyMirror English builds
 
-The finished Windows x64 setup EXE is built on GitHub's Windows runner; it is **not** yet available until a build finishes successfully.
+## Ready-to-install Windows x64 setup EXE
 
-- [Build runs and downloadable artifacts](https://github.com/Fireworkstars46/App-Builds/actions/workflows/build-ritschy-mirror.yml)
-- [Releases / ready-to-install setup EXE](https://github.com/Fireworkstars46/App-Builds/releases)
+**[Download RitschyMirror-English-Setup-1.3.2.exe](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2/RitschyMirror-English-Setup-1.3.2.exe)**
 
-Look for `RitschyMirror-English-Setup-1.3.2.exe`. GitHub Actions artifacts may download as a ZIP containing the EXE. An installer published in GitHub Releases can be downloaded directly.
+- [Release page](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2)
+- [Windows build logs / downloadable artifact](https://github.com/Fireworkstars46/App-Builds/actions/runs/35688102189)
+- [English translation source and installer definition](../Source/)
 
-This is an unofficial translation. An automated successful compile does **not** constitute a hands-on Windows test of its screen-mirroring features.
+The setup was compiled and packaged on a Windows GitHub Actions runner from upstream RitschyMirror version 1.3.2. It is an **unofficial English translation** and a pre-release; screen-mirroring functions have not yet been manually tested after installation on Windows. The installer may replace the existing German installation.
+
+Build binaries are stored as GitHub Releases assets and workflow artifacts rather than committed to the source repository's Git history. This folder provides their direct download and source links.
