@@ -37,6 +37,14 @@ jobs:
           python RitschyMirror/Source/translate.py
           if ($LASTEXITCODE -ne 0) { throw "Translation failed" }
 
+      - name: Enable alternate full-monitor capture for unsupported DXGI systems
+        shell: pwsh
+        env:
+          RITSCHY_SOURCE: _upstream/ritschy-mirror
+        run: |
+          python RitschyMirror/Source/enable_monitor_fallback.py
+          if ($LASTEXITCODE -ne 0) { throw "Monitor fallback patch failed" }
+
       - name: Set up .NET 9 SDK
         uses: actions/setup-dotnet@v4
         with:
@@ -65,13 +73,15 @@ jobs:
           $iscc = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
           & $iscc 'RitschyMirror/Source/RitschyMirror-English.iss'
           if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed' }
-          if (!(Test-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2.exe')) { throw 'Setup EXE not generated' }
+          if (!(Test-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-CaptureFix1.exe')) { throw 'Setup EXE not generated' }
+          Rename-Item '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-CaptureFix1.exe' 'RitschyMirror-English-Setup-1.3.2-CaptureFix1.exe'
+          if (!(Test-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-CaptureFix1.exe')) { throw 'Capture fix setup not generated' }
 
       - name: Upload finished installer as build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: RitschyMirror-English-Setup-1.3.2
-          path: _upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2.exe
+          name: RitschyMirror-English-Setup-1.3.2-CaptureFix1
+          path: _upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-CaptureFix1.exe
           if-no-files-found: error
           retention-days: 90
 
@@ -80,12 +90,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $file = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2.exe'
-          $tag = 'ritschymirror-english-1.3.2'
+          $file = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-CaptureFix1.exe'
+          $tag = 'ritschymirror-english-1.3.2-capturefix1'
           gh release view $tag 2>$null
           if ($LASTEXITCODE -eq 0) {
             gh release upload $tag $file --clobber
           } else {
-            gh release create $tag $file --target $env:GITHUB_SHA --title 'RitschyMirror 1.3.2 English (unofficial)' --notes 'Unofficial English-language translation of RitschyMirror 1.3.2. Built automatically on Windows from the upstream MIT-licensed source. Screen-capture functionality has not yet been tested manually on Windows.' --prerelease
+            gh release create $tag $file --target $env:GITHUB_SHA --title 'RitschyMirror 1.3.2 English — Capture Fix 1 (unofficial)' --notes 'Adds an automatic Windows Graphics Capture (whole-monitor) fallback when DXGI DuplicateOutput1 reports DXGI_ERROR_UNSUPPORTED. Keeps the original English UI, monitor selection and windowed mode. This Windows build was compiled and packaged automatically; the workaround has not yet been tested on the affected laptop.' --prerelease
           }
           if ($LASTEXITCODE -ne 0) { throw 'Release upload failed; the setup remains available under Actions artifacts.' }
