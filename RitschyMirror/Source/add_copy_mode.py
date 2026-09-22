@@ -28,8 +28,8 @@ replace_one("MirrorConfig.cs",
 '        "copy_mode", "output_bit_depth", "source_display", "target_display",')
 
 replace_one("SettingsForm.cs",
-'        Header("Bild / Tonemap");',
-'        Header("Bild / Tonemap");\n'
+'        Header("Image / Tone mapping");',
+'        Header("Image / Tone mapping");\n'
 '        CheckRow("Copy mode (SDR colors, no image adjustments; restart required)",\n'
 '                 _cfg.CopyMode, v => _cfg.CopyMode = v);')
 
