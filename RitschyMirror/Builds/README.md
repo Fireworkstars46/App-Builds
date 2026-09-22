@@ -1,17 +1,20 @@
 # RitschyMirror English builds
 
-## Latest: 1.3.2 English — Capture Fix 1
+## Latest: 1.3.2 English — Copy Mode 1
 
-**[Download the ready-to-install Windows EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-capturefix1/RitschyMirror-English-Setup-1.3.2-CaptureFix1.exe)**
+**[Download the ready-to-install Windows setup EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-copymode1/RitschyMirror-English-Setup-1.3.2-CopyMode1.exe)**
 
-- [Release details](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-capturefix1)
-- [Successful Windows build](https://github.com/Fireworkstars46/App-Builds/actions/runs/35689314339)
-- [Capture workaround source](../Source/enable_monitor_fallback.py)
+- [Release details](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-copymode1)
+- [Successful Windows build](https://github.com/Fireworkstars46/App-Builds/actions/runs/35690097779)
+- [Copy-mode source changes](../Source/add_copy_mode.py)
 
-This unofficial English build adds a whole-monitor Windows Graphics Capture fallback when the original DXGI Desktop Duplication API reports `DXGI_ERROR_UNSUPPORTED (0x887A0004)`. The existing UI, Windows Extend mode and windowed output remain available. The Windows build and installer packaging succeeded; the workaround still needs to be tested on the affected laptop.
+In Settings > Image / Tone mapping, enable **Copy mode (SDR colors, no image adjustments; restart required)**, set Capture mode to **monitor**, and keep Output mode on **windowed**. Click **Restart (display)**. In copy mode the program requests 8-bit SDR BGRA capture from Windows Graphics Capture, uses an 8-bit output swapchain, and bypasses tone mapping, exposure, gamma, saturation and contrast. The alternative DXGI capture fallback remains available outside copy mode.
 
-## Previous version
+**Limitations:** This is an unofficial build tested only by automated Windows compilation and installer packaging. Copy mode aims to preserve SDR colors but cannot guarantee pixel-identical capture through HDMI, the capture card, its preview app and Windows display color management. A 1280x720 preview of a 1920x1080 desktop will still be downscaled, affecting text sharpness. Moving the preview window onto the extended HDMI display prevents the mirror-in-mirror effect.
 
-- [English 1.3.2 original installer (without capture fallback)](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2/RitschyMirror-English-Setup-1.3.2.exe)
+## Previous builds
 
-Build executables live in GitHub Releases and Actions artifacts, linked from this folder, rather than being committed to the Git source tree.
+- [English capture fix 1](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-capturefix1/RitschyMirror-English-Setup-1.3.2-CaptureFix1.exe)
+- [Initial English version](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2/RitschyMirror-English-Setup-1.3.2.exe)
+
+Build executables are published in GitHub Releases and Actions artifacts, rather than being committed to this repository.
