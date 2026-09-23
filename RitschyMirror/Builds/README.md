@@ -1,6 +1,26 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Projector FPS 1
+## Latest: English 1.3.2 — Live Snap 1
+
+**[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-livesnap1/RitschyMirror-English-Setup-1.3.2-LiveSnap1.exe)**
+
+- [Successful Windows build and installer publication](https://github.com/Fireworkstars46/App-Builds/actions/runs/35809793131)
+- [Live snap/restore source patch](../Source/live_browser_snap_restore.py)
+
+This build adds browser-style **drag to top edge to maximize** and **drag a maximized title bar down to restore its last small size** to the existing **Smooth live drag** mode. It also constrains window movement to the combined desktop edges without locking the window to one monitor (when Keep preview inside one display is OFF). This is custom nonblocking snapping, not full Windows Aero Snap parity. It preserves the live recursive projector, selectable FPS, Lightshot screenshot visibility and standard title bar when Borderless projector is OFF.
+
+### Test
+
+1. Close RitschyMirror and its tray icon. Install Live Snap 1 over Projector FPS 1. No uninstall is needed.
+2. Settings → Output mode: Windowed; Preview style: Recursive projector (OBS-style); Borderless projector: OFF; Preview window movement: Smooth live drag; Keep preview inside one display: OFF. Restart preview.
+3. Drag the title bar to the upper physical screen edge and release to maximize, then drag the maximized title bar downward to restore the prior size. Drag to the edge of the combined desktop; it should remain reachable on-screen and still allow crossing to an adjacent display.
+4. The continuous preview and this specific monitor layout have not been tested on the user's own laptop; send a screenshot or newest mirror.log section if the movement or capture is incorrect.
+
+## Previous: Projector FPS 1
+
+[Previous installer release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-projectorfps1)
+
+## Projector FPS 1 details
 
 **[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-projectorfps1/RitschyMirror-English-Setup-1.3.2-ProjectorFPS1.exe)**
 
