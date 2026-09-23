@@ -1,6 +1,21 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — OBS Projector 1
+## Latest: English 1.3.2 — OBS Projector 2 (Live Fit)
+
+**[Download the Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-obsprojector2/RitschyMirror-English-Setup-1.3.2-OBSProjector2.exe)**
+
+- [Windows build and installer](https://github.com/Fireworkstars46/App-Builds/actions/runs/35817259142)
+- [Live video/black-margins viewport patch](../Source/obs_live_viewport_reflow.py)
+
+The user video showed a standard window being resized into unusual wide/tall shapes while the **Fit** layout's black padding and video area failed to reflow correctly during the mouse gesture. OBS Projector 1 deferred DXGI backbuffer resizing until mouse release (to prevent the older freeze), but still calculated the video layout using that old buffer's aspect ratio. Projector 2 calculates a *logical* video viewport based on the current embedded-child client dimensions every frame, including while a native drag/resize is in progress. It transforms those logical viewport coordinates back into the current GPU buffer dimensions; DWM presents the resulting fresh frame into the changing child window size. The video and black padding should track the new live aspect ratio even before mouse release. This preserves Fit's 16:9 picture without distortion: black bars are still expected when the outer preview window is not 16:9. To eliminate black bars entirely, users may select layout mode Stretch (distorts the picture) or resize the window to the source's aspect ratio.
+
+**Test:** Close RitschyMirror plus its tray icon; install OBS Projector 2; select Monitor / DISPLAY1, HDMI TO USB target, Windowed, Recursive projector, Borderless OFF, Normal Windows (browser-like), Layout Fit, FPS 60. Restart display. Hold and drag a preview border to make a very wide window and then a tall window while watching if the video and the black side/top bars reflow *during* the drag. Build success is not proof of the physical preview's live behavior on the laptop.
+
+## Previous: OBS Projector 1
+
+[OBS Projector 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-obsprojector1)
+
+## OBS Projector 1 details
 
 **[Download the Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-obsprojector1/RitschyMirror-English-Setup-1.3.2-OBSProjector1.exe)**
 
