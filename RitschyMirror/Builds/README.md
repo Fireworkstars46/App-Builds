@@ -1,34 +1,29 @@
 # RitschyMirror English builds
 
-## Latest: RitschyMirror English 1.3.2 — Debug 1
+## Latest: English 1.3.2 — Debug Fix 1
 
-**[Download the Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-debug1/RitschyMirror-English-Setup-1.3.2-Debug1.exe)**
+**[Download the fixed Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-debugfix1/RitschyMirror-English-Setup-1.3.2-DebugFix1.exe)**
 
-- [Successful Windows build and installer packaging](https://github.com/Fireworkstars46/App-Builds/actions/runs/35800732553)
-- [Release page](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-debug1)
-- [Diagnostic patch source](../Source/debug_capture_freezes.py)
+- [Build / release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-debugfix1)
+- [Successful Windows build](https://github.com/Fireworkstars46/App-Builds/actions/runs/35801578377)
+- [Source of the two startup corrections](../Source/fix_debug_startup.py)
 
-### New debugging tools
+### Why the prior Auto Clarity and Debug builds failed on startup
 
-- **Debug logging (FPS, stalls and repeated-screen detection)**: Enabled by default for the debug build, with an on/off checkbox in the image settings.
-- **Open debug log folder**: A button under Settings → About opens the folder containing `mirror.log`. After reproducing a freeze, close mirroring if possible, then open the log and share its most recent lines.
-- **Recursive mirror warning**: When the preview window overlaps the captured source display at startup, the log prints `RECURSIVE MIRROR WARNING`. Another warning identifies source and target being the same display.
-- **Render stall watchdog**: A separate background thread records `RENDER STALL` if the rendering loop makes no progress for at least four seconds, including the last recorded stage (window pump, capture acquire, GPU render, present, etc.). Warning repeats at most once per five seconds.
-- **Low-frequency diagnostics**: Approximate presented FPS, new captured frames per second, source and preview dimensions, window state and startup capture/preview display selections. No screenshots or videos are recorded by these diagnostics.
-- Existing features remain: SDR Copy mode, optional automatic clarity, optional screen-edge confinement, preview opens on Main/Extended/Remember, custom window sizing and maximize/restore, FPS limit and low latency.
+The new auto-clarity parameter made the Direct3D constant-buffer C# struct 72 bytes long. D3D11 constant buffer byte sizes must be divisible by 16; the driver rejected 72 with E_INVALIDARG at CreateBuffer. Debug Fix 1 adds 8 bytes of padding to make the buffer 80 bytes. Merely disabling Auto Clarity does *not* change the original broken buffer size; install this fixed build to test.
 
-### Steps for the freeze / mirror-in-mirror issue
+The user's diagnostics also revealed preview_open_on=main even though the main display was the captured SOURCE. Debug Fix 1 moves the preview to the selected HDMI target automatically when its startup rectangle would overlap the captured source display, preventing the common recursive mirror-at-startup feedback. The selectable Preview opens on setting is preserved for non-overlapping window placement.
 
-1. Quit RitschyMirror completely from its tray icon; install Debug 1 over the previous English build. Your existing `mirror_config.json` should remain in place.
-2. Open Settings; ensure **Debug logging** is checked. Keep Windows set to **Extend**. For the test set Capture mode = monitor, Source monitor = the MAIN desktop, Target monitor = HDMI TO USB, and Preview opens on = Extended display. Keep the preview on the HDMI target, **not** on the captured main screen.
-3. Start mirroring and briefly reproduce the glitch once. If it freezes, wait about five seconds so the independent watchdog can attempt to record the blocked stage, then end RitschyMirror using Task Manager if necessary.
-4. Open Settings → About → **Open debug log folder**. Open `mirror.log` and send the lines from the latest Render-Start through the failure. The older lines from prior versions will still be in the log. Review the log before sharing since earlier versions can log app/window titles and local paths.
+### Test
 
-**Limitations:** Debug 1 adds diagnostics, not an automatic fix for freezes, recursive mirroring or capture-card image quality. Windows GitHub Actions compiled and packaged the EXE successfully, but the debugger's runtime behavior on the user's laptop has not been tested.
+1. Fully close RitschyMirror (including tray), install Debug Fix 1 **over** the previous English build. Existing settings should be preserved.
+2. Open Settings. Keep Windows on **Extend**, Capture mode **monitor**, Source = main internal display, Target = HDMI TO USB, Preview opens on = **Extended display**. Keep **Debug logging** enabled. You may first test with Auto Clarity OFF for minimal variables.
+3. Start mirroring once. The preview should open on HDMI rather than the captured source. If the preview is black, frozen or recursively repeats, close the application, open Settings → About → Open debug log folder, and send the newest `mirror.log` section.
+4. This build has passed compilation and installer packaging on Windows, but physical monitor, capture-card and preview behavior remain unverified on the target machine.
 
 ## Previous builds
 
-- [Auto Clarity & Edges 1](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-clarityedges1/RitschyMirror-English-Setup-1.3.2-ClarityEdges1.exe)
-- [Preview Select 1](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-previewselect1/RitschyMirror-English-Setup-1.3.2-PreviewSelect1.exe)
+- [Debug 1 (contains the 72-byte startup bug)](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-debug1)
+- [Auto Clarity & Edges 1 (contains the same bug)](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-clarityedges1)
+- [Preview Select 1](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-previewselect1)
 
-Installers are published as GitHub Release assets and Actions artifacts, not committed to the source history.
