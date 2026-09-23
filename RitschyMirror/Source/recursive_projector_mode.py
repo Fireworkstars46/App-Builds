@@ -6,7 +6,8 @@ window frames seen in the feedback are image pixels, not separate HWNDs.
 
 Projector mode keeps the existing monitor-capture/render pipeline, opts out
 of WDA_EXCLUDEFROMCAPTURE so Lightshot and the monitor source can both see the
-preview, and applies a 30 FPS safety cap. Optional borderless projector has
+preview. The existing user FPS setting (30, 60, 120, unlimited) applies
+unchanged. Optional borderless projector has
 Win32 nonclient hit testing for mouse drag and edge resize without drawing
 a title bar. Normal browser-like window mode remains available.
 """
@@ -47,7 +48,8 @@ patch("SettingsForm.cs",
         Note("Projector uses the SAME preview window: no extra windows are created.");
         Note("To get the tunnel: source = Main monitor, preview opens on = Main.");
         Note("Projector is visible to Lightshot, even if Hide preview is checked.");
-        Note("Projector caps rendering at 30 FPS; style/borderless changes need restart.");
+        Note("Projector obeys the selected FPS limit (30, 60, 120 or unlimited).");
+        Note("Style/borderless changes need restart; high FPS may increase GPU load.");
         CheckRow("Hide preview from screenshots (prevents mirror feedback)",
                  _cfg.HidePreviewFromScreenshots,
                  v => _cfg.HidePreviewFromScreenshots = v);''')
@@ -125,7 +127,7 @@ patch("MirrorEngine.cs",
                 cfg.HidePreviewFromScreenshots && !projector);
             if (projector)
                 Log("[PROJECTOR] Single preview window; screen feedback intentionally allowed. " +
-                    "Lightshot-visible; 30 FPS safety limit. Borderless=" + cfg.ProjectorBorderless);
+                    "Lightshot-visible; FPS follows selected limit (" + cfg.FpsLimit + "). Borderless=" + cfg.ProjectorBorderless);
             if (!captureAffinitySet)''')
 
 patch("MirrorEngine.cs",
@@ -161,12 +163,7 @@ patch("MirrorEngine.cs",
 '''                $"hide_preview_from_screenshots={cfg.HidePreviewFromScreenshots}, " +
                 $"recursive_projector={cfg.RecursiveProjector}, projector_borderless={cfg.ProjectorBorderless}.");''')
 
-patch("MirrorEngine.cs",
-'''                int limit = cfg.FpsLimit is 30 or 60 or 120 ? cfg.FpsLimit : 0;''',
-'''                int limit = cfg.FpsLimit is 30 or 60 or 120 ? cfg.FpsLimit : 0;
-                // Recursive monitor feedback can otherwise saturate CPU/GPU.
-                // A smaller user cap (30) remains respected; unlimited/60/120
-                // become a 30 FPS cap only when projector mode is active.
-                if (projector) limit = limit == 0 ? 30 : Math.Min(limit, 30);''')
+# Retain the existing FPS-limit calculation from smooth_drag_and_fps.py.
+# Projector now follows the same 30/60/120/unlimited choice as Normal preview.
 
-print("OBS-style one-window recursive projector mode patch applied")
+print("OBS-style one-window recursive projector mode patch applied; FPS obeys user setting")
