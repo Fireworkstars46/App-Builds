@@ -1,6 +1,21 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Native Live 1
+## Latest: English 1.3.2 — Native Live 2
+
+**[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-nativelive2/RitschyMirror-English-Setup-1.3.2-NativeLive2.exe)**
+
+- [Windows compilation, installer, and release succeeded](https://github.com/Fireworkstars46/App-Builds/actions/runs/35814725992)
+- [Source patch](../Source/native_live_drag_resize_v2.py)
+
+Native Live 2 retains one standard Win32 preview on its own UI thread, with the capture/render thread separate. A second live-resize issue was the rendering thread calling DXGI ResizeBuffers repeatedly while a native titlebar move or border resize was in progress, plus continuously writing window geometry to the config on each resize event. During native move/resize this build continues presenting new frames using the current buffers while Windows scales the image to the changing window size; buffer reallocation and geometry save happen after release. This specifically targets preview pauses/blanking during a regular Windows drag or resize. It does not change which monitor is captured or duplicate the Windows display.
+
+**Test:** Close RitschyMirror and its tray icon, install Native Live 2 over the previous installer, select Capture mode Monitor and your main-display source; Output mode Windowed; Preview style Recursive projector (OBS-style); Borderless projector OFF; Preview window movement Normal Windows (browser-like); FPS limit 60. Keep Windows set to Extend. Restart the preview. While holding the title bar or a resize border, verify that the source video visibly changes *before* releasing the mouse. The compiled installer alone cannot verify the native DWM/capture performance on the actual laptop. If frames still visibly pause, reproduce one 5-second drag with the debug log enabled and share the latest mirror.log so the capture FPS and rendering/present stalls during the gesture can be compared.
+
+## Previous: Native Live 1
+
+[Native Live 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-nativelive1)
+
+## Native Live 1 details
 
 **[Download Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-nativelive1/RitschyMirror-English-Setup-1.3.2-NativeLive1.exe)**
 
