@@ -1,6 +1,21 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Live Bounce 1
+## Latest: English 1.3.2 — Vertical Drag 1
+
+**[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-verticaldrag1/RitschyMirror-English-Setup-1.3.2-VerticalDrag1.exe)**
+
+- [Successful Windows build](https://github.com/Fireworkstars46/App-Builds/actions/runs/35810956261)
+- [Source patch](../Source/fix_tall_window_vertical_drag.py)
+
+Corrects a vertical dragging lock after top-edge bounce for very tall restored preview windows. The previous smooth-drag code capped the window top at the screen top when its saved height exceeded the monitor usable height: horizontal movement worked, but downward movement was mathematically prevented. This release changes the lower vertical bound for an oversized window to allow pulling the title bar downward and keep it accessible near the monitor bottom. It retains dragging partly above the screen and returning to the top on release, the normal title bar, live preview resizing, cross-screen movement with confinement OFF, and the existing projector/Lightshot/FPS controls.
+
+To test: close app and tray icon, install Vertical Drag 1 over Live Bounce 1; choose Windowed output, Borderless projector OFF, Smooth live drag, and Keep preview inside one display OFF. Restart preview; drag the window upward partly off-screen, release so it bounces to the top, then grab the title bar and drag it downward. The Windows build passed; runtime drag behavior on the user's actual monitor setup still requires testing.
+
+## Previous: Live Bounce 1
+
+[Live Bounce 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-livebounce1)
+
+## Live Bounce 1 details
 
 **[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-livebounce1/RitschyMirror-English-Setup-1.3.2-LiveBounce1.exe)**
 
