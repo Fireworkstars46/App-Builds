@@ -1,6 +1,21 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Vertical Drag 1
+## Latest: English 1.3.2 — Resize Bounds 1
+
+**[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-resizebounds1/RitschyMirror-English-Setup-1.3.2-ResizeBounds1.exe)**
+
+- [Successful Windows build and release](https://github.com/Fireworkstars46/App-Builds/actions/runs/35811688818)
+- [Source patch](../Source/resize_screen_bounds_only.py)
+
+This version separates whole-window **movement** from edge **resizing** in Smooth live drag. Moving a window preserves the previous partial-offscreen movement and cross-display behavior, with the existing top bounce. Resizing via an edge or corner now stays inside the working area of the monitor where resizing began, independent of the **Keep preview inside one display** movement setting. If the window was partially offscreen from moving it, the resize first brings it fully into the selected monitor; the same preview window and live renderer remain in use.
+
+To test: fully close RitschyMirror and its tray icon, install Resize Bounds 1 over Vertical Drag 1, select Windowed output, Borderless projector OFF, Smooth live drag, and Keep preview inside one display OFF. Restart the preview. Drag the whole window partially above the top and pull it back down, then resize from a side or corner. The edge resize must stop before it extends beyond that monitor's visible work area. Moving the whole window should retain its previous behavior. The Windows installer compiled successfully; actual live resize behavior on the user's monitor setup still requires testing.
+
+## Previous: Vertical Drag 1
+
+[Vertical Drag 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-verticaldrag1)
+
+## Vertical Drag 1 details
 
 **[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-verticaldrag1/RitschyMirror-English-Setup-1.3.2-VerticalDrag1.exe)**
 
