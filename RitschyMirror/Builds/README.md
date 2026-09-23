@@ -1,32 +1,32 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Native Window 1
+## Latest: English 1.3.2 — Projector 1
 
-**[Download the Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-nativewindow1/RitschyMirror-English-Setup-1.3.2-NativeWindow1.exe)**
+**[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-projector1/RitschyMirror-English-Setup-1.3.2-Projector1.exe)**
 
-- [GitHub Release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-nativewindow1)
-- [Successful Windows build](https://github.com/Fireworkstars46/App-Builds/actions/runs/35802668373)
-- [Source patch](../Source/native_window_main_preview.py)
+- [GitHub release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-projector1)
+- [Successful Windows compile and installer packaging](https://github.com/Fireworkstars46/App-Builds/actions/runs/35805309888)
+- [Projector feature source](../Source/recursive_projector_mode.py)
 
-### Changes
+### Projector 1 features
 
-- Preview opens on **Main display** respects the setting; it is no longer forcibly relocated to HDMI. Choose **Extended display** to make the HDMI-to-USB capture card see the RitschyMirror preview. With only the preview window on Main, the alt laptop's HDMI capture stream cannot also see that window (the HDMI output is a different monitor).
-- **Preview window movement** setting: **Normal Windows (browser-like)** (new default) uses the real system titlebar and window border mechanics, including dragging across displays and Windows Snap. **Smooth live drag** uses the earlier non-blocking custom movement logic instead.
-- The previous **Keep preview inside one display** setting affects **Smooth live drag** only and does not stop cross-display movement in Normal Windows mode; default is now off for new configurations.
-- On Windows versions supporting `WDA_EXCLUDEFROMCAPTURE`, RitschyMirror requests exclusion of its own preview window from Windows Graphics Capture, to prevent mirror-in-mirror loops when that window is on the captured source screen. If Windows refuses exclusion, the log warns. Other capture tools may not honor the Windows exclusion.
-- Native OS drag/resize can momentarily pause the preview while a mouse button is held because the renderer and native window's message loop use the same thread. Release the mouse button to resume; use Smooth live drag if uninterrupted preview rendering during movement matters more than native window snapping.
-- Keeps the 80-byte Direct3D constant-buffer alignment fix, optional SDR auto clarity, debug logs and Open log folder button, remembered window dimensions and positions, and Extend mode support.
+A new **Preview style** setting offers *Normal preview* or *Recursive projector (OBS-style)*. Projector mode uses the same existing Win32 preview window, not additional preview HWNDs. When the preview is on its captured monitor and Windows capture exclusion is off, screen feedback repeatedly depicts that same window, producing an image tunnel. The exact feedback pattern depends on placement, scaling, and frame pacing and cannot be promised to have a particular spiral geometry.
 
-### Test
+**Borderless projector (no repeating title bars)** is an independent setting enabled by default. When projector mode is on, the preview has a borderless window surface so the nested captured images do not show a repeated title bar. Move the window by dragging the interior; resize near the first nine physical pixels of an edge or corner, or turn the borderless option off to get the normal Windows window controls. Press Alt+F4 or Escape to close the borderless preview. The app tray/settings remain available. Normal preview preserves the previous native browser-like window behavior.
 
-1. Close RitschyMirror fully (including system tray icon), install Native Window 1 over the old English build (no manual uninstall).
-2. Open Settings → **Preview opens on: Main display**, set **Preview window movement: Normal Windows (browser-like)**, and leave **Keep preview inside one display** off if using Smooth live drag later. Restart the preview.
-3. Drag the preview's titlebar or use a window edge as in a normal browser, including across Windows displays. The setting changes how preview moves, not Windows display topology.
-4. For the physical HDMI capture card on the alt laptop to show the preview, place the preview onto **HDMI TO USB** (or select Extended display at startup).
-5. If the app freezes or repeats itself, open Settings → About → Open debug log folder and share the latest `mirror.log` section. The Windows build compiled successfully but the end-to-end behavior on this specific laptop and capture card still requires testing.
+Projector mode is visible to Lightshot because it disables preview capture exclusion while active, regardless of the normal *Hide preview from screenshots* setting; toggling screenshot hiding has no effect until returning to Normal preview. Recursive feedback can consume substantial GPU/CPU; projector mode caps its software frame limiter at 30 FPS. Normal mode respects the existing FPS selector. Windows remains on **Extend**, not Duplicate.
 
-## Previous builds
+### Test on the main laptop
 
+1. Fully close RitschyMirror including its tray icon, then install Projector 1 over your previous English build. No manual uninstall is needed; existing config should remain.
+2. Settings: Capture mode = **monitor**, Source = **Main** internal display, Target = **HDMI TO USB**; Output mode = **windowed**; Preview opens on = **Main display**.
+3. Choose Preview style = **Recursive projector (OBS-style)** and select **Borderless projector** to remove title bars. Apply via the existing **Restart (structural)** button or stop/start mirroring.
+4. Make the preview smaller than the physical screen and position it off-center to see a clear recursive tunnel. A fullscreen window covering the same captured display can eliminate the visible inset/tunnel effect. Press Lightshot's capture key to test screenshot visibility.
+5. If you need the *alt* laptop's camera app to show the mirrored output instead, move the preview onto the **HDMI TO USB** target/extended display. The window on main by itself does not generate video content on the extended output; Windows Extend keeps the screens distinct. Feedback may stop after you move the preview off the captured Main display.
+6. If any frame stalls or unexpectedly multiple OS windows appear, open Settings → About → Open debug log folder and share the latest `mirror.log` section. Build/publish passed on GitHub Actions, but the actual screen feedback/dragging has not yet been validated on the user's laptop.
+
+### Prior builds
+
+- [Lightshot 1](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-lightshot1)
+- [Native Window 1](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-nativewindow1)
 - [Debug Fix 1](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-debugfix1)
-- [Debug 1 (contains the pre-fix shader buffer size bug)](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-debug1)
-- [Preview Select 1](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-previewselect1)
