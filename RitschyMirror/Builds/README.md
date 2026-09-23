@@ -1,6 +1,21 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Live Snap 1
+## Latest: English 1.3.2 — Live Bounce 1
+
+**[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-livebounce1/RitschyMirror-English-Setup-1.3.2-LiveBounce1.exe)**
+
+- [Successful Windows build](https://github.com/Fireworkstars46/App-Builds/actions/runs/35810293808)
+- [Top-edge bounce source patch](../Source/live_top_edge_bounce.py)
+
+This revision changes **Smooth live drag**: you can pull the normal-sized preview about halfway above the physical screen top while holding the mouse button. On release it repositions the same normal-sized preview to the working area's top edge instead of maximising it or sticking to the top during the drag. Dragging across the boundary between two extended Windows monitors remains available with **Keep preview inside one display = OFF**. The existing manual maximize/restore button still works; dragging from a deliberately maximized preview still restores its prior dimensions. Video remains rendered by the existing preview render loop; actual FPS during resizing depends on hardware.
+
+To test: close RitschyMirror including its tray icon, install Live Bounce 1 over the previous version, set **Output mode: Windowed**, **Borderless projector: OFF**, **Preview window movement: Smooth live drag**, and **Keep preview inside one display: OFF**. Stop and restart preview after changes. Drag the title bar so its upper half extends above the screen, and release it; the outer top edge should land flush with the visible screen/work area without maximizing. If the window starts maximized from a previously saved preference, click its Restore Down button once to return to the normal window size.
+
+### Previous: Live Snap 1
+
+[Live Snap 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-livesnap1)
+
+## Live Snap 1 details
 
 **[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-livesnap1/RitschyMirror-English-Setup-1.3.2-LiveSnap1.exe)**
 
