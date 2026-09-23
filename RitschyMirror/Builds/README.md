@@ -1,31 +1,34 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Auto Clarity & Edges 1
+## Latest: RitschyMirror English 1.3.2 — Debug 1
 
-**[Download the Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-clarityedges1/RitschyMirror-English-Setup-1.3.2-ClarityEdges1.exe)**
+**[Download the Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-debug1/RitschyMirror-English-Setup-1.3.2-Debug1.exe)**
 
-- [Release page](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-clarityedges1)
-- [Successful Windows build and installer packaging](https://github.com/Fireworkstars46/App-Builds/actions/runs/35786982630)
-- [Auto clarity and screen edge patch](../Source/auto_clarity_and_window_edges.py)
+- [Successful Windows build and installer packaging](https://github.com/Fireworkstars46/App-Builds/actions/runs/35800732553)
+- [Release page](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-debug1)
+- [Diagnostic patch source](../Source/debug_capture_freezes.py)
 
-### Changes
+### New debugging tools
 
-- **Auto clarity (mild SDR text sharpening):** An optional GPU preview filter in RitschyMirror's **Copy mode** that mildly sharpens text and scales its strength up when the source is reduced to a smaller preview. It is an adjustable on/off switch under **Image / Tone mapping**. This *does not* change Camera HD's own Sharpness setting, correct the capture card's hardware compression, or recreate detail lost in the capture feed. Stronger sharpening may cause halos or slightly reduce performance; disable Auto clarity if that occurs.
-- **Keep preview inside its current display:** An optional checkbox under **Source / Target & Mode**. When enabled, dragging the titlebar or resizing the preview using a border/corner is constrained to the display on which the move/resize began. The app also gently snaps the preview to the screen edge (~12 pixels). The feature prevents an accidental drag onto the other laptop's HDMI output display. Turn it off to move the preview freely between displays.
-- Preserves the existing preview location selector (Main / Extended / Remember last position), custom sizing, maximize/restore, saved geometry, copy mode, monitor capture fallback, and FPS/low-latency controls.
+- **Debug logging (FPS, stalls and repeated-screen detection)**: Enabled by default for the debug build, with an on/off checkbox in the image settings.
+- **Open debug log folder**: A button under Settings → About opens the folder containing `mirror.log`. After reproducing a freeze, close mirroring if possible, then open the log and share its most recent lines.
+- **Recursive mirror warning**: When the preview window overlaps the captured source display at startup, the log prints `RECURSIVE MIRROR WARNING`. Another warning identifies source and target being the same display.
+- **Render stall watchdog**: A separate background thread records `RENDER STALL` if the rendering loop makes no progress for at least four seconds, including the last recorded stage (window pump, capture acquire, GPU render, present, etc.). Warning repeats at most once per five seconds.
+- **Low-frequency diagnostics**: Approximate presented FPS, new captured frames per second, source and preview dimensions, window state and startup capture/preview display selections. No screenshots or videos are recorded by these diagnostics.
+- Existing features remain: SDR Copy mode, optional automatic clarity, optional screen-edge confinement, preview opens on Main/Extended/Remember, custom window sizing and maximize/restore, FPS limit and low latency.
 
-**Important:** Normal Windows windows *can* cross between monitors; the stop-at-edge behavior is a custom optional restriction. The preview app's hand-implemented drag/resize path is *not* identical to native Windows Aero Snap or OBS's UI. The limiter applies to mouse drag/edge resize, not every OS window-placement shortcut or programmatic repositioning.
+### Steps for the freeze / mirror-in-mirror issue
 
-### Installation and initial settings
+1. Quit RitschyMirror completely from its tray icon; install Debug 1 over the previous English build. Your existing `mirror_config.json` should remain in place.
+2. Open Settings; ensure **Debug logging** is checked. Keep Windows set to **Extend**. For the test set Capture mode = monitor, Source monitor = the MAIN desktop, Target monitor = HDMI TO USB, and Preview opens on = Extended display. Keep the preview on the HDMI target, **not** on the captured main screen.
+3. Start mirroring and briefly reproduce the glitch once. If it freezes, wait about five seconds so the independent watchdog can attempt to record the blocked stage, then end RitschyMirror using Task Manager if necessary.
+4. Open Settings → About → **Open debug log folder**. Open `mirror.log` and send the lines from the latest Render-Start through the failure. The older lines from prior versions will still be in the log. Review the log before sharing since earlier versions can log app/window titles and local paths.
 
-Close the previous RitschyMirror process completely, install the EXE, open Settings and enable **Copy mode**, **Auto clarity**, and **Keep preview inside its current display**. Under **Preview opens on**, choose **Extended display** if the preview should drive your HDMI capture card, or **Main display** if you want to see the preview on your own screen (which may produce mirror-in-mirror if it also captures the main screen). Restart (display) to apply structural changes. Windows should remain in **Extend** mode.
-
-**Test status:** GitHub Actions on Windows compiled and packaged the application and published the installer successfully. Real-world text sharpness, screen-edge confinement, resizing and capture-card latency have **not been tested on the target laptop**. Auto clarity is image enhancement, not an automatic objective sharpness or capture feed diagnosis algorithm.
+**Limitations:** Debug 1 adds diagnostics, not an automatic fix for freezes, recursive mirroring or capture-card image quality. Windows GitHub Actions compiled and packaged the EXE successfully, but the debugger's runtime behavior on the user's laptop has not been tested.
 
 ## Previous builds
 
+- [Auto Clarity & Edges 1](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-clarityedges1/RitschyMirror-English-Setup-1.3.2-ClarityEdges1.exe)
 - [Preview Select 1](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-previewselect1/RitschyMirror-English-Setup-1.3.2-PreviewSelect1.exe)
-- [Resize Save 1](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-resizesave1/RitschyMirror-English-Setup-1.3.2-ResizeSave1.exe)
-- [Smooth FPS 1](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-smoothfps1/RitschyMirror-English-Setup-1.3.2-SmoothFPS1.exe)
 
-Installer EXEs are GitHub release assets and Actions artifacts, linked here instead of checked into source Git history.
+Installers are published as GitHub Release assets and Actions artifacts, not committed to the source history.
