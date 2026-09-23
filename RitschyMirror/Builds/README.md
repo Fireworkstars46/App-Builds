@@ -1,6 +1,22 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Projector 1
+## Latest: English 1.3.2 — Projector FPS 1
+
+**[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-projectorfps1/RitschyMirror-English-Setup-1.3.2-ProjectorFPS1.exe)**
+
+[Successful Windows build and release](https://github.com/Fireworkstars46/App-Builds/actions/runs/35808097520).
+
+This revision removes the projector-only 30 FPS cap. Projector mode now respects Settings → FPS limit: **30, 60, 120, or unlimited**, exactly as normal preview does. It retains the single-window recursive tunnel, optional borderless projector, Lightshot screenshot visibility, smooth live drag, and Windows Extend support. The FPS selection is a target/upper cap, not a guarantee of achieved FPS. Unlimited can increase GPU load and worsen lag during continuous live resizing.
+
+### Installation and test
+
+Close RitschyMirror completely including its tray icon, install Projector FPS 1 over the previous build, and choose Settings → FPS limit → **60** first. Keep **Preview style → Recursive projector (OBS-style)** and **Preview window movement → Smooth live drag** for the same visual effect with live resizing. If 60 FPS is fluid, test 120 FPS or unlimited; if it gets worse, lower the limit. No Windows display duplication is needed. The Windows build completed successfully, but live performance on the user's own laptop and capture card remains unverified.
+
+## Previous build: Projector 1 (forced 30 FPS cap)
+
+[Projector 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-projector1)
+
+## Projector 1 details
 
 **[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-projector1/RitschyMirror-English-Setup-1.3.2-Projector1.exe)**
 
