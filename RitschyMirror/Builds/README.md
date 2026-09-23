@@ -1,6 +1,21 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Native Live 2
+## Latest: English 1.3.2 — OBS Projector 1
+
+**[Download the Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-obsprojector1/RitschyMirror-English-Setup-1.3.2-OBSProjector1.exe)**
+
+- [Windows compilation, packaging, and release: successful](https://github.com/Fireworkstars46/App-Builds/actions/runs/35815828824)
+- [OBS-style presentation source patch](../Source/obs_style_native_video_surface.py)
+
+The preview is one ordinary **top-level Windows window**, hosting an **embedded video-only child surface** (not a second on-screen preview window). A dedicated GUI thread handles Windows native titlebar drag/edge resize, Snap, maximize/restore and cross-monitor movement; the existing capture/render thread separately owns the video child swapchain. During native window resizing, the video child follows the client rectangle and the worker keeps submitting new frames to its swapchain, using the last captured texture at the selected FPS when capture does not produce a newer frame yet. DXGI backbuffer reallocations and preview-geometry configuration writes are deferred until release. Other window modes keep their previous implementation. This aims to avoid both main-thread drag freezes and repeated swapchain reallocations, without using OBS or network streaming.
+
+**Test on the actual laptop:** Close the application and its tray icon. Install OBS Projector 1 over the prior release; choose Capture mode Monitor, source Main / DISPLAY1, target HDMI TO USB, Output mode Windowed, Preview style Recursive projector (OBS-style), Borderless projector OFF, Preview window movement Normal Windows (browser-like), FPS limit 60. Restart the preview. Move the titlebar and hold a window edge while resizing; verify that content visibly changes before releasing the mouse, and that the child video image fills the new size after release. If the image remains blank or pauses, enable debug logging, perform a five-second drag while your desktop content changes, and share the latest mirror.log. The Windows CI compile/package result **does not prove** perfect OBS parity or physical HDMI capture-card behavior on your laptop.
+
+## Previous: Native Live 2
+
+[Native Live 2 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-nativelive2)
+
+## Native Live 2 details
 
 **[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-nativelive2/RitschyMirror-English-Setup-1.3.2-NativeLive2.exe)**
 
