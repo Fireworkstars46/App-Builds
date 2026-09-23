@@ -1,6 +1,25 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Resize Bounds 1
+## Latest: English 1.3.2 — Native Live 1
+
+**[Download Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-nativelive1/RitschyMirror-English-Setup-1.3.2-NativeLive1.exe)**
+
+- [Successful Windows compile, installer package and release](https://github.com/Fireworkstars46/App-Builds/actions/runs/35812233981)
+- [Native UI thread source patch](../Source/native_live_ui_thread.py)
+
+### Native Windows window with live rendering
+
+This release changes how **Normal Windows (browser-like)** works for windowed, framed previews. The existing preview HWND and Windows message loop now belong to a dedicated UI thread, while the existing Direct3D capture/render pipeline continues on the independent engine thread. Windows' modal titlebar drag and border resize loop therefore no longer blocks the main rendering loop. The regular Windows frame, minimize/maximize/restore buttons, native window snapping and normal cross-monitor movement are preserved without forcing the custom smooth-drag movement restrictions. It uses a **single real preview HWND**; native UI-thread creation does not open a second preview.
+
+**Test settings:** Close RitschyMirror and its tray icon, install Native Live 1 over the previous build, set **Output mode → Windowed**, **Borderless projector → OFF**, **Preview window movement → Normal Windows (browser-like)**, leave your chosen projector/Lightshot/FPS options unchanged, then restart the preview. Drag its titlebar and resize from each edge; expect Windows' normal movement with frames continuing during the gesture. The native Windows window may still let you move portions of its frame off-screen, just as other Windows apps do. Windows snapping is controlled by normal Windows Snap settings.
+
+This build has compiled and was packaged successfully on GitHub Actions. **The behavior and achieved FPS during a live Windows drag must still be tested on the actual main laptop and HDMI capture card**. Windows' window compositor, capture mode, or system load can still affect the perceived frame rate; if a capture freeze or crash occurs, share the newest `mirror.log` from Settings → About → Open debug log folder.
+
+## Previous: Resize Bounds 1
+
+[Resize Bounds 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-resizebounds1)
+
+## Resize Bounds 1 details
 
 **[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-resizebounds1/RitschyMirror-English-Setup-1.3.2-ResizeBounds1.exe)**
 
