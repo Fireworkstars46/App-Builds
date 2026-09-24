@@ -1,6 +1,21 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Preview X Only 1
+## Latest: English 1.3.2 — Double Click Preview 1
+
+**[Download Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-doubleclickpreview1/RitschyMirror-English-Setup-1.3.2-DoubleClickPreview1.exe)**
+
+- [Windows build and published release](https://github.com/Fireworkstars46/App-Builds/actions/runs/35979348287)
+- [Source patch: two tray double-clicks for preview](../Source/tray_two_double_click_preview.py)
+
+Use the existing RitschyMirror notification-area icon: **one double-click** opens/restores the main Settings window; **double-click a second time within 10 seconds** to show/restore the native renderer preview. If its X stopped mirroring, the second double-click starts mirroring again. If the preview is already running but hidden to tray, it restores it. Single left-click continues to open/restore Settings. The gesture never minimizes the preview; its own X still stops mirroring only, whereas the main Settings X closes the entire app.
+
+**Test on Windows:** Completely exit old RitschyMirror including its tray icon before installing this build. Double-click notification icon once to show Settings, then double-click it again within 10 seconds to bring up the preview (or restart mirroring if previously stopped with preview X). Windows build success cannot guarantee actual notification icon event timing on your laptop.
+
+## Previous: Preview X Only 1
+
+[Preview X Only 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-previewxonly1)
+
+## Preview X Only 1 details
 
 **[Download Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-previewxonly1/RitschyMirror-English-Setup-1.3.2-PreviewXOnly1.exe)**
 
