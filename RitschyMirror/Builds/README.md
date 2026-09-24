@@ -1,6 +1,21 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Tray Preview 1
+## Latest: English 1.3.2 — Visible Tray 1
+
+**[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-visibletray1/RitschyMirror-English-Setup-1.3.2-VisibleTray1.exe)**
+
+- [Windows compilation, installer, and release successful](https://github.com/Fireworkstars46/App-Builds/actions/runs/35958272180)
+- [Taskbar-only hiding source patch](../Source/visible_extended_preview_tray.py)
+
+**This is different from minimizing the projector to the tray.** The preview remains **visible and rendering on HDMI TO USB** (Windows Extend mode) while its **Windows taskbar button** is hidden. RitschyMirror already runs with one notification-area tray icon; the new Settings checkbox **Hide preview taskbar button (keep preview visible)** is checked by default, with an option to restore the taskbar button. The implementation calls the Windows Shell taskbar interface to remove just the button rather than changing the framed window into a Tool Window, so the regular title bar and system window controls stay intact. The existing Show preview / Hide preview to tray menu still exists, but using Hide preview to tray intentionally hides the *video window itself*; do not use it for the present keep-the-HDMI-video-visible use case.
+
+**On the main laptop:** Close RitschyMirror and its tray icon, install Visible Tray 1. In Settings choose Capture mode Monitor, Source DISPLAY1, Target HDMI TO USB, Output mode Windowed, Preview opens on Extended display, and leave **Hide preview taskbar button (keep preview visible)** enabled. Restart (display). Confirm that the RitschyMirror preview remains on the HDMI extended screen while its taskbar button vanishes from the main Windows taskbar. The Windows 10 notification-area placement is controlled by Windows: to pin the existing icon visibly beside the clock, click the **^** tray overflow and drag the RitschyMirror icon out next to the clock. Do **not** click preview Minimize or Hide preview to tray, because those commands hide the whole video window. The installer built successfully, but taskbar shell behavior still requires confirmation on the target laptop.
+
+## Previous: Tray Preview 1
+
+[Tray Preview 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-traypreview1)
+
+## Tray Preview 1 details
 
 **[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-traypreview1/RitschyMirror-English-Setup-1.3.2-TrayPreview1.exe)**
 
