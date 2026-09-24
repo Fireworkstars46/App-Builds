@@ -55,9 +55,9 @@ patch("SettingsForm.cs",
         // Auf kleinen/kurzen''')
 
 patch("SettingsForm.cs",
-'''        Note("Agent-/Bind-/Port-Änderungen wirken nach App-Neustart.");
+'''        Note("Agent/bind/port changes require restarting the app.");
     }''',
-'''        Note("Agent-/Bind-/Port-Änderungen wirken nach App-Neustart.");
+'''        Note("Agent/bind/port changes require restarting the app.");
         _minimizeMainSettingsCheck = CheckRow(
             "Minimize MAIN Settings window to tray when clicking —",
             _app.MinimizeSettingsToTray,
