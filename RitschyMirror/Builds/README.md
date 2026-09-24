@@ -1,6 +1,24 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Minimize Tray Switch 1
+## Latest: English 1.3.2 — Both Tray Switch 1
+
+**[Download the Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-bothtrayswitch1/RitschyMirror-English-Setup-1.3.2-BothTraySwitch1.exe)**
+
+- [Successful Windows compilation, packaging and GitHub Release](https://github.com/Fireworkstars46/App-Builds/actions/runs/35973917695)
+- [Independent main Settings window minimize-to-tray implementation](../Source/optional_main_settings_minimize_to_tray.py)
+- [Existing renderer-preview minimize-to-tray implementation](../Source/optional_minimize_to_tray_preview_menu.py)
+
+This release has **two independent, persisted minimize-to-tray ON/OFF settings**. **Minimize preview to tray when clicking —** applies only to the renderer/video window; it can be changed in the main app Settings, by right-clicking directly inside the preview video, or in the existing tray menu. **Minimize MAIN Settings window to tray when clicking —** applies only to the main WinForms Settings window; it can be changed in that Settings window or in the tray icon right-click menu. ON hides the selected window to the existing single tray icon when its ordinary minimize button is clicked; OFF uses ordinary Windows minimizing for the selected window. Neither choice changes the other. Tray **Open / Restore Settings** restores a hidden or ordinarily minimized Settings window. When Settings is hidden, double-clicking the tray icon restores Settings; **Show preview** restores the preview separately.
+
+**Do not confuse either minimize option with Hide preview taskbar button (keep preview visible).** The latter leaves the renderer visible on HDMI TO USB and suppresses just its Windows taskbar button. Minimize-to-tray of the renderer hides video until restored; minimizing only Settings does not hide or interrupt the renderer.
+
+**Test:** Completely exit prior RitschyMirror, including tray icon; install Both Tray Switch 1. In main Settings set preview on Extended display and Windows Output mode Windowed. Independently test ON/OFF for the main Settings and renderer minimize options and restore each from tray. Verify that the video continues rendering when only the main Settings window is hidden. CI verifies compilation and packaging, not actual tray/minimize behavior on the user's Windows laptop.
+
+## Previous: Minimize Tray Switch 1
+
+[Minimize Tray Switch 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-minimizetrayswitch1)
+
+## Minimize Tray Switch 1 details
 
 **[Download Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-minimizetrayswitch1/RitschyMirror-English-Setup-1.3.2-MinimizeTraySwitch1.exe)**
 
