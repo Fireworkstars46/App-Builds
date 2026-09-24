@@ -1,6 +1,21 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — OBS Projector 2 (Live Fit)
+## Latest: English 1.3.2 — Tray Preview 1
+
+**[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-traypreview1/RitschyMirror-English-Setup-1.3.2-TrayPreview1.exe)**
+
+- [Windows compilation and installer build](https://github.com/Fireworkstars46/App-Builds/actions/runs/35957655397)
+- [Tray controls patch](../Source/preview_to_existing_tray.py)
+
+The app already had a single-instance system tray icon. This release adds working **Show preview** and **Hide preview to tray** options to its right-click menu. For a normal framed Windows preview, clicking the real Minimize button hides the preview window to the already-running app icon instead of terminating RitschyMirror. Double-click the tray icon to restore the preview when hidden; otherwise double-click opens Settings. The existing Start/Stop mirroring, Settings, Open log, and Exit menu entries are retained. There is no second app instance or additional tray icon, and the preview stays as one video window when shown.
+
+Windows 10, not applications, controls whether a tray icon is always shown outside the notification-area overflow. To pin it visibly next to the clock, start the app, click the small **^** next to the clock, and drag the RitschyMirror icon out into the taskbar notification area. Hiding the preview removes the preview itself from both your desktop and any capture view of that window while it remains hidden; right-click the icon and select **Show preview** to bring it back. Windows CI compiled the feature, but native icon and minimize/restore interactions must still be verified on the actual laptop.
+
+## Previous: OBS Projector 2
+
+[OBS Projector 2 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-obsprojector2)
+
+## OBS Projector 2 details
 
 **[Download the Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-obsprojector2/RitschyMirror-English-Setup-1.3.2-OBSProjector2.exe)**
 
