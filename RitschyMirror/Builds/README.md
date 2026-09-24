@@ -1,6 +1,23 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Tray Settings Sync 1
+## Latest: English 1.3.2 — Minimize Tray Switch 1
+
+**[Download Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-minimizetrayswitch1/RitschyMirror-English-Setup-1.3.2-MinimizeTraySwitch1.exe)**
+
+- [Windows build, installer and release](https://github.com/Fireworkstars46/App-Builds/actions/runs/35972803924)
+- [On-screen preview/context menu, main Settings and tray switch source patch](../Source/optional_minimize_to_tray_preview_menu.py)
+
+Adds an **independent Minimize preview to tray ON/OFF** option, selectable in both the main RitschyMirror Settings checkbox and the preview's ON-SCREEN menu (right-click directly inside the video picture, not on the Windows titlebar). The existing notification-area tray icon also offers an ON/OFF menu item; the preview, tray menu and open Settings checkbox use the same saved config key and stay synchronized.
+
+**ON (default, previous behavior):** Clicking the preview titlebar **—** hides the whole video window to the existing tray icon. Choose **Show preview** from that icon or double-click it to restore video to the extended display. **OFF:** Clicking **—** uses normal Windows minimize, not the custom Hide-to-tray action. To restore with the tray icon even if the independent taskbar button is hidden, choose Show preview or double-click the icon. Importantly, **Hide preview taskbar button (keep preview visible)** is a *separate* setting: leave it ON to keep the extended-display window showing without any Windows taskbar button, and do not press minimize unless you actually want the video window minimized or hidden. Ctrl+Alt+T still toggles only the taskbar-button setting, never video visibility.
+
+**Test:** Completely exit RitschyMirror including its tray icon. Install the new build, set Output mode Windowed, Preview opens on Extended display, Target HDMI TO USB and Normal Windows (browser-like). Right-click inside the video on the extended display, toggle Minimize to tray OFF then ON, and observe that the corresponding checkbox in the main Settings window and tray menu reflect the same state. With OFF, test normal minimize and tray Show preview; with ON, test custom hide-to-tray and restore. CI compilation does not prove physical HDMI, right-click routing or native minimize interactions on your laptop.
+
+## Previous: Tray Settings Sync 1
+
+[Tray Settings Sync 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-traysettingssync1)
+
+## Tray Settings Sync 1 details
 
 **[Download the fixed Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-traysettingssync1/RitschyMirror-English-Setup-1.3.2-TraySettingsSync1.exe)**
 
