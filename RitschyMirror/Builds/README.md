@@ -1,6 +1,21 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Both X Exit 1
+## Latest: English 1.3.2 — Preview X Only 1
+
+**[Download Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-previewxonly1/RitschyMirror-English-Setup-1.3.2-PreviewXOnly1.exe)**
+
+- [Successful Windows build, packaging, and published release](https://github.com/Fireworkstars46/App-Builds/actions/runs/35977674311)
+- [Source: Preview X stops mirroring only](../Source/preview_x_stops_mirroring_only.py)
+
+**Main Settings X:** Fully exits the RitschyMirror application, renderer and notification icon. **Renderer/preview X:** Closes only the preview/video window and stops mirroring; main Settings and the existing tray icon stay open. The user can Start mirroring again without restarting the app. The renderer WM_CLOSE no longer emits the callback that previously told the tray host to Quit. The most recent main Settings notification icon restore fix and both independent minimize-to-tray switches remain in place. Ctrl+Alt+T still affects only preview taskbar-button visibility while video stays visible.
+
+**Test:** Exit the old copy including the tray icon before installation. Click preview X and confirm Settings and tray remain available, then Start mirroring to reopen preview. Click main Settings X and confirm the app, preview and tray icon all exit. CI build cannot verify native window actions on the actual Windows laptop.
+
+## Previous: Both X Exit 1
+
+[Both X Exit 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-bothxexit1)
+
+## Both X Exit 1 details
 
 **[Download Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-bothxexit1/RitschyMirror-English-Setup-1.3.2-BothXExit1.exe)**
 
