@@ -1,6 +1,19 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Visible Tray 1
+## Latest: English 1.3.2 — Visible Tray Shortcut 1
+
+**[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-visibletrayshortcut1/RitschyMirror-English-Setup-1.3.2-VisibleTrayShortcut1.exe)**
+
+- [Windows build and packaged installer](https://github.com/Fireworkstars46/App-Builds/actions/runs/35958958216)
+- [Shortcut source patch](../Source/visible_tray_shortcut.py)
+
+**Ctrl+Alt+T** is a new global keyboard shortcut to toggle only the *RitschyMirror preview window's taskbar button*, while leaving the app's existing notification-area tray icon and the live projector on the extended HDMI display completely visible. The tray right-click menu includes a one-click **Hide preview taskbar button (keep video visible)** toggle. Press the shortcut again to show the taskbar button; the choice persists across launches. This does not hide the entire Windows taskbar and does not minimize the video window. For an extended capture-card setup, select **Preview opens on: Extended display**, Target **HDMI TO USB**, Output mode **Windowed** and keep Windows display mode **Extend**. If the shortcut conflicts with another app, use the right-click tray command. Windows decides whether the notification-area icon appears in the visible section versus the ^ overflow; to pin it visibly, drag the icon out of that popup.
+
+## Previous: Visible Tray 1
+
+[Visible Tray 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-visibletray1)
+
+## Visible Tray 1 details
 
 **[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-visibletray1/RitschyMirror-English-Setup-1.3.2-VisibleTray1.exe)**
 
