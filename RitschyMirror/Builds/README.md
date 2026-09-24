@@ -1,6 +1,21 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Both Tray Switch 1
+## Latest: English 1.3.2 — Both X Exit 1
+
+**[Download Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-bothxexit1/RitschyMirror-English-Setup-1.3.2-BothXExit1.exe)**
+
+- [Successful Windows compilation, installer, and published release](https://github.com/Fireworkstars46/App-Builds/actions/runs/35975100390)
+- [Source: coordinated exit when either X is clicked](../Source/x_closes_entire_app_both_windows.py)
+
+In this version, clicking **X on EITHER the main Settings window or the renderer/preview window completely exits RitschyMirror**: it stops mirroring, closes the other window, shuts down the HTTP agent and removes the tray icon. The preview X queues the shutdown on the tray/WinForms UI thread to avoid deadlocking the renderer's own Win32 UI thread. A separate flag distinguishes the actual renderer X from internal WM_CLOSE messages during Stop/Restart (display) and GPU-resource cleanup, which must NOT quit the app. The two existing **Minimize to tray** ON/OFF switches continue to control ONLY their own minus buttons, and the independent taskbar-button-only hiding option continues to keep HDMI video visible. The main Settings footer **Close** button also invokes Form.Close() and therefore exits the entire app in this build.
+
+**Test:** Close the prior running copy completely (including tray icon), install this version, and test with both windows open. Clicking the main Settings X should close renderer and tray icon too. On a new run, clicking the renderer X should likewise close main Settings and tray icon. On another run, try both minus buttons and Restart (display): those actions must not close the app. CI verifies build, not native X-button shutdown on the Windows laptop.
+
+## Previous: Both Tray Switch 1
+
+[Both Tray Switch 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-bothtrayswitch1)
+
+## Both Tray Switch 1 details
 
 **[Download the Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-bothtrayswitch1/RitschyMirror-English-Setup-1.3.2-BothTraySwitch1.exe)**
 
