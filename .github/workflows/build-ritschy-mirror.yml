@@ -269,6 +269,14 @@ jobs:
           python RitschyMirror/Source/preview_x_stops_mirroring_only.py
           if ($LASTEXITCODE -ne 0) { throw "Preview-only X close patch failed" }
 
+      - name: Open renderer on second tray icon double-click
+        shell: pwsh
+        env:
+          RITSCHY_SOURCE: _upstream/ritschy-mirror
+        run: |
+          python RitschyMirror/Source/tray_two_double_click_preview.py
+          if ($LASTEXITCODE -ne 0) { throw "Tray second-double-click preview patch failed" }
+
       - name: Set up .NET 9 SDK
         uses: actions/setup-dotnet@v4
         with:
@@ -298,14 +306,14 @@ jobs:
           & $iscc 'RitschyMirror/Source/RitschyMirror-English.iss'
           if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed' }
           if (!(Test-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2.exe')) { throw 'Setup EXE not generated' }
-          Rename-Item '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2.exe' 'RitschyMirror-English-Setup-1.3.2-PreviewXOnly1.exe'
-          if (!(Test-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-PreviewXOnly1.exe')) { throw 'Preview X Only 1 installer setup not generated' }
+          Rename-Item '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2.exe' 'RitschyMirror-English-Setup-1.3.2-DoubleClickPreview1.exe'
+          if (!(Test-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-DoubleClickPreview1.exe')) { throw 'Double Click Preview 1 installer setup not generated' }
 
       - name: Upload finished installer as build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: RitschyMirror-English-Setup-1.3.2-PreviewXOnly1
-          path: _upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-PreviewXOnly1.exe
+          name: RitschyMirror-English-Setup-1.3.2-DoubleClickPreview1
+          path: _upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-DoubleClickPreview1.exe
           if-no-files-found: error
           retention-days: 90
 
@@ -314,12 +322,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $file = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-PreviewXOnly1.exe'
-          $tag = 'ritschymirror-english-1.3.2-previewxonly1'
+          $file = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-DoubleClickPreview1.exe'
+          $tag = 'ritschymirror-english-1.3.2-doubleclickpreview1'
           gh release view $tag 2>$null
           if ($LASTEXITCODE -eq 0) {
             gh release upload $tag $file --clobber
           } else {
-            gh release create $tag $file --target $env:GITHUB_SHA --title 'RitschyMirror 1.3.2 English — Preview X Only 1 (unofficial)' --notes 'Changes the native renderer/preview X to close ONLY its preview/mirroring session, leaving main Settings app and tray icon running so the user can Start mirror again. Main Settings X continues to exit RitschyMirror completely. Settings restore-from-tray fix, both independent minimize-to-tray ON/OFF switches, and preview taskbar-button-only hide remain unchanged. CI compile cannot verify actual Windows preview close and restore on target hardware.' --prerelease
+            gh release create $tag $file --target $env:GITHUB_SHA --title 'RitschyMirror 1.3.2 English — Double Click Preview 1 (unofficial)' --notes 'The existing tray notification icon now supports two consecutive DOUBLE-CLICKS within 10 seconds: the first opens or restores main Settings, and the second restores the native renderer preview or starts mirroring if the preview X stopped it. Single left-click still restores Settings, and the tray Show preview menu remains available. The preview is never minimized by this gesture; the renderer X still stops mirroring only, while main Settings X quits the app. Both independent minimize-to-tray switches are unchanged. CI compilation cannot verify physical Windows tray gesture timing on the user's laptop.' --prerelease
           }
           if ($LASTEXITCODE -ne 0) { throw 'Release upload failed; the setup remains available under Actions artifacts.' }
