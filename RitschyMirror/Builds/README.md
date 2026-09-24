@@ -1,6 +1,21 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Tray Shortcut Fix 1
+## Latest: English 1.3.2 — Tray Settings Sync 1
+
+**[Download the fixed Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-traysettingssync1/RitschyMirror-English-Setup-1.3.2-TraySettingsSync1.exe)**
+
+- [Successful Windows compilation, packaging, and release](https://github.com/Fireworkstars46/App-Builds/actions/runs/35971806025)
+- [Source patch: two-way synchronization](../Source/sync_tray_main_settings.py)
+
+The user's tray menu/keyboard shortcut and the main Settings checkbox were not synchronized. The open Settings window cached its checkbox when created, so using the tray changed the persisted value but not the visible checkbox. Editing any unrelated Settings control saved the whole cached config and could undo a tray change. In this release, the tray and main Settings form synchronize the persisted Hide preview taskbar button preference both ways while the Settings window stays open. A tray action updates the open form immediately, with a periodic refresh to cover external changes. A Settings checkbox action saves only the one taskbar preference with MergePatch and applies the actual shell-taskbar command immediately. Other Settings saves preserve the latest taskbar choice. Tray menu wording/checkmark updates when the menu opens and the control is changed. The projector stays VISIBLE and rendering on the Extended HDMI TO USB screen: the preference hides only the taskbar button, not the preview or Windows taskbar itself.
+
+**Test:** Quit the old RitschyMirror completely, including tray icon; install Tray Settings Sync 1. Open main Settings, leave it open, and use Ctrl+Alt+T or the tray taskbar toggle. The Settings checkbox should change and tray menu text should change to the opposite action. Then change the Settings checkbox: the tray menu and taskbar-button visibility should follow. Test a different Settings control and verify it does not revert your taskbar choice. Windows CI compilation does not verify shell taskbar behavior on the target laptop.
+
+## Previous: Tray Shortcut Fix 1
+
+[Tray Shortcut Fix 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-trayshortcutfix1)
+
+## Tray Shortcut Fix 1 details
 
 **[Download the fixed Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-trayshortcutfix1/RitschyMirror-English-Setup-1.3.2-TrayShortcutFix1.exe)**
 
