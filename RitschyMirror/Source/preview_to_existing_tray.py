@@ -60,12 +60,8 @@ patch("Win32Window.cs",
     // Run exclusively''')
 
 patch("Win32Window.cs",
-'''        switch (msg)
-        {
-            case 0x0010: // WM_CLOSE''',
-'''        switch (msg)
-        {
-            case WmPreviewTrayVisibility:
+'''            case 0x0010: // WM_CLOSE''',
+'''            case WmPreviewTrayVisibility:
                 // This executes on the preview's true owning UI thread.
                 // SW_HIDE takes it out of the taskbar, without destroying the
                 // DXGI swapchain or exiting the mirror render loop.
