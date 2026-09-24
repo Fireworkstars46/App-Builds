@@ -1,6 +1,21 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Visible Tray Shortcut 1
+## Latest: English 1.3.2 — Tray Shortcut Fix 1
+
+**[Download the fixed Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-trayshortcutfix1/RitschyMirror-English-Setup-1.3.2-TrayShortcutFix1.exe)**
+
+- [Successful Windows compilation, installer, and release](https://github.com/Fireworkstars46/App-Builds/actions/runs/35963699184)
+- [Persistence/menu-state fix patch](../Source/fix_taskbar_shortcut_persistence.py)
+
+**Confirmed code bug in the prior release:** The Ctrl+Alt+T and tray menu actions called MirrorConfig.MergePatch to save hide_preview_taskbar_button, but that property was absent from the config patch whitelist. The save silently ignored the change; the tray timer re-read the prior value and undid the taskbar button change. This release adds the key to the patch whitelist, checks that the saved value matches the requested value before sending Windows the taskbar operation, logs a [TASKBAR] action line for diagnosis, and changes the tray menu text explicitly between **Hide preview taskbar button** and **Show preview taskbar button**. Video remains visible on Extended display; the action touches only its taskbar button and not the physical HDMI stream or Windows taskbar itself.
+
+**Install:** Completely exit the currently running RitschyMirror including the tray icon; install Tray Shortcut Fix 1, launch it with Target HDMI TO USB, Preview opens on Extended display, Output mode Windowed. Use Ctrl+Alt+T or the right-click tray option to hide the preview's taskbar button while keeping the preview showing. The menu should switch its text to Show preview taskbar button after hiding, and the state should not revert a few seconds later. Press Ctrl+Alt+T again to restore the taskbar button. CI confirms compile/package only; validate taskbar-shell visibility and video on your own Windows laptop.
+
+## Previous: Visible Tray Shortcut 1
+
+[Visible Tray Shortcut 1 release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-visibletrayshortcut1)
+
+## Visible Tray Shortcut 1 details
 
 **[Download Windows installer EXE](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-visibletrayshortcut1/RitschyMirror-English-Setup-1.3.2-VisibleTrayShortcut1.exe)**
 
