@@ -95,8 +95,7 @@ patch("Win32Window.cs",
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
     [DllImport("user32.dll")] private static extern bool IsWindowVisible(IntPtr hWnd);
-    [DllImport("user32.dll")] private static extern bool PostMessage(
-        IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+    // PostMessage is already declared by native_live_ui_thread.py.
     [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);''')
 
 patch("TrayContext.cs",
