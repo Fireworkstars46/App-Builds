@@ -113,7 +113,7 @@ patch("TrayContext.cs",
 
 patch("TrayContext.cs",
 '''        menu.Items.Add(_toggleItem);
-        menu.Items.Add(new ToolStripMenuItem("Settings",''',
+        menu.Items.Add(new ToolStripMenuItem("Settings…",''',
 '''        menu.Items.Add(_toggleItem);
         _showPreviewItem = new ToolStripMenuItem("Show preview", null,
             (_, _) => Win32Window.RequestPreviewVisibility(true));
@@ -137,7 +137,7 @@ patch("TrayContext.cs",
         };''')
 
 patch("TrayContext.cs",
-'''        _toggleItem.Text = running ? "Stop mirror" : "Start mirror";''',
+'''        _toggleItem.Text = running ? "Stop mirroring" : "Start mirroring";''',
 '''        _toggleItem.Text = running ? "Stop mirror" : "Start mirror";
         bool hasPreview = Win32Window.PreviewExists;
         bool hidden = hasPreview && Win32Window.PreviewHidden;
