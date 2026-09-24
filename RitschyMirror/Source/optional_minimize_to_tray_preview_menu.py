@@ -156,7 +156,7 @@ patch("Win32Window.cs",
 patch("Win32Window.cs",
 '''    [DllImport("user32.dll")] private static extern bool IsWindowVisible(IntPtr hWnd);''',
 '''    [DllImport("user32.dll")] private static extern bool IsWindowVisible(IntPtr hWnd);
-    [DllImport("user32.dll")] private static extern bool IsIconic(IntPtr hWnd);
+    // IsIconic was already declared by the existing window geometry patches.
     [DllImport("user32.dll")] private static extern IntPtr GetParent(IntPtr hWnd);
     [DllImport("user32.dll")] private static extern IntPtr CreatePopupMenu();
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern bool AppendMenu(
