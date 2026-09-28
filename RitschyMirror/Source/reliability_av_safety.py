@@ -117,7 +117,7 @@ for name in other_apps:
     if name.lower() in all_cs.lower():
         raise RuntimeError(f"cross-app coupling detected in runtime source: {name}")
 
-if "[UninstallDelete]" in iss:
+if re.search(r"(?mi)^\s*\[UninstallDelete\]\s*$", iss):
     raise RuntimeError("blanket UninstallDelete is not allowed; preserve user settings/logs")
 
 report_lines = [
