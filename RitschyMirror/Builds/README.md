@@ -1,15 +1,23 @@
 # RitschyMirror English builds
 
-## Latest: English 1.3.2 — Double Click Preview 1
+## Latest: English 1.3.2 — Build 2 Reliability & AV Safety
 
-**[Download Windows installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-doubleclickpreview1/RitschyMirror-English-Setup-1.3.2-DoubleClickPreview1.exe)**
+**[Download installer](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-build2-reliabilitysafety/RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe)**
 
-- [Windows build and published release](https://github.com/Fireworkstars46/App-Builds/actions/runs/35979348287)
-- [Source patch: two tray double-clicks for preview](../Source/tray_two_double_click_preview.py)
+**[Download final patched source](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-build2-reliabilitysafety/RitschyMirror-1.3.2-Build2-ReliabilitySafety-Source.zip)**
 
-Use the existing RitschyMirror notification-area icon: **one double-click** opens/restores the main Settings window; **double-click a second time within 10 seconds** to show/restore the native renderer preview. If its X stopped mirroring, the second double-click starts mirroring again. If the preview is already running but hidden to tray, it restores it. Single left-click continues to open/restore Settings. The gesture never minimizes the preview; its own X still stops mirroring only, whereas the main Settings X closes the entire app.
+- [Reliability / AV-safety audit report](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-build2-reliabilitysafety/RitschyMirror-1.3.2-Build2-ReliabilitySafety-Audit.txt)
+- [SHA-256 checksums](https://github.com/Fireworkstars46/App-Builds/releases/download/ritschymirror-english-1.3.2-build2-reliabilitysafety/RitschyMirror-1.3.2-Build2-ReliabilitySafety-SHA256.txt)
+- [Successful Windows build and install/update/uninstall validation](https://github.com/Fireworkstars46/App-Builds/actions/runs/36396568791)
 
-**Test on Windows:** Completely exit old RitschyMirror including its tray icon before installing this build. Double-click notification icon once to show Settings, then double-click it again within 10 seconds to bring up the preview (or restart mirroring if previously stopped with preview X). Windows build success cannot guarantee actual notification icon event timing on your laptop.
+No user-facing feature changes are intended in this build. The established AppId, %LOCALAPPDATA%\\Programs\\RitschyMirror install path, RitschyMirror identity, app_settings.json / mirror_config.json names, single-instance identity, tray/mirroring behavior, and optional startup behavior remain compatible. The Windows build now uses a private self-contained multi-file .NET deployment so native runtime files stay in the RitschyMirror install directory instead of relying on a self-extracting single-file runtime bundle. It explicitly requests asInvoker/uiAccess=false and the release build fails if invasive process-injection/debugger/keyboard-hook/clipboard/service/task/shared-temp/shell patterns are introduced.
+
+CI performed a real silent install, wrote sentinel app_settings.json and mirror_config.json files, reinstalled over the same AppId/path, verified both settings files were unchanged, verified the Start-menu shortcut target, confirmed optional autostart was not created by default, then uninstalled and verified installed binaries/shortcut were removed while the two user settings files remained. No AV exclusions are added. This unofficial build is not Authenticode-signed, so Windows SmartScreen or antivirus reputation systems can still warn even when the static checks pass.
+
+## Previous: Double Click Stopped Fix 1
+
+[Previous release](https://github.com/Fireworkstars46/App-Builds/releases/tag/ritschymirror-english-1.3.2-doubleclickstoppedfix1)
+
 
 ## Previous: Preview X Only 1
 
