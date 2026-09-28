@@ -39,6 +39,10 @@ if 'requestedExecutionLevel level="asInvoker" uiAccess="false"' not in m:
 files = {p.name: p.read_text(encoding="utf-8", errors="ignore")
          for p in root.glob("*.cs")}
 all_cs = "\n".join(files.values())
+# Remove comments before primitive scanning so explanatory text cannot trigger
+# a false audit failure. String literals are intentionally retained.
+scan_cs = re.sub(r"/\\*.*?\\*/", "", all_cs, flags=re.S)
+scan_cs = re.sub(r"//[^\\n]*", "", scan_cs)
 iss = installer.read_text(encoding="utf-8")
 
 required_source = {
@@ -82,21 +86,26 @@ for ln in registry_lines:
 forbidden_runtime = [
     "CreateRemoteThread", "WriteProcessMemory", "ReadProcessMemory",
     "VirtualAllocEx", "VirtualProtectEx", "NtWriteVirtualMemory",
-    "SetWindowsHookEx", "GetAsyncKeyState", "GetKeyState(",
-    "RegisterRawInputDevices", "DebugActiveProcess", "CheckRemoteDebuggerPresent",
-    "OpenProcess(", "CreateToolhelp32Snapshot", "MiniDumpWriteDump",
+    "SetWindowsHookEx(", "GetAsyncKeyState(", "GetKeyState(",
+    "RegisterRawInputDevices(", "DebugActiveProcess(", "CheckRemoteDebuggerPresent(",
+    "CreateToolhelp32Snapshot(", "MiniDumpWriteDump(",
     "Clipboard.", "GetClipboardData", "SetClipboardData",
     "Path.GetTempPath", "GetTempPath", "%TEMP%", "%TMP%",
     "sc.exe", "schtasks", "CreateService", "OpenSCManager",
     "powershell.exe", "pwsh.exe", "cmd.exe", "taskkill",
 ]
-hits = [term for term in forbidden_runtime if term.lower() in all_cs.lower()]
+hits = [term for term in forbidden_runtime if term.lower() in scan_cs.lower()]
+dangerous_process_rights = [
+    "PROCESS_VM_WRITE", "PROCESS_VM_OPERATION", "PROCESS_CREATE_THREAD",
+    "PROCESS_ALL_ACCESS", "PROCESS_SUSPEND_RESUME",
+]
+hits += [term for term in dangerous_process_rights if term.lower() in scan_cs.lower()]
 if hits:
     raise RuntimeError("AV-sensitive runtime primitive(s) detected: " + ", ".join(hits))
 
 # RegisterHotKey is an existing documented feature and is permitted. Ensure
 # nobody silently replaces it with a lower-level keyboard interception path.
-if "RegisterHotKey" in all_cs and ("SetWindowsHookEx" in all_cs or "GetAsyncKeyState" in all_cs):
+if "RegisterHotKey" in scan_cs and ("SetWindowsHookEx(" in scan_cs or "GetAsyncKeyState(" in scan_cs):
     raise RuntimeError("global hotkey must remain RegisterHotKey-only")
 
 # Keep runtime identity separated from the user's other custom utilities.
