@@ -364,8 +364,8 @@ jobs:
           $shortcut = Join-Path $programs 'RitschyMirror\RitschyMirror.lnk'
 
           # Fresh silent install: post-install launch is skipped by skipifsilent.
-          & $installer /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /TASKS=""
-          if ($LASTEXITCODE -ne 0) { throw "Fresh installer test failed: $LASTEXITCODE" }
+          $install1 = Start-Process -FilePath $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -Wait -PassThru
+          if ($install1.ExitCode -ne 0) { throw "Fresh installer test failed: $($install1.ExitCode)" }
           if (!(Test-Path (Join-Path $appDir 'RitschyMirror.exe'))) { throw 'Installed EXE missing' }
           if (!(Test-Path (Join-Path $appDir 'coreclr.dll'))) { throw 'Private self-contained runtime missing' }
 
@@ -374,8 +374,8 @@ jobs:
           $appSentinel = '{"audit_preserve":"app_settings"}'
           Set-Content (Join-Path $appDir 'mirror_config.json') $mirrorSentinel -NoNewline -Encoding UTF8
           Set-Content (Join-Path $appDir 'app_settings.json') $appSentinel -NoNewline -Encoding UTF8
-          & $installer /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /TASKS=""
-          if ($LASTEXITCODE -ne 0) { throw "In-place update test failed: $LASTEXITCODE" }
+          $install2 = Start-Process -FilePath $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -Wait -PassThru
+          if ($install2.ExitCode -ne 0) { throw "In-place update test failed: $($install2.ExitCode)" }
           if ((Get-Content (Join-Path $appDir 'mirror_config.json') -Raw) -ne $mirrorSentinel) { throw 'mirror_config.json was changed during update' }
           if ((Get-Content (Join-Path $appDir 'app_settings.json') -Raw) -ne $appSentinel) { throw 'app_settings.json was changed during update' }
 
@@ -390,8 +390,8 @@ jobs:
           # Uninstall removes installed binaries/shortcuts but intentionally retains user data.
           $uninstaller = Get-ChildItem $appDir -Filter 'unins*.exe' | Select-Object -First 1
           if (!$uninstaller) { throw 'Uninstaller missing' }
-          & $uninstaller.FullName /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
-          if ($LASTEXITCODE -ne 0) { throw "Uninstall test failed: $LASTEXITCODE" }
+          $uninstall = Start-Process -FilePath $uninstaller.FullName -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -Wait -PassThru
+          if ($uninstall.ExitCode -ne 0) { throw "Uninstall test failed: $($uninstall.ExitCode)" }
           Start-Sleep -Seconds 2
           if (Test-Path (Join-Path $appDir 'RitschyMirror.exe')) { throw 'Uninstall left application executable behind' }
           if (!(Test-Path (Join-Path $appDir 'mirror_config.json'))) { throw 'Uninstall removed mirror_config.json user data' }
