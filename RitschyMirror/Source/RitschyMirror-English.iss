@@ -40,8 +40,11 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription:
 Name: "autostart"; Description: "Start RitschyMirror when I sign in to Windows"; GroupDescription: "Startup:"; Flags: unchecked
 
 [Files]
-Source: "{#SrcDir}\EnglishBuild\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#SrcDir}\installer\default_config\mirror_config.json"; DestDir: "{app}"; Flags: onlyifdoesntexist
+; Install the complete private, self-contained .NET output in RitschyMirror's own
+; application directory. No shared DLLs, helpers, services, or temp extraction.
+Source: "{#SrcDir}\EnglishBuild\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; User config is never overwritten on install/update and is kept on uninstall.
+Source: "{#SrcDir}\installer\default_config\mirror_config.json"; DestDir: "{app}"; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Icons]
 Name: "{group}\RitschyMirror"; Filename: "{app}\{#MyAppExeName}"; Comment: "Screen Mirror Tool"
@@ -55,5 +58,6 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "Launch RitschyMirror"; Flags: nowait postinstall skipifsilent
 
-[UninstallDelete]
-Type: filesandordirs; Name: "{app}"
+; Deliberately no blanket [UninstallDelete] for {app}: user-created settings,
+; mirror.log, and other RitschyMirror data remain after uninstall. Inno removes
+; the binaries/shortcuts/registry values it installed.
