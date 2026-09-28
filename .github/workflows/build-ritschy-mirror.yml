@@ -285,6 +285,37 @@ jobs:
           python RitschyMirror/Source/fix_tray_double_click_stopped_preview.py
           if ($LASTEXITCODE -ne 0) { throw "Stopped renderer double-click fix failed" }
 
+      - name: Apply least-privilege manifest and run reliability / AV-safety audit
+        shell: pwsh
+        env:
+          RITSCHY_SOURCE: _upstream/ritschy-mirror
+          RITSCHY_INSTALLER: RitschyMirror/Source/RitschyMirror-English.iss
+          RITSCHY_AUDIT_REPORT: _upstream/ritschy-mirror/RELIABILITY-AV-SAFETY-AUDIT.txt
+        run: |
+          python RitschyMirror/Source/reliability_av_safety.py
+          if ($LASTEXITCODE -ne 0) { throw "Reliability / AV-safety audit failed" }
+
+      - name: Package final patched source without legacy admin install helpers
+        shell: pwsh
+        run: |
+          $stage = '_source-package'
+          Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $stage | Out-Null
+          Get-ChildItem '_upstream/ritschy-mirror' -Force | Where-Object {
+            $_.Name -notin @('.git','bin','obj','EnglishBuild','EnglishInstaller','install.ps1','publish.ps1')
+          } | ForEach-Object {
+            Copy-Item $_.FullName $stage -Recurse -Force
+          }
+          @'
+          RitschyMirror 1.3.2 English - Build 2 Reliability & AV Safety
+          This archive contains the final patched source used for the release.
+          Legacy install.ps1/publish.ps1 helper scripts are intentionally omitted:
+          the release installer is the least-privilege Inno Setup package.
+          No user settings or logs are included in this source archive.
+          '@ | Set-Content (Join-Path $stage 'BUILD-NOTES.txt') -Encoding UTF8
+          Compress-Archive -Path "$stage\*" -DestinationPath 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Source.zip' -CompressionLevel Optimal
+          if (!(Test-Path 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Source.zip')) { throw 'Source ZIP not generated' }
+
       - name: Set up .NET 9 SDK
         uses: actions/setup-dotnet@v4
         with:
@@ -293,9 +324,16 @@ jobs:
       - name: Build a standalone Windows x64 application
         shell: pwsh
         run: |
-          dotnet publish _upstream/ritschy-mirror/MirrorTool.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=false -o _upstream/ritschy-mirror/EnglishBuild
+          dotnet publish _upstream/ritschy-mirror/MirrorTool.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -o _upstream/ritschy-mirror/EnglishBuild
           if ($LASTEXITCODE -ne 0) { throw "Windows app compilation failed" }
           if (!(Test-Path '_upstream/ritschy-mirror/EnglishBuild/RitschyMirror.exe')) { throw "App executable was not generated" }
+          # Prevent the runtime from relying on single-file native extraction to a shared temp location.
+          # Configs are installed separately with onlyifdoesntexist so existing user values are untouched.
+          Remove-Item '_upstream/ritschy-mirror/EnglishBuild/mirror_config.json' -Force -ErrorAction SilentlyContinue
+          Remove-Item '_upstream/ritschy-mirror/EnglishBuild/app_settings.json' -Force -ErrorAction SilentlyContinue
+          Get-ChildItem '_upstream/ritschy-mirror/EnglishBuild' -Filter '*.pdb' -Recurse | Remove-Item -Force
+          if (!(Test-Path '_upstream/ritschy-mirror/EnglishBuild/coreclr.dll')) { throw "Self-contained runtime files missing" }
+          if (Test-Path '_upstream/ritschy-mirror/EnglishBuild/mirror_config.json') { throw "Publish output must not contain user config" }
 
       - name: Install Inno Setup compiler when needed
         shell: pwsh
@@ -314,14 +352,77 @@ jobs:
           & $iscc 'RitschyMirror/Source/RitschyMirror-English.iss'
           if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed' }
           if (!(Test-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2.exe')) { throw 'Setup EXE not generated' }
-          Rename-Item '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2.exe' 'RitschyMirror-English-Setup-1.3.2-DoubleClickStoppedFix1.exe'
-          if (!(Test-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-DoubleClickStoppedFix1.exe')) { throw 'Double Click Stopped Fix 1 installer setup not generated' }
+          Rename-Item '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2.exe' 'RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe'
+          if (!(Test-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe')) { throw 'Build 2 Reliability Safety installer setup not generated' }
 
-      - name: Upload finished installer as build artifact
+      - name: Verify in-place update, shortcuts, startup isolation and data-preserving uninstall
+        shell: pwsh
+        run: |
+          $installer = (Resolve-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe').Path
+          $appDir = Join-Path $env:LOCALAPPDATA 'Programs\RitschyMirror'
+          $programs = [Environment]::GetFolderPath('Programs')
+          $shortcut = Join-Path $programs 'RitschyMirror\RitschyMirror.lnk'
+
+          # Fresh silent install: post-install launch is skipped by skipifsilent.
+          & $installer /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /TASKS=""
+          if ($LASTEXITCODE -ne 0) { throw "Fresh installer test failed: $LASTEXITCODE" }
+          if (!(Test-Path (Join-Path $appDir 'RitschyMirror.exe'))) { throw 'Installed EXE missing' }
+          if (!(Test-Path (Join-Path $appDir 'coreclr.dll'))) { throw 'Private self-contained runtime missing' }
+
+          # Simulate real user data, then reinstall over the same AppId/path.
+          $mirrorSentinel = '{"audit_preserve":"mirror_config"}'
+          $appSentinel = '{"audit_preserve":"app_settings"}'
+          Set-Content (Join-Path $appDir 'mirror_config.json') $mirrorSentinel -NoNewline -Encoding UTF8
+          Set-Content (Join-Path $appDir 'app_settings.json') $appSentinel -NoNewline -Encoding UTF8
+          & $installer /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /TASKS=""
+          if ($LASTEXITCODE -ne 0) { throw "In-place update test failed: $LASTEXITCODE" }
+          if ((Get-Content (Join-Path $appDir 'mirror_config.json') -Raw) -ne $mirrorSentinel) { throw 'mirror_config.json was changed during update' }
+          if ((Get-Content (Join-Path $appDir 'app_settings.json') -Raw) -ne $appSentinel) { throw 'app_settings.json was changed during update' }
+
+          # Shortcut points only to this app. Optional autostart must remain absent by default.
+          if (!(Test-Path $shortcut)) { throw 'Start-menu shortcut missing' }
+          $wsh = New-Object -ComObject WScript.Shell
+          $lnk = $wsh.CreateShortcut($shortcut)
+          if ($lnk.TargetPath -ne (Join-Path $appDir 'RitschyMirror.exe')) { throw "Bad shortcut target: $($lnk.TargetPath)" }
+          $runValue = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'RitschyMirror' -ErrorAction SilentlyContinue).RitschyMirror
+          if ($runValue) { throw 'Autostart registry value unexpectedly created when task was not selected' }
+
+          # Uninstall removes installed binaries/shortcuts but intentionally retains user data.
+          $uninstaller = Get-ChildItem $appDir -Filter 'unins*.exe' | Select-Object -First 1
+          if (!$uninstaller) { throw 'Uninstaller missing' }
+          & $uninstaller.FullName /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+          if ($LASTEXITCODE -ne 0) { throw "Uninstall test failed: $LASTEXITCODE" }
+          Start-Sleep -Seconds 2
+          if (Test-Path (Join-Path $appDir 'RitschyMirror.exe')) { throw 'Uninstall left application executable behind' }
+          if (!(Test-Path (Join-Path $appDir 'mirror_config.json'))) { throw 'Uninstall removed mirror_config.json user data' }
+          if (!(Test-Path (Join-Path $appDir 'app_settings.json'))) { throw 'Uninstall removed app_settings.json user data' }
+          if (Test-Path $shortcut) { throw 'Uninstall left Start-menu shortcut behind' }
+
+          # Runner cleanup only; not part of the product uninstaller.
+          Remove-Item $appDir -Recurse -Force -ErrorAction SilentlyContinue
+
+      - name: Create audit report copy and SHA-256 checksums
+        shell: pwsh
+        run: |
+          Copy-Item '_upstream/ritschy-mirror/RELIABILITY-AV-SAFETY-AUDIT.txt' 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Audit.txt'
+          $installer = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe'
+          $source = 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Source.zip'
+          $audit = 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Audit.txt'
+          @(
+            "$(Get-FileHash $installer -Algorithm SHA256 | Select-Object -ExpandProperty Hash)  RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe"
+            "$(Get-FileHash $source -Algorithm SHA256 | Select-Object -ExpandProperty Hash)  RitschyMirror-1.3.2-Build2-ReliabilitySafety-Source.zip"
+            "$(Get-FileHash $audit -Algorithm SHA256 | Select-Object -ExpandProperty Hash)  RitschyMirror-1.3.2-Build2-ReliabilitySafety-Audit.txt"
+          ) | Set-Content 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-SHA256.txt' -Encoding ASCII
+
+      - name: Upload finished installer, source and audit as build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: RitschyMirror-English-Setup-1.3.2-DoubleClickStoppedFix1
-          path: _upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-DoubleClickStoppedFix1.exe
+          name: RitschyMirror-1.3.2-Build2-ReliabilitySafety
+          path: |
+            _upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe
+            RitschyMirror-1.3.2-Build2-ReliabilitySafety-Source.zip
+            RitschyMirror-1.3.2-Build2-ReliabilitySafety-Audit.txt
+            RitschyMirror-1.3.2-Build2-ReliabilitySafety-SHA256.txt
           if-no-files-found: error
           retention-days: 90
 
@@ -330,12 +431,15 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $file = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-DoubleClickStoppedFix1.exe'
-          $tag = 'ritschymirror-english-1.3.2-doubleclickstoppedfix1'
+          $installer = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe'
+          $source = 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Source.zip'
+          $audit = 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Audit.txt'
+          $checksums = 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-SHA256.txt'
+          $tag = 'ritschymirror-english-1.3.2-build2-reliabilitysafety'
           gh release view $tag 2>$null
           if ($LASTEXITCODE -eq 0) {
-            gh release upload $tag $file --clobber
+            gh release upload $tag $installer $source $audit $checksums --clobber
           } else {
-            gh release create $tag $file --target $env:GITHUB_SHA --title 'RitschyMirror 1.3.2 English — Double Click Stopped Fix 1 (unofficial)' --notes 'Fixes second tray icon double-click unexpectedly restarting a stopped renderer. The first double-click opens main Settings, and the second double-click within 10 seconds now ONLY restores an already RUNNING preview window, never begins a new mirror session if renderer X stopped it. Use Start mirror explicitly to resume mirroring. Single click still restores Settings, preview X stops mirroring only, main Settings X exits app. Both minimize-to-tray switches remain unchanged. CI compilation cannot verify Windows tray gesture behavior on target hardware.' --prerelease
+            gh release create $tag $installer $source $audit $checksums --target $env:GITHUB_SHA --title 'RitschyMirror 1.3.2 English — Build 2 Reliability & AV Safety (unofficial)' --notes 'No feature or behavior changes are intended. This reliability/safety build keeps the same AppId, install path, app identity, settings filenames and current tray/mirroring behavior. It uses a private self-contained multi-file .NET deployment instead of a native self-extracting single-file bundle, explicitly requests asInvoker/uiAccess=false, adds a fail-closed scan for injection/hooks/debugger/clipboard/service/task/temp/shell patterns, preserves app_settings.json and mirror_config.json across in-place install, and keeps user config/log data on uninstall. Installer CI performs fresh install, same-path reinstall, config-preservation, shortcut, default-startup-isolation and uninstall checks. No AV exclusions are added. The executable is not Authenticode-signed, so SmartScreen reputation warnings can still occur.' --prerelease
           }
           if ($LASTEXITCODE -ne 0) { throw 'Release upload failed; the setup remains available under Actions artifacts.' }
