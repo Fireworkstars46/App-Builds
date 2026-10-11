@@ -10,6 +10,7 @@ import runpy
 here = Path(__file__).resolve().parent
 for name in (
     "build3_core_reliability.py",
+    "build3_remove_mouse_hook.py",
     "build3_program_selftest.py",
     "build3_settings_ui.py",
     "build3_tray_behavior.py",
