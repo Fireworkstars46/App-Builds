@@ -13,11 +13,15 @@ permissions:
 jobs:
   windows-installer:
     runs-on: windows-latest
+    env:
+      RITSCHY_SOURCE: _upstream/ritschy-mirror
+      RITSCHY_INSTALLER: RitschyMirror/Source/RitschyMirror-English.iss
+
     steps:
       - name: Check out App-Builds
         uses: actions/checkout@v4
 
-      - name: Check out the exact RitschyMirror 1.3.2 source
+      - name: Check out exact RitschyMirror 1.3.2 upstream source
         uses: actions/checkout@v4
         with:
           repository: RitschyRigz/ritschy-mirror
@@ -29,273 +33,95 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Translate the UI into English
+      - name: Apply established Build 2 behavior patches in exact order
         shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
         run: |
-          python RitschyMirror/Source/translate.py
-          if ($LASTEXITCODE -ne 0) { throw "Translation failed" }
+          $patches = @(
+            'translate.py',
+            'enable_monitor_fallback.py',
+            'add_copy_mode.py',
+            'smooth_drag_and_fps.py',
+            'persistent_resizable_preview.py',
+            'preview_start_display.py',
+            'auto_clarity_and_window_edges.py',
+            'debug_capture_freezes.py',
+            'fix_debug_startup.py',
+            'native_window_main_preview.py',
+            'lightshot_capture_toggle.py',
+            'recursive_projector_mode.py',
+            'live_browser_snap_restore.py',
+            'live_top_edge_bounce.py',
+            'fix_tall_window_vertical_drag.py',
+            'resize_screen_bounds_only.py',
+            'native_live_ui_thread.py',
+            'native_live_drag_resize_v2.py',
+            'obs_style_native_video_surface.py',
+            'obs_live_viewport_reflow.py',
+            'preview_to_existing_tray.py',
+            'visible_extended_preview_tray.py',
+            'visible_tray_shortcut.py',
+            'fix_taskbar_shortcut_persistence.py',
+            'sync_tray_main_settings.py',
+            'optional_minimize_to_tray_preview_menu.py',
+            'optional_main_settings_minimize_to_tray.py',
+            'x_closes_entire_app_both_windows.py',
+            'fix_main_settings_tray_restore.py',
+            'preview_x_stops_mirroring_only.py',
+            'tray_two_double_click_preview.py',
+            'fix_tray_double_click_stopped_preview.py'
+          )
+          foreach ($patch in $patches) {
+            Write-Host "Applying $patch"
+            python "RitschyMirror/Source/$patch"
+            if ($LASTEXITCODE -ne 0) { throw "Established patch failed: $patch" }
+          }
 
-      - name: Enable alternate full-monitor capture for unsupported DXGI systems
+      - name: Apply Build 3 current Custom Instructions patch set
         shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
         run: |
-          python RitschyMirror/Source/enable_monitor_fallback.py
-          if ($LASTEXITCODE -ne 0) { throw "Monitor fallback patch failed" }
+          python RitschyMirror/Source/current_instructions_build3.py
+          if ($LASTEXITCODE -ne 0) { throw "Build 3 current-instructions patch failed" }
 
-      - name: Add color-neutral 8-bit SDR copy mode
+      - name: Run least-privilege AV and isolation static audit
         shell: pwsh
         env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/add_copy_mode.py
-          if ($LASTEXITCODE -ne 0) { throw "Copy-mode patch failed" }
-
-      - name: Improve smooth dragging, FPS and low-latency capture
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/smooth_drag_and_fps.py
-          if ($LASTEXITCODE -ne 0) { throw "Smooth drag and FPS patch failed" }
-
-      - name: Add remembered window size, maximization and live resizing
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/persistent_resizable_preview.py
-          if ($LASTEXITCODE -ne 0) { throw "Resizable preview patch failed" }
-
-      - name: Add preview startup display selector
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/preview_start_display.py
-          if ($LASTEXITCODE -ne 0) { throw "Preview start display patch failed" }
-
-      - name: Add optional automatic clarity and screen-edge confinement
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/auto_clarity_and_window_edges.py
-          if ($LASTEXITCODE -ne 0) { throw "Automatic clarity and screen edge patch failed" }
-
-      - name: Add debug logs for freeze and recursive mirroring
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/debug_capture_freezes.py
-          if ($LASTEXITCODE -ne 0) { throw "Debug diagnostics patch failed" }
-
-      - name: Fix shader buffer size and recursive preview startup
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/fix_debug_startup.py
-          if ($LASTEXITCODE -ne 0) { throw "Startup crash and recursive preview fix failed" }
-
-      - name: Honor Main preview and use native Windows window movement
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/native_window_main_preview.py
-          if ($LASTEXITCODE -ne 0) { throw "Main preview and native window patch failed" }
-
-      - name: Allow Lightshot screenshot of preview
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/lightshot_capture_toggle.py
-          if ($LASTEXITCODE -ne 0) { throw "Lightshot screenshot visibility patch failed" }
-
-      - name: Add single-window recursive projector mode
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/recursive_projector_mode.py
-          if ($LASTEXITCODE -ne 0) { throw "Recursive projector patch failed" }
-
-      - name: Add browser-style live snap and off-screen protection
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/live_browser_snap_restore.py
-          if ($LASTEXITCODE -ne 0) { throw "Live snap and drag-to-restore patch failed" }
-
-      - name: Bounce partially off-screen preview back to top without maximizing
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/live_top_edge_bounce.py
-          if ($LASTEXITCODE -ne 0) { throw "Top-edge bounce patch failed" }
-
-      - name: Fix vertical drag for oversized preview windows
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/fix_tall_window_vertical_drag.py
-          if ($LASTEXITCODE -ne 0) { throw "Vertical drag patch failed" }
-
-      - name: Keep resizing within screen while allowing free window movement
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/resize_screen_bounds_only.py
-          if ($LASTEXITCODE -ne 0) { throw "Resize-only screen bounds patch failed" }
-
-      - name: Keep native Windows dragging live on a separate UI thread
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/native_live_ui_thread.py
-          if ($LASTEXITCODE -ne 0) { throw "Native live UI thread patch failed" }
-
-      - name: Keep native Windows preview live during resize
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/native_live_drag_resize_v2.py
-          if ($LASTEXITCODE -ne 0) { throw "Live native resize optimization patch failed" }
-
-      - name: Add OBS-style embedded projector presentation surface
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/obs_style_native_video_surface.py
-          if ($LASTEXITCODE -ne 0) { throw "OBS-style native surface patch failed" }
-
-      - name: Reflow preview video and black margins during native resize
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/obs_live_viewport_reflow.py
-          if ($LASTEXITCODE -ne 0) { throw "Live preview viewport reflow patch failed" }
-
-      - name: Add tray controls for preview
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/preview_to_existing_tray.py
-          if ($LASTEXITCODE -ne 0) { throw "Preview tray patch failed" }
-
-      - name: Keep extended preview visible without a Windows taskbar button
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/visible_extended_preview_tray.py
-          if ($LASTEXITCODE -ne 0) { throw "Extended visible preview and tray-only taskbar patch failed" }
-
-      - name: Add one-key shortcut to hide only preview taskbar button
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/visible_tray_shortcut.py
-          if ($LASTEXITCODE -ne 0) { throw "Visible tray shortcut patch failed" }
-
-      - name: Fix taskbar hotkey preference persistence and menu feedback
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/fix_taskbar_shortcut_persistence.py
-          if ($LASTEXITCODE -ne 0) { throw "Taskbar hotkey persistence fix failed" }
-
-      - name: Synchronize tray control with live main app Settings checkbox
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/sync_tray_main_settings.py
-          if ($LASTEXITCODE -ne 0) { throw "Tray and Settings synchronization patch failed" }
-
-      - name: Add optional minimize-to-tray switch to native preview and main Settings
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/optional_minimize_to_tray_preview_menu.py
-          if ($LASTEXITCODE -ne 0) { throw "Optional minimize-to-tray preview UI patch failed" }
-
-      - name: Add independent main Settings minimize-to-tray ON/OFF and restore
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/optional_main_settings_minimize_to_tray.py
-          if ($LASTEXITCODE -ne 0) { throw "Main Settings minimize-to-tray patch failed" }
-
-      - name: Make X on either renderer or main Settings exit the whole app
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/x_closes_entire_app_both_windows.py
-          if ($LASTEXITCODE -ne 0) { throw "Both-window X full-exit patch failed" }
-
-      - name: Fix main Settings restore from existing tray icon
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/fix_main_settings_tray_restore.py
-          if ($LASTEXITCODE -ne 0) { throw "Main Settings restore fix failed" }
-
-      - name: Make preview X stop mirroring only while main Settings X exits app
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/preview_x_stops_mirroring_only.py
-          if ($LASTEXITCODE -ne 0) { throw "Preview-only X close patch failed" }
-
-      - name: Open renderer on second tray icon double-click
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/tray_two_double_click_preview.py
-          if ($LASTEXITCODE -ne 0) { throw "Tray second-double-click preview patch failed" }
-
-      - name: Keep stopped renderer stopped on tray preview double-click
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-        run: |
-          python RitschyMirror/Source/fix_tray_double_click_stopped_preview.py
-          if ($LASTEXITCODE -ne 0) { throw "Stopped renderer double-click fix failed" }
-
-      - name: Apply least-privilege manifest and run reliability / AV-safety audit
-        shell: pwsh
-        env:
-          RITSCHY_SOURCE: _upstream/ritschy-mirror
-          RITSCHY_INSTALLER: RitschyMirror/Source/RitschyMirror-English.iss
           RITSCHY_AUDIT_REPORT: _upstream/ritschy-mirror/RELIABILITY-AV-SAFETY-AUDIT.txt
         run: |
           python RitschyMirror/Source/reliability_av_safety.py
           if ($LASTEXITCODE -ne 0) { throw "Reliability / AV-safety audit failed" }
 
-      - name: Package final patched source without legacy admin install helpers
+      - name: Run full current Custom Instructions static audit
+        shell: pwsh
+        env:
+          RITSCHY_BUILD3_AUDIT_REPORT: _upstream/ritschy-mirror/BUILD3-CURRENT-INSTRUCTIONS-AUDIT.txt
+        run: |
+          python RitschyMirror/Source/build3_current_instructions_audit.py
+          if ($LASTEXITCODE -ne 0) { throw "Build 3 current-instructions audit failed" }
+
+      - name: Set up .NET 9 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Compile with warnings treated as errors
+        shell: pwsh
+        run: |
+          dotnet build _upstream/ritschy-mirror/MirrorTool.csproj -c Release -r win-x64 -p:TreatWarningsAsErrors=true
+          if ($LASTEXITCODE -ne 0) { throw "Compiler/static validation failed" }
+
+      - name: Publish private self-contained Windows x64 application
+        shell: pwsh
+        run: |
+          dotnet publish _upstream/ritschy-mirror/MirrorTool.csproj -c Release -r win-x64 --self-contained true --no-restore -p:PublishSingleFile=false -p:PublishTrimmed=false -p:TreatWarningsAsErrors=true -o _upstream/ritschy-mirror/EnglishBuild
+          if ($LASTEXITCODE -ne 0) { throw "Windows application publish failed" }
+          if (!(Test-Path '_upstream/ritschy-mirror/EnglishBuild/RitschyMirror.exe')) { throw "Application EXE was not generated" }
+          Remove-Item '_upstream/ritschy-mirror/EnglishBuild/mirror_config.json' -Force -ErrorAction SilentlyContinue
+          Remove-Item '_upstream/ritschy-mirror/EnglishBuild/app_settings.json' -Force -ErrorAction SilentlyContinue
+          Get-ChildItem '_upstream/ritschy-mirror/EnglishBuild' -Filter '*.pdb' -Recurse | Remove-Item -Force
+          if (!(Test-Path '_upstream/ritschy-mirror/EnglishBuild/coreclr.dll')) { throw "Private self-contained runtime files missing" }
+          if (Test-Path '_upstream/ritschy-mirror/EnglishBuild/mirror_config.json') { throw "Publish output must not contain a user config" }
+
+      - name: Package final patched source
         shell: pwsh
         run: |
           $stage = '_source-package'
@@ -307,33 +133,19 @@ jobs:
             Copy-Item $_.FullName $stage -Recurse -Force
           }
           @'
-          RitschyMirror 1.3.2 English - Build 2 Reliability & AV Safety
-          This archive contains the final patched source used for the release.
-          Legacy install.ps1/publish.ps1 helper scripts are intentionally omitted:
-          the release installer is the least-privilege Inno Setup package.
-          No user settings or logs are included in this source archive.
+          RitschyMirror 1.3.2 English - Build 3
+          CURRENT Custom Instructions reliability / diagnostics / UI / tray audit build.
+
+          This archive contains the final patched source compiled by this workflow.
+          Existing rendering, preview, tray-click, install/data identity and settings
+          behavior are preserved unless a new backward-compatible setting explicitly
+          controls the new behavior. Legacy admin install.ps1/publish.ps1 helpers are
+          intentionally omitted; the release installer is the least-privilege path.
+          No user settings, user logs, tokens, messages, clipboard data, or keystrokes
+          are included in this source archive.
           '@ | Set-Content (Join-Path $stage 'BUILD-NOTES.txt') -Encoding UTF8
-          Compress-Archive -Path "$stage\*" -DestinationPath 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Source.zip' -CompressionLevel Optimal
-          if (!(Test-Path 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Source.zip')) { throw 'Source ZIP not generated' }
-
-      - name: Set up .NET 9 SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
-
-      - name: Build a standalone Windows x64 application
-        shell: pwsh
-        run: |
-          dotnet publish _upstream/ritschy-mirror/MirrorTool.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false -p:PublishTrimmed=false -o _upstream/ritschy-mirror/EnglishBuild
-          if ($LASTEXITCODE -ne 0) { throw "Windows app compilation failed" }
-          if (!(Test-Path '_upstream/ritschy-mirror/EnglishBuild/RitschyMirror.exe')) { throw "App executable was not generated" }
-          # Prevent the runtime from relying on single-file native extraction to a shared temp location.
-          # Configs are installed separately with onlyifdoesntexist so existing user values are untouched.
-          Remove-Item '_upstream/ritschy-mirror/EnglishBuild/mirror_config.json' -Force -ErrorAction SilentlyContinue
-          Remove-Item '_upstream/ritschy-mirror/EnglishBuild/app_settings.json' -Force -ErrorAction SilentlyContinue
-          Get-ChildItem '_upstream/ritschy-mirror/EnglishBuild' -Filter '*.pdb' -Recurse | Remove-Item -Force
-          if (!(Test-Path '_upstream/ritschy-mirror/EnglishBuild/coreclr.dll')) { throw "Self-contained runtime files missing" }
-          if (Test-Path '_upstream/ritschy-mirror/EnglishBuild/mirror_config.json') { throw "Publish output must not contain user config" }
+          Compress-Archive -Path "$stage\*" -DestinationPath 'RitschyMirror-1.3.2-Build3-CurrentInstructions-Source.zip' -CompressionLevel Optimal
+          if (!(Test-Path 'RitschyMirror-1.3.2-Build3-CurrentInstructions-Source.zip')) { throw 'Build 3 source ZIP not generated' }
 
       - name: Install Inno Setup compiler when needed
         shell: pwsh
@@ -345,101 +157,156 @@ jobs:
           }
           if (!(Test-Path $iscc)) { throw 'Inno Setup compiler not found' }
 
-      - name: Package the English setup EXE
+      - name: Package Build 3 installer
         shell: pwsh
         run: |
           $iscc = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
           & $iscc 'RitschyMirror/Source/RitschyMirror-English.iss'
           if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed' }
-          if (!(Test-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2.exe')) { throw 'Setup EXE not generated' }
-          Rename-Item '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2.exe' 'RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe'
-          if (!(Test-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe')) { throw 'Build 2 Reliability Safety installer setup not generated' }
+          $base = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2.exe'
+          $final = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build3-CurrentInstructions.exe'
+          if (!(Test-Path $base)) { throw 'Base setup EXE not generated' }
+          Rename-Item $base (Split-Path $final -Leaf)
+          if (!(Test-Path $final)) { throw 'Build 3 installer setup not generated' }
 
-      - name: Verify in-place update, shortcuts, startup isolation and data-preserving uninstall
+      - name: Verify Build 2 to Build 3 update, shortcuts, startup, Safe Self-Test and uninstall
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          $installer = (Resolve-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe').Path
           $appDir = Join-Path $env:LOCALAPPDATA 'Programs\RitschyMirror'
+          $installer = (Resolve-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build3-CurrentInstructions.exe').Path
           $programs = [Environment]::GetFolderPath('Programs')
-          $shortcut = Join-Path $programs 'RitschyMirror\RitschyMirror.lnk'
+          $desktop = [Environment]::GetFolderPath('Desktop')
+          $mainShortcut = Join-Path $programs 'RitschyMirror\RitschyMirror.lnk'
+          $settingsShortcut = Join-Path $programs 'RitschyMirror\RitschyMirror Settings.lnk'
+          $desktopShortcut = Join-Path $desktop 'RitschyMirror.lnk'
+          $runKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
 
-          # Fresh silent install: post-install launch is skipped by skipifsilent.
-          $install1 = Start-Process -FilePath $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -Wait -PassThru
-          if ($install1.ExitCode -ne 0) { throw "Fresh installer test failed: $($install1.ExitCode)" }
-          if (!(Test-Path (Join-Path $appDir 'RitschyMirror.exe'))) { throw 'Installed EXE missing' }
-          if (!(Test-Path (Join-Path $appDir 'coreclr.dll'))) { throw 'Private self-contained runtime missing' }
+          Remove-Item $appDir -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item (Join-Path $programs 'RitschyMirror') -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item $desktopShortcut -Force -ErrorAction SilentlyContinue
+          Remove-ItemProperty $runKey -Name 'RitschyMirror' -ErrorAction SilentlyContinue
 
-          # Simulate real user data, then reinstall over the same AppId/path.
-          $mirrorSentinel = '{"audit_preserve":"mirror_config"}'
-          $appSentinel = '{"audit_preserve":"app_settings"}'
+          New-Item -ItemType Directory -Path '_previous-build' | Out-Null
+          gh release download 'ritschymirror-english-1.3.2-build2-reliabilitysafety' --repo 'Fireworkstars46/App-Builds' --pattern 'RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe' --dir '_previous-build'
+          if ($LASTEXITCODE -ne 0) { throw 'Could not download completed Build 2 for real update test' }
+          $build2 = (Resolve-Path '_previous-build/RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe').Path
+
+          $oldInstall = Start-Process -FilePath $build2 -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/TASKS=""') -Wait -PassThru
+          if ($oldInstall.ExitCode -ne 0) { throw "Build 2 baseline install failed: $($oldInstall.ExitCode)" }
+          if (!(Test-Path (Join-Path $appDir 'RitschyMirror.exe'))) { throw 'Build 2 baseline EXE missing' }
+
+          $mirrorSentinel = '{"audit_preserve":"mirror_config","build":2}'
+          $appSentinel = '{"audit_preserve":"app_settings","build":2}'
           Set-Content (Join-Path $appDir 'mirror_config.json') $mirrorSentinel -NoNewline -Encoding UTF8
           Set-Content (Join-Path $appDir 'app_settings.json') $appSentinel -NoNewline -Encoding UTF8
-          $install2 = Start-Process -FilePath $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -Wait -PassThru
-          if ($install2.ExitCode -ne 0) { throw "In-place update test failed: $($install2.ExitCode)" }
-          if ((Get-Content (Join-Path $appDir 'mirror_config.json') -Raw) -ne $mirrorSentinel) { throw 'mirror_config.json was changed during update' }
-          if ((Get-Content (Join-Path $appDir 'app_settings.json') -Raw) -ne $appSentinel) { throw 'app_settings.json was changed during update' }
 
-          # Shortcut points only to this app. Optional autostart must remain absent by default.
-          if (!(Test-Path $shortcut)) { throw 'Start-menu shortcut missing' }
+          $update = Start-Process -FilePath $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -Wait -PassThru
+          if ($update.ExitCode -ne 0) { throw "Build 2 -> Build 3 in-place update failed: $($update.ExitCode)" }
+          if ((Get-Content (Join-Path $appDir 'mirror_config.json') -Raw) -ne $mirrorSentinel) { throw 'mirror_config.json changed during Build 2 -> Build 3 update' }
+          if ((Get-Content (Join-Path $appDir 'app_settings.json') -Raw) -ne $appSentinel) { throw 'app_settings.json changed during Build 2 -> Build 3 update' }
+          if (!(Test-Path (Join-Path $appDir 'RitschyMirror.exe'))) { throw 'Build 3 installed EXE missing' }
+          if (!(Test-Path (Join-Path $appDir 'coreclr.dll'))) { throw 'Build 3 private runtime missing' }
+
+          if (!(Test-Path $mainShortcut) -or !(Test-Path $settingsShortcut)) { throw 'Start Menu shortcuts missing' }
           $wsh = New-Object -ComObject WScript.Shell
-          $lnk = $wsh.CreateShortcut($shortcut)
-          if ($lnk.TargetPath -ne (Join-Path $appDir 'RitschyMirror.exe')) { throw "Bad shortcut target: $($lnk.TargetPath)" }
-          $runValue = (Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'RitschyMirror' -ErrorAction SilentlyContinue).RitschyMirror
-          if ($runValue) { throw 'Autostart registry value unexpectedly created when task was not selected' }
+          $mainLnk = $wsh.CreateShortcut($mainShortcut)
+          $settingsLnk = $wsh.CreateShortcut($settingsShortcut)
+          $expectedExe = Join-Path $appDir 'RitschyMirror.exe'
+          if ($mainLnk.TargetPath -ne $expectedExe) { throw "Bad main shortcut target: $($mainLnk.TargetPath)" }
+          if ($settingsLnk.TargetPath -ne $expectedExe -or $settingsLnk.Arguments -ne '--settings') { throw 'Bad Settings shortcut target/arguments' }
+          if ([string]::IsNullOrWhiteSpace($mainLnk.IconLocation) -or [string]::IsNullOrWhiteSpace($settingsLnk.IconLocation)) { throw 'Shortcut icon path missing' }
+          $runValue = (Get-ItemProperty $runKey -Name 'RitschyMirror' -ErrorAction SilentlyContinue).RitschyMirror
+          if ($runValue) { throw 'Autostart unexpectedly enabled when Build 2 had it disabled' }
 
-          # Uninstall removes installed binaries/shortcuts but intentionally retains user data.
+          $selfTestExe = Join-Path $appDir 'RitschyMirror.exe'
+          $selfTest = Start-Process -FilePath $selfTestExe -ArgumentList '--safe-self-test' -Wait -PassThru
+          if ($selfTest.ExitCode -ne 0) { throw "Installed Safe Self-Test failed: $($selfTest.ExitCode)" }
+          $selfTestReport = Join-Path $appDir 'Diagnostics\Safe-Self-Test-Last.txt'
+          if (!(Test-Path $selfTestReport)) { throw 'Safe Self-Test report missing' }
+          if ((Get-Content $selfTestReport -Raw) -notmatch 'RESULT: PASS') { throw 'Safe Self-Test did not report PASS' }
+          Copy-Item $selfTestReport 'RitschyMirror-1.3.2-Build3-Safe-Self-Test-CI.txt' -Force
+
+          $taskInstall = Start-Process -FilePath $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/TASKS="desktopicon,autostart"') -Wait -PassThru
+          if ($taskInstall.ExitCode -ne 0) { throw "Optional shortcut/startup task install failed: $($taskInstall.ExitCode)" }
+          if (!(Test-Path $desktopShortcut)) { throw 'Optional desktop shortcut not created' }
+          $desktopLnk = $wsh.CreateShortcut($desktopShortcut)
+          if ($desktopLnk.TargetPath -ne $expectedExe -or [string]::IsNullOrWhiteSpace($desktopLnk.IconLocation)) { throw 'Desktop shortcut target/icon invalid' }
+          $runValue = (Get-ItemProperty $runKey -Name 'RitschyMirror' -ErrorAction Stop).RitschyMirror
+          if ($runValue -notmatch [regex]::Escape($expectedExe)) { throw 'Optional startup value does not target installed EXE' }
+
+          $preserveTasks = Start-Process -FilePath $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -Wait -PassThru
+          if ($preserveTasks.ExitCode -ne 0) { throw "Task-preservation update failed: $($preserveTasks.ExitCode)" }
+          if (!(Test-Path $desktopShortcut)) { throw 'Desktop shortcut choice was lost during update' }
+          $runValue = (Get-ItemProperty $runKey -Name 'RitschyMirror' -ErrorAction Stop).RitschyMirror
+          if ($runValue -notmatch [regex]::Escape($expectedExe)) { throw 'Startup choice was lost during update' }
+
           $uninstaller = Get-ChildItem $appDir -Filter 'unins*.exe' | Select-Object -First 1
           if (!$uninstaller) { throw 'Uninstaller missing' }
           $uninstall = Start-Process -FilePath $uninstaller.FullName -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -Wait -PassThru
           if ($uninstall.ExitCode -ne 0) { throw "Uninstall test failed: $($uninstall.ExitCode)" }
           Start-Sleep -Seconds 2
-          if (Test-Path (Join-Path $appDir 'RitschyMirror.exe')) { throw 'Uninstall left application executable behind' }
+          if (Test-Path $expectedExe) { throw 'Uninstall left application executable behind' }
+          if (Test-Path $mainShortcut -or Test-Path $settingsShortcut -or Test-Path $desktopShortcut) { throw 'Uninstall left shortcut behind' }
+          if ((Get-ItemProperty $runKey -Name 'RitschyMirror' -ErrorAction SilentlyContinue).RitschyMirror) { throw 'Uninstall left RitschyMirror startup value behind' }
           if (!(Test-Path (Join-Path $appDir 'mirror_config.json'))) { throw 'Uninstall removed mirror_config.json user data' }
           if (!(Test-Path (Join-Path $appDir 'app_settings.json'))) { throw 'Uninstall removed app_settings.json user data' }
-          if (Test-Path $shortcut) { throw 'Uninstall left Start-menu shortcut behind' }
+          if (!(Test-Path (Join-Path $appDir 'Diagnostics\Safe-Self-Test-Last.txt'))) { throw 'Uninstall removed diagnostic/self-test user data' }
 
-          # Runner cleanup only; not part of the product uninstaller.
           Remove-Item $appDir -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item '_previous-build' -Recurse -Force -ErrorAction SilentlyContinue
 
-      - name: Create audit report copy and SHA-256 checksums
+      - name: Copy audit reports and create SHA-256 checksums
         shell: pwsh
         run: |
-          Copy-Item '_upstream/ritschy-mirror/RELIABILITY-AV-SAFETY-AUDIT.txt' 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Audit.txt'
-          $installer = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe'
-          $source = 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Source.zip'
-          $audit = 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Audit.txt'
-          @(
-            "$(Get-FileHash $installer -Algorithm SHA256 | Select-Object -ExpandProperty Hash)  RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe"
-            "$(Get-FileHash $source -Algorithm SHA256 | Select-Object -ExpandProperty Hash)  RitschyMirror-1.3.2-Build2-ReliabilitySafety-Source.zip"
-            "$(Get-FileHash $audit -Algorithm SHA256 | Select-Object -ExpandProperty Hash)  RitschyMirror-1.3.2-Build2-ReliabilitySafety-Audit.txt"
-          ) | Set-Content 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-SHA256.txt' -Encoding ASCII
+          Copy-Item '_upstream/ritschy-mirror/RELIABILITY-AV-SAFETY-AUDIT.txt' 'RitschyMirror-1.3.2-Build3-AV-Safety-Audit.txt'
+          Copy-Item '_upstream/ritschy-mirror/BUILD3-CURRENT-INSTRUCTIONS-AUDIT.txt' 'RitschyMirror-1.3.2-Build3-CurrentInstructions-Audit.txt'
+          $files = @(
+            '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build3-CurrentInstructions.exe',
+            'RitschyMirror-1.3.2-Build3-CurrentInstructions-Source.zip',
+            'RitschyMirror-1.3.2-Build3-AV-Safety-Audit.txt',
+            'RitschyMirror-1.3.2-Build3-CurrentInstructions-Audit.txt',
+            'RitschyMirror-1.3.2-Build3-Safe-Self-Test-CI.txt'
+          )
+          $lines = foreach ($file in $files) {
+            $h = Get-FileHash $file -Algorithm SHA256
+            "$($h.Hash)  $(Split-Path $file -Leaf)"
+          }
+          $lines | Set-Content 'RitschyMirror-1.3.2-Build3-SHA256.txt' -Encoding ASCII
 
-      - name: Upload finished installer, source and audit as build artifact
+      - name: Upload Build 3 installer, source, audits and self-test
         uses: actions/upload-artifact@v4
         with:
-          name: RitschyMirror-1.3.2-Build2-ReliabilitySafety
+          name: RitschyMirror-1.3.2-Build3-CurrentInstructions
           path: |
-            _upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe
-            RitschyMirror-1.3.2-Build2-ReliabilitySafety-Source.zip
-            RitschyMirror-1.3.2-Build2-ReliabilitySafety-Audit.txt
-            RitschyMirror-1.3.2-Build2-ReliabilitySafety-SHA256.txt
+            _upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build3-CurrentInstructions.exe
+            RitschyMirror-1.3.2-Build3-CurrentInstructions-Source.zip
+            RitschyMirror-1.3.2-Build3-AV-Safety-Audit.txt
+            RitschyMirror-1.3.2-Build3-CurrentInstructions-Audit.txt
+            RitschyMirror-1.3.2-Build3-Safe-Self-Test-CI.txt
+            RitschyMirror-1.3.2-Build3-SHA256.txt
           if-no-files-found: error
           retention-days: 90
 
-      - name: Publish direct EXE download on GitHub Releases
+      - name: Publish Build 3 GitHub Release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $installer = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe'
-          $source = 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Source.zip'
-          $audit = 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-Audit.txt'
-          $checksums = 'RitschyMirror-1.3.2-Build2-ReliabilitySafety-SHA256.txt'
-          $tag = 'ritschymirror-english-1.3.2-build2-reliabilitysafety'
+          $tag = 'ritschymirror-english-1.3.2-build3-currentinstructions'
+          $assets = @(
+            '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build3-CurrentInstructions.exe',
+            'RitschyMirror-1.3.2-Build3-CurrentInstructions-Source.zip',
+            'RitschyMirror-1.3.2-Build3-AV-Safety-Audit.txt',
+            'RitschyMirror-1.3.2-Build3-CurrentInstructions-Audit.txt',
+            'RitschyMirror-1.3.2-Build3-Safe-Self-Test-CI.txt',
+            'RitschyMirror-1.3.2-Build3-SHA256.txt'
+          )
           gh release view $tag 2>$null
           if ($LASTEXITCODE -eq 0) {
-            gh release upload $tag $installer $source $audit $checksums --clobber
+            gh release upload $tag @assets --clobber
           } else {
-            gh release create $tag $installer $source $audit $checksums --target $env:GITHUB_SHA --title 'RitschyMirror 1.3.2 English — Build 2 Reliability & AV Safety (unofficial)' --notes 'No feature or behavior changes are intended. This reliability/safety build keeps the same AppId, install path, app identity, settings filenames and current tray/mirroring behavior. It uses a private self-contained multi-file .NET deployment instead of a native self-extracting single-file bundle, explicitly requests asInvoker/uiAccess=false, adds a fail-closed scan for injection/hooks/debugger/clipboard/service/task/temp/shell patterns, preserves app_settings.json and mirror_config.json across in-place install, and keeps user config/log data on uninstall. Installer CI performs fresh install, same-path reinstall, config-preservation, shortcut, default-startup-isolation and uninstall checks. No AV exclusions are added. The executable is not Authenticode-signed, so SmartScreen reputation warnings can still occur.' --prerelease
+            gh release create $tag @assets --target $env:GITHUB_SHA --title 'RitschyMirror 1.3.2 English — Build 3 Current Instructions Audit (unofficial)' --notes 'Build 3 preserves the existing RitschyMirror identity, rendering/preview behavior, settings/data paths, tray click behavior, AppId, install path and update compatibility while filling gaps found by the current Custom Instructions audit. Added: bounded/versioned privacy-sanitized logging; Debug Mode default OFF; isolated Safe Self-Test; app-local Diagnostics/exports/crash reports; Settings and tray access to diagnostics; configurable main-X-to-tray vs Exit; Open Settings at startup; Start Minimized to Tray; tray notification ON/OFF; Explorer TaskbarCreated tray recovery; responsive bottom Settings layout with Exit App; explicit shortcut icons; full static audit. The existing HTTP agent remains the only intentional listener and no new firewall/admin/service/task/process-injection/hook/debugger behavior was added. CI compiles with warnings as errors, installs the previous Build 2 then updates to Build 3 with byte-exact config preservation, runs the installed Safe Self-Test, verifies shortcuts/startup task preservation, and checks data-preserving uninstall. This unsigned build can still receive SmartScreen/AV reputation warnings; no AV exclusions are added. Real GPU/capture-card behavior, actual Explorer restart visuals, and third-party AV reputation were not hardware/runtime-tested by CI.' --prerelease
           }
-          if ($LASTEXITCODE -ne 0) { throw 'Release upload failed; the setup remains available under Actions artifacts.' }
+          if ($LASTEXITCODE -ne 0) { throw 'Build 3 release publish failed' }
