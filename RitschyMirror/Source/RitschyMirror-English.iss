@@ -1,19 +1,20 @@
 #define MyAppVersion "1.3.2"
+#define MyBuildNumber "3"
 #define MyAppName "RitschyMirror"
 #define MyAppExeName "RitschyMirror.exe"
 #define SrcDir SourcePath + "..\..\_upstream\ritschy-mirror"
 
 [Setup]
-; Same application ID and install location as the original version.
+; Same application ID and install location as the previous completed builds.
 AppId={{8F2C6A14-9B3D-4E7A-AC51-1D9E2F6B0C77}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-AppVerName={#MyAppName} {#MyAppVersion} (English)
+AppVerName={#MyAppName} {#MyAppVersion} Build {#MyBuildNumber} (English)
 AppPublisher=RitschyRigz (unofficial English translation)
 AppPublisherURL=https://github.com/RitschyRigz/ritschy-mirror
 VersionInfoVersion={#MyAppVersion}
 VersionInfoProductName={#MyAppName}
-VersionInfoDescription=RitschyMirror unofficial English setup
+VersionInfoDescription=RitschyMirror unofficial English setup Build {#MyBuildNumber}
 DefaultDirName={localappdata}\Programs\RitschyMirror
 DisableProgramGroupPage=yes
 DefaultGroupName={#MyAppName}
@@ -47,10 +48,10 @@ Source: "{#SrcDir}\EnglishBuild\*"; DestDir: "{app}"; Flags: ignoreversion recur
 Source: "{#SrcDir}\installer\default_config\mirror_config.json"; DestDir: "{app}"; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Icons]
-Name: "{group}\RitschyMirror"; Filename: "{app}\{#MyAppExeName}"; Comment: "Screen Mirror Tool"
-Name: "{group}\RitschyMirror Settings"; Filename: "{app}\{#MyAppExeName}"; Parameters: "--settings"
+Name: "{group}\RitschyMirror"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"; Comment: "Screen Mirror Tool"
+Name: "{group}\RitschyMirror Settings"; Filename: "{app}\{#MyAppExeName}"; Parameters: "--settings"; IconFilename: "{app}\{#MyAppExeName}"
 Name: "{group}\{cm:UninstallProgram,RitschyMirror}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\RitschyMirror"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{autodesktop}\RitschyMirror"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "RitschyMirror"; ValueData: """{app}\{#MyAppExeName}"""; Tasks: autostart; Flags: uninsdeletevalue
@@ -59,5 +60,5 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: 
 Filename: "{app}\{#MyAppExeName}"; Description: "Launch RitschyMirror"; Flags: nowait postinstall skipifsilent
 
 ; Deliberately no blanket [UninstallDelete] for {app}: user-created settings,
-; mirror.log, and other RitschyMirror data remain after uninstall. Inno removes
-; the binaries/shortcuts/registry values it installed.
+; mirror.log, Diagnostics, and other RitschyMirror data remain after uninstall.
+; Inno removes only the binaries/shortcuts/registry values it installed.
