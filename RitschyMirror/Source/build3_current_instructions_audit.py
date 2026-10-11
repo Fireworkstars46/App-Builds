@@ -13,6 +13,12 @@ report = Path(os.environ.get("RITSCHY_BUILD3_AUDIT_REPORT", root / "BUILD3-CURRE
 
 files = {p.name: p.read_text(encoding="utf-8", errors="ignore") for p in root.glob("*.cs")}
 all_cs = "\n".join(files.values())
+# Ignore explanatory comments for invasive-primitive checks; actual source tokens
+# and string literals remain scanned. This avoids audit false positives from comments
+# such as "do not use SetWindowsHookEx(...)" while still blocking a real import/call.
+scan_cs = re.sub(r"/\*.*?\*/", "", all_cs, flags=re.S)
+scan_cs = re.sub(r"//[^\n]*", "", scan_cs)
+csproj = (root / "MirrorTool.csproj").read_text(encoding="utf-8", errors="ignore")
 iss = installer.read_text(encoding="utf-8")
 errors = []
 checks = []
@@ -27,7 +33,7 @@ def contains(file, *needles):
 
 # Version/build + identity/update compatibility.
 require(contains("AppInfo.cs", "BuildNumber = 3", "BuildLabel"), "normal version retains separate continuing Build 3 identity")
-require('<Version>1.3.2</Version>' in files.get("MirrorTool.csproj", ""), "normal application version remains 1.3.2")
+require('<Version>1.3.2</Version>' in csproj, "normal application version remains 1.3.2")
 require('AppId={{8F2C6A14-9B3D-4E7A-AC51-1D9E2F6B0C77}' in iss, "installer AppId preserved")
 require('DefaultDirName={localappdata}\\Programs\\RitschyMirror' in iss, "install path preserved")
 require('PrivilegesRequired=lowest' in iss, "installer remains least privilege")
@@ -113,14 +119,14 @@ require('Name: "{group}\\RitschyMirror"' in iss and 'Filename: "{app}\\{#MyAppEx
         "Start Menu shortcut targets permanent installed EXE")
 require('IconFilename: "{app}\\{#MyAppExeName}"' in iss, "shortcut icon path is explicit and permanent")
 require('Name: "{autodesktop}\\RitschyMirror"' in iss and 'Tasks: desktopicon' in iss, "desktop shortcut task remains optional")
-require('SetCurrentProcessExplicitAppUserModelID' not in all_cs, "no unsupported/unneeded AppUserModelID API import introduced")
+require('SetCurrentProcessExplicitAppUserModelID' not in scan_cs, "no unsupported/unneeded AppUserModelID API import introduced")
 
 # Safety/isolation (complements reliability_av_safety.py).
 for forbidden in ("CreateRemoteThread", "WriteProcessMemory", "VirtualAllocEx", "SetWindowsHookEx(", "DebugActiveProcess(", "MiniDumpWriteDump(", "Clipboard.", "GetClipboardData", "SetClipboardData", "powershell.exe", "pwsh.exe", "cmd.exe", "schtasks", "CreateService"):
-    require(forbidden.lower() not in all_cs.lower(), f"no invasive runtime primitive: {forbidden}")
+    require(forbidden.lower() not in scan_cs.lower(), f"no invasive runtime primitive: {forbidden}")
 for other in ("Crash Monitor", "CrashMonitor", "Program Diagnostic Monitor", "ProgramDiagnostic"):
-    require(other.lower() not in all_cs.lower(), f"no runtime coupling to other custom app: {other}")
-require('Path.GetTempPath' not in all_cs and 'GetTempPath' not in all_cs, "no shared TEMP dependency; self-test/exports stay RitschyMirror-local")
+    require(other.lower() not in scan_cs.lower(), f"no runtime coupling to other custom app: {other}")
+require('Path.GetTempPath' not in scan_cs and 'GetTempPath' not in scan_cs, "no shared TEMP dependency; self-test/exports stay RitschyMirror-local")
 require('RegisterHotKey' in tray and 'SetWindowsHookEx' not in tray and 'GetAsyncKeyState' not in tray,
         "existing Ctrl+Alt+T remains documented RegisterHotKey rather than a keyboard hook")
 
