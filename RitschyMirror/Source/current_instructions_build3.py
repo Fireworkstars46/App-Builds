@@ -15,6 +15,7 @@ for name in (
     "build3_settings_ui.py",
     "build3_tray_behavior.py",
     "build3_fix_tray_compile.py",
+    "build3_warning_cleanup.py",
 ):
     print("Applying", name)
     runpy.run_path(str(here / name), run_name="__main__")
