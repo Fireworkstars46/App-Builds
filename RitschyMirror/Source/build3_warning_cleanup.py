@@ -6,7 +6,9 @@ These are correctness/static-cleanliness fixes only. They preserve runtime behav
 - remove obsolete preview-full-exit bookkeeping left unused after preview X became
   preview-only in the previous completed build,
 - remove duplicate manifest DPI declarations because Program already requests
-  PerMonitorV2 with SetProcessDpiAwarenessContext before WinForms starts.
+  PerMonitorV2 with SetProcessDpiAwarenessContext before WinForms starts,
+- make the project restore the same private self-contained win-x64 runtime packs
+  used by the release publish so the subsequent --no-restore publish is deterministic.
 """
 import os, re
 from pathlib import Path
@@ -72,5 +74,10 @@ if n != 1:
     raise RuntimeError(f"app.manifest: expected one windowsSettings DPI block, found {n}")
 manifest.write_text(m2, encoding="utf-8")
 print("removed duplicate manifest DPI declaration; Program PerMonitorV2 path retained")
+
+# The release has intentionally used a private self-contained runtime since Build 2.
+# Align the project restore with that publish mode so runtime packs are restored once
+# by the warnings-as-errors build and the following --no-restore publish can succeed.
+replace("MirrorTool.csproj", "<SelfContained>false</SelfContained>", "<SelfContained>true</SelfContained>")
 
 print("Build 3 warnings-as-errors cleanup applied")
