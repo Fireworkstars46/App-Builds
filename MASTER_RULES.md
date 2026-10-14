@@ -219,3 +219,9 @@ Do not mark DONE just because code parses, callbacks exist, or a partial test pa
 - Distinguish static validation from real runtime testing.
 - Do not claim an OS-level behavior was physically tested if it was only simulated/validated by logic.
 - For failures, report the exact failing feature and expected vs actual result when available.
+
+## 26. Future rules and lessons
+- When a new general development requirement, safety rule, testing rule, or recurring lesson is discovered, add it to this master rules file so future projects use it automatically.
+- If the new rule comes from a bug or regression, also add or strengthen a Safe Self-Test/regression test that would detect that problem in future builds.
+- Project-specific features stay with that project unless they are useful as a general rule for other projects.
+- Do not remove or weaken existing master rules when adding new ones unless the user explicitly requests it.
