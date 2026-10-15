@@ -127,6 +127,10 @@ Before release, check at minimum:
 - Parser errors, #Warn issues, startup warnings, uncaught runtime exceptions, or important failures hidden by broad try/catch block DONE status.
 - In AutoHotkey, an OnExit callback must explicitly return 0/blank unless exit cancellation is intentionally required; do not let a logging/helper return value accidentally cancel process termination.
 - For AutoHotkey projects with ExitApp/OnExit behavior, add an isolated child-process/test-harness regression test for actual termination when practical so accidental OnExit cancellation is detected before DONE.
+- Static checks must verify that built-in variables, built-in functions, directives, and other runtime-specific language features are valid for the project’s targeted AutoHotkey/runtime version.
+- Be especially strict when code is migrated, reused, or adapted between AutoHotkey v1 and v2 or between other incompatible runtime versions.
+- Invalid version-specific references are release-blocking issues, even when the surrounding logic is otherwise correct.
+- When practical, add a targeted regression check for known runtime-version mismatch mistakes so the same incompatibility cannot silently return in a later build.
 
 ## 15. Safe Self-Test requirements
 - Provide a Safe Self-Test for projects where meaningful automated testing is possible.
