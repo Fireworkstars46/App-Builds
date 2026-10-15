@@ -125,6 +125,8 @@ Before release, check at minimum:
 - Pay special attention to short helpers such as R(), W(), logging, settings, state, and utility functions.
 - Do not allow a local/parameter name to silently shadow a function/helper.
 - Parser errors, #Warn issues, startup warnings, uncaught runtime exceptions, or important failures hidden by broad try/catch block DONE status.
+- In AutoHotkey, an OnExit callback must explicitly return 0/blank unless exit cancellation is intentionally required; do not let a logging/helper return value accidentally cancel process termination.
+- For AutoHotkey projects with ExitApp/OnExit behavior, add an isolated child-process/test-harness regression test for actual termination when practical so accidental OnExit cancellation is detected before DONE.
 
 ## 15. Safe Self-Test requirements
 - Provide a Safe Self-Test for projects where meaningful automated testing is possible.
