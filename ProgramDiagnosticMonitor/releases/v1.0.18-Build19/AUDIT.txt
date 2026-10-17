@@ -1,0 +1,118 @@
+=== Program Diagnostic Monitor v1.0.18 Build 19 STATIC/RELEASE AUDIT ===
+001. PASS - Version is v1.0.18 Build 19
+002. PASS - Isolated main window class preserved
+003. PASS - Isolated installer class preserved
+004. PASS - Dedicated app-data namespace
+005. PASS - Dedicated install namespace
+006. PASS - Isolated uninstall identity
+007. PASS - No app-wide single-instance guard added | settings-write mutex is allowed
+008. PASS - Settings write mutex exists
+009. PASS - Stale-writer merge path exists
+010. PASS - Setting persisted: MinimizeToTray
+011. PASS - Setting persisted: CloseToTray
+012. PASS - Setting persisted: StartMinimized
+013. PASS - Setting persisted: OpenSettingsAtStartup
+014. PASS - Setting persisted: StartPaused
+015. PASS - Setting persisted: Notifications
+016. PASS - Setting persisted: DebugMode
+017. PASS - Setting persisted: TrayClickMode
+018. PASS - Atomic settings replacement
+019. PASS - Settings persistence self-test write/read/compare
+020. PASS - Debug Settings/main UI synchronization self-test
+021. PASS - All Settings controls production-handler self-test
+022. PASS - Safe Self-Test explicit statuses
+023. PASS - Safe Self-Test temporary rotation cleanup
+024. PASS - Cold-start runtime limitation reported
+025. PASS - Exit runtime limitation reported
+026. PASS - Close/X destructive fallback reported
+027. PASS - Bounded five-file logs
+028. PASS - Privacy-safe monitoring start/stop/freeze logging
+029. PASS - TaskbarCreated recovery
+030. PASS - Tray single/double click separation
+031. PASS - Minimize/Close/Exit paths are distinct
+032. PASS - Window minimum size
+033. PASS - Reset Window Layout
+034. PASS - Remembered window geometry
+035. PASS - Multi-monitor offscreen recovery
+036. PASS - Passive monitor never launches target
+037. PASS - All app OpenProcess requests limited query | every OpenProcess source line
+038. PASS - Forbidden app source API absent: CreateProcessW
+039. PASS - Forbidden app source API absent: OpenThread
+040. PASS - Forbidden app source API absent: Thread32First
+041. PASS - Forbidden app source API absent: Thread32Next
+042. PASS - Forbidden app source API absent: GetThreadTimes
+043. PASS - Forbidden app source API absent: Module32First
+044. PASS - Forbidden app source API absent: Module32Next
+045. PASS - Forbidden app source API absent: OpenProcessToken
+046. PASS - Forbidden app source API absent: GetTokenInformation
+047. PASS - Forbidden app source API absent: OpenEventLogW
+048. PASS - Forbidden app source API absent: ReadEventLogW
+049. PASS - Forbidden app source API absent: GetExtendedTcpTable
+050. PASS - Forbidden app source API absent: GetExtendedUdpTable
+051. PASS - Forbidden app source API absent: CreateRemoteThread
+052. PASS - Forbidden app source API absent: WriteProcessMemory
+053. PASS - Forbidden app source API absent: VirtualAllocEx
+054. PASS - Forbidden app source API absent: SetWindowsHookEx
+055. PASS - Forbidden app source API absent: DebugActiveProcess
+056. PASS - Forbidden app source API absent: ReadProcessMemory
+057. PASS - No broad module implementation
+058. PASS - No broad event-log implementation
+059. PASS - No network owner-table implementation
+060. PASS - Watched-folder recursion disabled
+061. PASS - Protected peer classifier
+062. PASS - WCT dynamically resolved
+063. PASS - WCT restricted to hung MAIN UI
+064. PASS - 150 ms bounded WM_NULL probe
+065. PASS - Helper sampling refresh bounded
+066. PASS - Target restart watch remains 30 seconds
+067. PASS - Installer preserves app-data directories
+068. PASS - Installer Finish-only optional launch
+069. PASS - Installer preserves desktop shortcut choice on upgrade
+070. PASS - Installer verifies embedded SHA-256
+071. PASS - Uninstaller preserves Logs/Diagnostics
+072. PASS - Uninstaller guards exact isolated delete roots
+073. PASS - Uninstaller cleanup helper is project-local
+074. PASS - Source header does not declare removed APIs
+075. PASS - Import generator does not request removed APIs
+076. PASS - All three release component EXEs exist
+077. PASS - PE import table readable
+078. PASS - Forbidden app PE import absent: CreateProcessW
+079. PASS - Forbidden app PE import absent: OpenThread
+080. PASS - Forbidden app PE import absent: Thread32First
+081. PASS - Forbidden app PE import absent: Thread32Next
+082. PASS - Forbidden app PE import absent: GetThreadTimes
+083. PASS - Forbidden app PE import absent: Module32First
+084. PASS - Forbidden app PE import absent: Module32Next
+085. PASS - Forbidden app PE import absent: OpenProcessToken
+086. PASS - Forbidden app PE import absent: GetTokenInformation
+087. PASS - Forbidden app PE import absent: OpenEventLogW
+088. PASS - Forbidden app PE import absent: ReadEventLogW
+089. PASS - Forbidden app PE import absent: GetExtendedTcpTable
+090. PASS - Forbidden app PE import absent: GetExtendedUdpTable
+091. PASS - Forbidden app PE import absent: CreateRemoteThread
+092. PASS - Forbidden app PE import absent: WriteProcessMemory
+093. PASS - Forbidden app PE import absent: VirtualAllocEx
+094. PASS - Forbidden app PE import absent: SetWindowsHookEx
+095. PASS - Forbidden app PE import absent: DebugActiveProcess
+096. PASS - Forbidden app PE import absent: ReadProcessMemory
+097. PASS - App imports limited-query process APIs only by source contract
+098. PASS - Combined setup payload hashes/exact bytes | embedded app/uninstaller exact; stub=188928 app=389120 uninstaller=181760
+099. PASS - Build17 identity token preserved: ProgramDiagnosticMonitorIsolatedWindow
+100. PASS - Build17 identity token preserved: ProgramDiagnosticMonitor-Isolated
+SUMMARY: 100 PASS, 0 FAIL, 100 TOTAL
+APP_SHA256=66ad9c8ec8f2e3f112eac8d01776701c81a8d01fd3c7655d2255c7c410632d1b
+SETUP_SHA256=471fe2ee5c1f5db5f346a94b6d0ee20c0b92ecec356016a8c89ddad789eaf6db
+
+ENVIRONMENT NOTE
+----------------
+This audit was run in the ChatGPT Linux build environment using cross-compiled Windows PE binaries.
+No claim is made that Windows GUI rendering, DPI behavior, tray interaction, Explorer restart,
+WCT against a real hung target, installer UX, SmartScreen, or Bitdefender behavior was physically
+executed here. The in-app Safe Self-Test reports those runtime limitations explicitly.
+
+SOURCE REBUILD VERIFICATION
+---------------------------
+PASS - Clean rebuild from Program_Diagnostic_Monitor_Source_v1.0.18_Build_19.zip produced byte-identical deterministic binaries.
+PASS - Main EXE SHA-256: 66ad9c8ec8f2e3f112eac8d01776701c81a8d01fd3c7655d2255c7c410632d1b
+PASS - Uninstaller SHA-256: 1fd90f280589c3947e8f5b46861d64d5e4a1057d7e1071cca7552eefdf9200b0
+PASS - Setup SHA-256: 471fe2ee5c1f5db5f346a94b6d0ee20c0b92ecec356016a8c89ddad789eaf6db
