@@ -1,0 +1,22 @@
+PUBLIC ARCHIVE COPY
+This copy preserves the recorded test/log content while replacing the local Windows user-profile path with %USERPROFILE% for privacy.
+
+2026-10-17 13:11:06 [INFO] v1.0.18 Build 19 - Application startup
+2026-10-17 13:11:11 [INFO] v1.0.18 Build 19 - Debug Mode enabled
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Setting changed through Settings production handler
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Setting changed through Settings production handler
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Setting changed through Settings production handler
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Setting changed through Settings production handler
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Setting changed through Settings production handler
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Setting changed through Settings production handler
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Debug Mode disabled
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Setting changed through Settings production handler
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Window layout reset to primary-monitor defaults
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Debug Mode disabled
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Debug Mode enabled
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Runtime paused
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Runtime resumed
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Main window minimized to tray
+2026-10-17 13:11:18 [INFO] v1.0.18 Build 19 - Safe Self-Test completed with 0 FAIL
+2026-10-17 13:12:07 [INFO] v1.0.18 Build 19 - Setting changed through Settings production handler
+2026-10-17 13:12:12 [INFO] v1.0.18 Build 19 - Main window minimized to tray
