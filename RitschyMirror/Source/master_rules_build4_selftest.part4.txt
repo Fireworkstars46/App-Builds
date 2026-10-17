@@ -43,6 +43,9 @@
         lines.Add($"TOTAL: PASS={pass} FAIL={fail} SKIPPED={skipped}");
         lines.Add(fail == 0 ? "RESULT: PASS" : "RESULT: FAIL");
         File.WriteAllLines(reportPath, lines);
+        // Always echo the complete per-item report in Safe Test Mode so CI failures
+        // remain diagnosable even when the process intentionally returns a failure code.
+        Console.WriteLine(string.Join(Environment.NewLine, lines));
         summary = fail == 0
             ? $"Safe self-test passed: {pass} PASS, {skipped} SKIPPED."
             : $"Safe self-test failed: {pass} PASS, {fail} FAIL, {skipped} SKIPPED.";
