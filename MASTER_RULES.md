@@ -238,3 +238,16 @@ Do not mark DONE just because code parses, callbacks exist, or a partial test pa
 - If the new rule comes from a bug or regression, also add or strengthen a Safe Self-Test/regression test that would detect that problem in future builds.
 - Project-specific features stay with that project unless they are useful as a general rule for other projects.
 - Do not remove or weaken existing master rules when adding new ones unless the user explicitly requests it.
+
+## 27. Permanent build archive
+- When GitHub access is available, use `https://github.com/Fireworkstars46/App-Builds` as the authoritative long-term archive for completed app/script builds and their release history.
+- Chat attachments, `/mnt/data`, temporary download links, conversation file cards, and file-library copies must not be the only copy of a completed build. They may be provided as convenience copies, but they do not replace the permanent archive.
+- Preserve every applicable completed-release artifact, including the full source/source ZIP, standalone EXE or other runnable/package artifact, installer/setup package, static/audit report, Safe Self-Test report or evidence, checksums/hashes, release notes/history, and project recovery metadata that is safe to store.
+- Never archive passwords, tokens, private signing keys, secrets, or other sensitive recovery material. Preserve only recovery metadata that is safe for the repository.
+- Preserve historical completed builds unchanged. Do not silently overwrite, replace, or repurpose an older Version/Build path or artifact with a later reconstruction or revision.
+- Use clear project/version/Build folders and filenames so old releases remain independently identifiable and recoverable.
+- Verify that the intended permanent GitHub copies actually exist and are retrievable after archival. A commit attempt, upload attempt, chat attachment, or generated file is not proof of successful permanent archival.
+- If archival fails or GitHub is unavailable, report that clearly and do not claim the permanent archive succeeded. Keep any available convenience copy, but retry permanent archival when GitHub access becomes available.
+- Archiving an unchanged existing build does not increment its Version or Build number. Increment Build only when a revised downloadable artifact/code revision is actually produced under the normal version/build rules.
+- Never fabricate or relabel a missing historical source/build to fill an archive gap. Record the historical artifact/source as unavailable or lost, preserve all trustworthy remaining evidence, and continue with the next legitimate Build number if reconstruction or code changes are required.
+- When GitHub is available for the project, permanent archival verification is part of release completion: do not call the release fully archived/DONE until the required permanent release artifacts have been verified in `Fireworkstars46/App-Builds`.
