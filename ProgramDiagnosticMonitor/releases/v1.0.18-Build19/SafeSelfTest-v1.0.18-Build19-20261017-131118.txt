@@ -1,0 +1,21 @@
+=== Program Diagnostic Monitor SAFE SELF-TEST v1.0.18 Build 19 ===
+PASS - Project Temp write -> read -> compare -> delete | C:\Users\rebec\AppData\Local\ProgramDiagnosticMonitor-Isolated\Temp
+PASS - Settings persistence write -> reload/read -> compare | all persisted settings; isolated temporary INI; real settings untouched
+PASS - Multi-instance stale-writer protection | older instance geometry merge preserved newer Debug setting in isolated settings file
+PASS - Settings controls production handlers + persistence | all eight setting controls exercised through the real Settings WM_COMMAND path against an isolated temporary INI; immediate/next-launch values verified after reload
+PASS - Reset Window Layout production control | real Settings button handler reset and persisted geometry only to isolated self-test settings
+PASS - Settings <-> main UI Debug synchronization | production setter toggled and restored without persisting test value
+PASS - Dedicated isolated project paths | C:\Users\rebec\AppData\Local\ProgramDiagnosticMonitor-Isolated
+PASS - Protected-peer classifier | Crash Monitor / RitschyMirror shield rule
+PASS - Bounded log rotation | isolated temporary log with tiny test cap; all temporary generations cleaned
+PASS - Tray icon production add path | tray registered
+PASS - Pause / Resume production state path | runtime state toggled and restored
+PASS - Window placement/minimum-size recovery | production clamp logic recovered deliberately invalid isolated in-memory geometry; saved settings restored
+PASS - Minimize-to-tray production handler | temporarily hid and restored the real main window without persisting the test toggle
+NOT TESTED - Close/X-to-tray destructive fallback | the production WM_CLOSE path is wired and statically validated, but the in-process self-test does not risk terminating itself if the handler regresses
+NOT TESTED - Cold-start decisions | Start Minimized / Open Settings / Start Paused require a relaunch; the monitor intentionally does not add self-launch/CreateProcess behavior for testing
+SKIPPED - Actual Exit App process termination | self-test does not terminate its own production process
+SKIPPED - Explorer/taskbar forced restart | forcing Explorer termination is intentionally not performed; TaskbarCreated rebuild path remains active
+NOT TESTED - Live target freeze/WCT capture | requires a real selected target and an actual hung MAIN UI thread
+
+Result: 0 FAIL, 2 SKIPPED, 3 NOT TESTED; all remaining executed tests PASS.
