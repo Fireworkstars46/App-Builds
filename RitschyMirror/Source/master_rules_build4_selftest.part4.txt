@@ -1,0 +1,95 @@
+            {
+                using var child = Process.Start(new ProcessStartInfo(Application.ExecutablePath, "--safe-self-test-exit-child")
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                });
+                if (child != null && child.WaitForExit(5000) && child.ExitCode == 0)
+                    Pass("shared application ExitThread production primitive terminates isolated child process");
+                else
+                {
+                    try { if (child != null && !child.HasExited) child.Kill(entireProcessTree: true); } catch { }
+                    Fail("shared application ExitThread production primitive terminates isolated child process");
+                }
+            }
+            catch (Exception ex) { Fail("shared application ExitThread production primitive terminates isolated child process", SanitizeText(ex.Message)); }
+
+            string expectedBase = Path.GetFullPath(baseDir).TrimEnd(Path.DirectorySeparatorChar);
+            string actualBase = Path.GetFullPath(AppContext.BaseDirectory).TrimEnd(Path.DirectorySeparatorChar);
+            if (string.Equals(expectedBase, actualBase, StringComparison.OrdinalIgnoreCase)) Pass("application base-path identity remains project-local");
+            else Fail("application base-path identity remains project-local", $"expected={expectedBase}, actual={actualBase}");
+
+            // These require real shell/hardware/reputation behavior and are not falsified as PASS.
+            Skip("physical NotifyIcon event timing and focus-dismiss behavior", "logic is production-tested above; actual Explorer shell gesture remains interactive");
+            Skip("Explorer.exe/taskbar restart visual tray recovery", "forcing Explorer termination is disruptive; TaskbarCreated wiring is static-audited");
+            Skip("real GPU/capture-card render, preview show/hide/taskbar style, drag/resize and topmost behavior", "requires target graphics/capture hardware and interactive desktop");
+            Skip("SmartScreen/Bitdefender reputation verdict", "unsigned reputation verdict is external and cannot be guaranteed by self-test");
+        }
+        catch (Exception ex)
+        {
+            Fail("self-test unhandled exception", SanitizeText(ex.ToString()));
+        }
+        finally
+        {
+            try
+            {
+                if (Directory.Exists(temp)) Directory.Delete(temp, recursive: true);
+                Pass("isolated SelfTestTemp cleanup completed");
+            }
+            catch (Exception ex) { Fail("isolated SelfTestTemp cleanup completed", SanitizeText(ex.Message)); }
+        }
+
+        lines.Add("");
+        lines.Add($"TOTAL: PASS={pass} FAIL={fail} SKIPPED={skipped}");
+        lines.Add(fail == 0 ? "RESULT: PASS" : "RESULT: FAIL");
+        File.WriteAllLines(reportPath, lines);
+        summary = fail == 0
+            ? $"Safe self-test passed: {pass} PASS, {skipped} SKIPPED."
+            : $"Safe self-test failed: {pass} PASS, {fail} FAIL, {skipped} SKIPPED.";
+        return fail == 0;
+    }
+
+    private static void PumpFor(int milliseconds)
+    {
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        while (sw.ElapsedMilliseconds < milliseconds)
+        {
+            Application.DoEvents();
+            Thread.Sleep(5);
+        }
+    }
+
+    private static T? FindControl<T>(Control root, Func<T, bool> predicate) where T : Control
+    {
+        foreach (Control child in root.Controls)
+        {
+            if (child is T typed && predicate(typed)) return typed;
+            var nested = FindControl<T>(child, predicate);
+            if (nested != null) return nested;
+        }
+        return null;
+    }
+
+    private static bool ContainsControlText(Control root, string text)
+    {
+        foreach (Control child in root.Controls)
+        {
+            if (string.Equals(child.Text, text, StringComparison.OrdinalIgnoreCase)) return true;
+            if (ContainsControlText(child, text)) return true;
+        }
+        return false;
+    }
+
+'''
+diag = diag[:start] + new_method + diag[end:]
+# add using Process + Forms if absent
+if 'using System.Diagnostics;' not in diag:
+    diag='using System.Diagnostics;\n'+diag
+if 'using System.Windows.Forms;' not in diag:
+    diag='using System.Windows.Forms;\n'+diag
+if 'using System.Drawing;' not in diag:
+    diag='using System.Drawing;\n'+diag
+write('DiagnosticsManager.cs',diag)
+
+
+print('Build 4 MASTER_RULES Safe Self-Test patch applied')
