@@ -1,0 +1,119 @@
+            else Fail("startup decision honors Open Settings + Start Minimized independently");
+
+            var p2 = StartupBehavior.Resolve(app, new[] { "--settings" });
+            if (p2.OpenSettings && !p2.HideSettingsToTray) Pass("explicit Settings launch overrides startup minimize and shows normally");
+            else Fail("explicit Settings launch overrides startup minimize and shows normally");
+
+            app.AutostartMirror = true;
+            var p3 = StartupBehavior.Resolve(app, Array.Empty<string>());
+            if (p3.AutostartMirror) Pass("start-paused/automatic-mirroring startup state uses shared production decision path");
+            else Fail("start-paused/automatic-mirroring startup state uses shared production decision path");
+
+            // Single-instance/event ordering with unique names: signal before any callback is registered.
+            string suffix = Guid.NewGuid().ToString("N");
+            using (var first = new SingleInstanceCoordinator("RitschyMirror.SelfTest.Mutex." + suffix,
+                                                              "RitschyMirror.SelfTest.Event." + suffix))
+            using (var second = new SingleInstanceCoordinator("RitschyMirror.SelfTest.Mutex." + suffix,
+                                                               "RitschyMirror.SelfTest.Event." + suffix))
+            {
+                if (first.IsPrimary && !second.IsPrimary) Pass("single-instance production coordinator deterministically rejects second instance");
+                else Fail("single-instance production coordinator deterministically rejects second instance",
+                          $"first={first.IsPrimary}, second={second.IsPrimary}");
+                second.SignalShowSettings();
+                if (first.ShowSettingsEvent.WaitOne(1000)) Pass("early second-instance Show Settings signal is retained before UI callback registration");
+                else Fail("early second-instance Show Settings signal is retained before UI callback registration", "signal timed out");
+            }
+
+            // Tray gesture arbitration is production code. Pump WinForms messages so the same Timer path runs.
+            int settingsCount = 0, previewCount = 0;
+            using (var clicks = new TrayClickCoordinator(() => settingsCount++, () => previewCount++, 40, TimeSpan.FromSeconds(1)))
+            {
+                clicks.OnMouseClick(MouseButtons.Left);
+                PumpFor(100);
+                if (settingsCount == 1 && previewCount == 0) Pass("tray single-click runs Settings exactly once after double-click arbitration window");
+                else Fail("tray single-click runs Settings exactly once after double-click arbitration window",
+                          $"settings={settingsCount}, preview={previewCount}");
+            }
+
+            settingsCount = 0; previewCount = 0;
+            using (var clicks = new TrayClickCoordinator(() => settingsCount++, () => previewCount++, 80, TimeSpan.FromSeconds(1)))
+            {
+                clicks.OnMouseClick(MouseButtons.Left);
+                clicks.OnDoubleClick();
+                PumpFor(120);
+                if (settingsCount == 1 && previewCount == 0) Pass("first tray double-click does not also fire delayed single-click");
+                else Fail("first tray double-click does not also fire delayed single-click",
+                          $"settings={settingsCount}, preview={previewCount}");
+
+                clicks.OnMouseClick(MouseButtons.Left);
+                clicks.OnDoubleClick();
+                PumpFor(120);
+                if (settingsCount == 1 && previewCount == 1) Pass("second distinct tray double-click restores-preview action exactly once without Settings duplicate");
+                else Fail("second distinct tray double-click restores-preview action exactly once without Settings duplicate",
+                          $"settings={settingsCount}, preview={previewCount}");
+            }
+
+            // Hidden Settings form uses real controls and production CheckedChanged/save paths.
+            var engine = new MirrorEngine(temp);
+            if (!File.Exists(mirrorPath)) new MirrorConfig().Save(mirrorPath);
+            using (var form = new SettingsForm(engine, appPath, app))
+            {
+                form.CreateControl();
+                var wa = Screen.PrimaryScreen?.WorkingArea ?? new Rectangle(0, 0, 800, 600);
+                if (form.Width <= wa.Width && form.Height <= wa.Height && form.MinimumSize.Width <= form.Width && form.MinimumSize.Height <= form.Height)
+                    Pass("hidden Settings window fits OS primary working area and respects safe minimum size");
+                else Fail("hidden Settings window fits OS primary working area and respects safe minimum size",
+                          $"form={form.Width}x{form.Height}, primary={wa.Width}x{wa.Height}, min={form.MinimumSize.Width}x{form.MinimumSize.Height}");
+
+                var issues = SettingsForm.ValidateUiLayoutContract().ToList();
+                if (issues.Count == 0) Pass("Settings UI layout contract reports no clipping/scroll/bottom-command structural issue");
+                else Fail("Settings UI layout contract reports no clipping/scroll/bottom-command structural issue", string.Join("; ", issues));
+
+                CheckBox? FindCheck(string prefix) => FindControl<CheckBox>(form, c => c.Text.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+                Button? FindButton(string text) => FindControl<Button>(form, c => string.Equals(c.Text, text, StringComparison.OrdinalIgnoreCase));
+
+                var debugBox = FindCheck("Debug Mode");
+                if (debugBox != null)
+                {
+                    debugBox.Checked = false;
+                    debugBox.Checked = true;
+                    if (MirrorConfig.Load(mirrorPath).DebugLogging) Pass("Settings Debug checkbox exercises production handler and persists immediately");
+                    else Fail("Settings Debug checkbox exercises production handler and persists immediately");
+                }
+                else Fail("Settings Debug checkbox production test", "control not found");
+
+                var taskbarBox = FindCheck("Hide preview taskbar button");
+                if (taskbarBox != null)
+                {
+                    taskbarBox.Checked = !taskbarBox.Checked;
+                    bool expected = taskbarBox.Checked;
+                    if (MirrorConfig.Load(mirrorPath).HidePreviewTaskbarButton == expected) Pass("Settings preview-taskbar checkbox and shared saved state stay synchronized");
+                    else Fail("Settings preview-taskbar checkbox and shared saved state stay synchronized");
+                }
+                else Fail("Settings preview-taskbar checkbox production test", "control not found");
+
+                var minPreviewBox = FindCheck("Minimize preview to tray");
+                if (minPreviewBox != null)
+                {
+                    minPreviewBox.Checked = !minPreviewBox.Checked;
+                    bool expected = minPreviewBox.Checked;
+                    if (MirrorConfig.Load(mirrorPath).MinimizePreviewToTray == expected) Pass("Settings preview-minimize checkbox and shared saved state stay synchronized");
+                    else Fail("Settings preview-minimize checkbox and shared saved state stay synchronized");
+                }
+                else Fail("Settings preview-minimize checkbox production test", "control not found");
+
+                var notificationsBox = FindCheck("Tray notifications");
+                if (notificationsBox != null)
+                {
+                    notificationsBox.Checked = !notificationsBox.Checked;
+                    bool expected = notificationsBox.Checked;
+                    if (app.NotificationsEnabled == expected && AppSettings.Load(appPath).NotificationsEnabled == expected)
+                        Pass("Settings notifications checkbox updates same runtime object + persisted state immediately");
+                    else Fail("Settings notifications checkbox updates same runtime object + persisted state immediately");
+                }
+                else Fail("Settings notifications checkbox production test", "control not found");
+
+                var mainMinBox = FindCheck("Minimize MAIN Settings window to tray");
+                if (mainMinBox != null)
+                {
+                    mainMinBox.Checked = !mainMinBox.Checked;
