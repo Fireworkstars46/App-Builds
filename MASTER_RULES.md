@@ -49,6 +49,8 @@ These rules apply to all current and future app/script projects unless a project
 - Provide Restore Defaults confirmation when destructive.
 - Provide Export/Import Settings when appropriate and validate import content before applying.
 - Preserve settings through updates.
+- For apps that can run multiple instances against shared settings/state, prevent stale instances from overwriting newer committed changes on exit or save. Use synchronization, versioning, reload-before-write, or another deterministic conflict policy appropriate to the project.
+- Settings intended to take effect immediately should apply through the normal production state path and persist without requiring an undocumented Save or restart step. If a restart/relaunch is required, make that explicit in the UI/status and preserve the pending value safely.
 
 ## 7. UI and window rules
 - No clipped, truncated, overlapping, hidden, or off-screen controls/text at supported sizes.
@@ -92,6 +94,7 @@ These rules apply to all current and future app/script projects unless a project
 ## 11. Single-instance and startup ordering
 - Normally use single-instance behavior unless the project intentionally supports multiple instances.
 - Relaunch should show/focus the existing app when that is the intended UX.
+- If a project intentionally supports switching between multi-instance and single-instance modes at runtime, define the transition behavior explicitly. When consolidating existing instances, choose the survivor deterministically and request graceful shutdown of the others through the normal exit path rather than force-killing them. Re-enabling multi-instance should permit future launches and should not recreate previously closed instances unless the project explicitly requires that behavior.
 - Verify startup initialization order.
 - External messages/callbacks must not access Settings/UI/state before required initialization has completed.
 - Safely defer early requests/messages until state is ready.
@@ -141,6 +144,9 @@ Before release, check at minimum:
 - Persistence: write -> reload/read -> compare.
 - Test Settings <-> tray/UI synchronization and the actual underlying state.
 - Test startup decisions/order, single-instance guard behavior, early message deferral, and applicable autostart logic.
+- For multi-instance projects that share settings/state, when safely automatable, test stale-writer/conflict behavior so an older instance closing or saving cannot overwrite a newer committed setting.
+- For projects with a runtime multi-instance/single-instance toggle, test the transition through production paths: multiple instances are allowed when enabled; disabling keeps the documented deterministic survivor and gracefully closes/consolidates the others; re-enabling allows future launches without resurrecting closed instances.
+- For settings documented as immediate, verify both runtime effect and persistence without a separate Save/restart. For settings documented as restart-required, verify the UI/status clearly says so and the value survives the required restart/relaunch when safely testable.
 - Test window X/Y/W/H, primary-monitor placement, remembered position/size/tab/state, Reset Window Layout, and topmost state where applicable.
 - Test import/export round-trip where applicable.
 - Test Manual Check vs automatic/watcher paths where both exist.
