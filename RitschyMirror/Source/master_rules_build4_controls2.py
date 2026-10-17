@@ -6,7 +6,15 @@ diag=p.read_text(encoding='utf-8')
 anchor='''                // Verify restart-required controls explicitly communicate that fact while
                 // their values persist immediately for the next restart.
                 // Production Reset button path, not just SettingsActions directly.'''
-insert='''                // Every safely testable combo box uses its actual SelectedIndexChanged production path.
+insert='''                // Button.PerformClick only executes a real WinForms Click path when the
+                // control can be selected. Keep the real Settings form alive but invisible
+                // while exercising safe production button handlers.
+                form.ShowInTaskbar = false;
+                form.Opacity = 0.0;
+                form.Show();
+                PumpFor(30);
+
+                // Every safely testable combo box uses its actual SelectedIndexChanged production path.
                 int comboOrdinal = 0;
                 foreach (var combo in FindControls<ComboBox>(form))
                 {
@@ -69,8 +77,12 @@ insert='''                // Every safely testable combo box uses its actual Sel
                     finally { try { number.Value = before; PumpFor(20); } catch { } }
                 }
 
+                // NumericUpDown and other composite WinForms controls contain internal
+                // TextBox-derived editor children. Those are implementation details, not
+                // separate RitschyMirror settings. Exercise only TextBox controls the app
+                // actually created as settings controls.
                 int textOrdinal = 0;
-                foreach (var textBox in FindControls<TextBox>(form))
+                foreach (var textBox in FindControls<TextBox>(form).Where(tb => tb.GetType() == typeof(TextBox)))
                 {
                     textOrdinal++;
                     string id = "Settings TextBox #" + textOrdinal;
@@ -96,18 +108,38 @@ insert='''                // Every safely testable combo box uses its actual Sel
                     finally { try { textBox.Text = before; PumpFor(20); } catch { } }
                 }
 
-                // The two refresh buttons are safe read-only enumerations of currently available
-                // displays/windows. Exercise the actual Click handlers; no external process is launched.
+                // Exercise the actual refresh-button Click handlers and prove they ran by
+                // corrupting the adjacent combo's item list first. A successful production
+                // refresh must remove the sentinel even if the environment has no windows.
                 var refreshButtons = FindControls<Button>(form).Where(b => b.Text == "↻").ToList();
                 int refreshOk = 0;
                 foreach (var refreshButton in refreshButtons)
                 {
-                    try { refreshButton.PerformClick(); PumpFor(20); refreshOk++; }
+                    try
+                    {
+                        var adjacent = FindControls<ComboBox>(form)
+                            .OrderBy(c => Math.Abs(c.Top - refreshButton.Top) + Math.Abs(c.Left - refreshButton.Left))
+                            .FirstOrDefault();
+                        if (adjacent == null)
+                        {
+                            Fail("Settings refresh button production path", "adjacent ComboBox not found");
+                            continue;
+                        }
+                        const string sentinel = "__RITSCHYMIRROR_SAFE_SELF_TEST_REFRESH__";
+                        adjacent.Items.Clear();
+                        adjacent.Items.Add(sentinel);
+                        adjacent.SelectedIndex = 0;
+                        refreshButton.PerformClick();
+                        PumpFor(30);
+                        bool handlerRan = !adjacent.Items.Contains(sentinel);
+                        if (handlerRan) refreshOk++;
+                        else Fail("Settings refresh button production path", "sentinel remained; Click handler did not repopulate control");
+                    }
                     catch (Exception ex) { Fail("Settings refresh button production path", SanitizeText(ex.Message)); }
                 }
-                if (refreshButtons.Count == 2 && refreshOk == 2) Pass("both Settings display/window Refresh buttons execute production handlers safely");
-                else Fail("both Settings display/window Refresh buttons execute production handlers safely",
-                          $"found={refreshButtons.Count}, completed={refreshOk}");
+                if (refreshButtons.Count == 2 && refreshOk == 2) Pass("both Settings display/window Refresh buttons execute production handlers and repopulate controls");
+                else Fail("both Settings display/window Refresh buttons execute production handlers and repopulate controls",
+                          $"found={refreshButtons.Count}, verified={refreshOk}");
 
                 // Verify restart-required controls explicitly communicate that fact while
                 // their values persist immediately for the next restart.
