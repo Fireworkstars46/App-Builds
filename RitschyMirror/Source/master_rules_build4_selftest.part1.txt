@@ -1,0 +1,140 @@
+import os
+from pathlib import Path
+root = Path(os.environ['RITSCHY_SOURCE'])
+def read(name): return (root/name).read_text(encoding='utf-8')
+def write(name, text): (root/name).write_text(text, encoding='utf-8')
+
+# Replace DiagnosticsManager Safe Self-Test with Build 4 comprehensive production-path test.
+diag=read('DiagnosticsManager.cs')
+start=diag.index('    public static bool RunSafeSelfTest(')
+end=diag.index('    public static string CreateDiagnosticReport', start)
+new_method=r'''    public static bool RunSafeSelfTest(string baseDir, out string reportPath, out string summary)
+    {
+        string diagnostics = DiagnosticsDirectory(baseDir);
+        Directory.CreateDirectory(diagnostics);
+        reportPath = Path.Combine(diagnostics, "Safe-Self-Test-Last.txt");
+        string temp = Path.Combine(diagnostics, "SelfTestTemp-" + Guid.NewGuid().ToString("N"));
+        var lines = new List<string>
+        {
+            "RitschyMirror Safe Test Mode / Self-Test",
+            $"Version: {AppInfo.BuildLabel}",
+            $"Timestamp: {DateTime.Now:O}",
+            "Scope: isolated production settings/state/UI/startup/tray-arbitration/diagnostics checks",
+            ""
+        };
+        int pass = 0, fail = 0, skipped = 0;
+        void Pass(string s) { pass++; lines.Add("PASS: " + s); }
+        void Fail(string s, string? detail = null)
+        {
+            fail++;
+            lines.Add("FAIL: " + s + (string.IsNullOrWhiteSpace(detail) ? "" : " | " + detail));
+        }
+        void Skip(string s, string reason)
+        {
+            skipped++;
+            lines.Add("SKIPPED: " + s + " | " + reason);
+        }
+        try
+        {
+            Directory.CreateDirectory(temp);
+            string appPath = Path.Combine(temp, "app_settings.json");
+            string mirrorPath = Path.Combine(temp, "mirror_config.json");
+
+            var app = new AppSettings
+            {
+                AgentEnabled = false,
+                AgentBind = "localhost",
+                AgentPort = 18774,
+                AutostartMirror = false,
+                MinimizeSettingsToTray = true,
+                CloseSettingsToTray = true,
+                StartMinimizedToTray = true,
+                OpenSettingsAtStartup = false,
+                NotificationsEnabled = false,
+            };
+            app.Save(appPath);
+            var app2 = AppSettings.Load(appPath);
+            if (!app2.AgentEnabled && app2.AgentBind == "localhost" && app2.AgentPort == 18774 &&
+                !app2.AutostartMirror && app2.MinimizeSettingsToTray && app2.CloseSettingsToTray &&
+                app2.StartMinimizedToTray && !app2.OpenSettingsAtStartup && !app2.NotificationsEnabled)
+                Pass("AppSettings production atomic write -> reload/read -> compare");
+            else Fail("AppSettings production atomic write -> reload/read -> compare", "one or more values differed");
+
+            var cfg = new MirrorConfig
+            {
+                DebugLogging = false,
+                FpsLimit = 60,
+                LayoutMode = "fit",
+                HidePreviewTaskbarButton = true,
+                MinimizePreviewToTray = true,
+                PreviewX = 123,
+                PreviewY = 234,
+                PreviewWidth = 1111,
+                PreviewHeight = 777,
+                PreviewMaximized = true,
+                PreviewOpenOn = "remember",
+            };
+            cfg.Save(mirrorPath);
+            var cfg2 = MirrorConfig.Load(mirrorPath);
+            if (!cfg2.DebugLogging && cfg2.FpsLimit == 60 && cfg2.LayoutMode == "fit" &&
+                cfg2.HidePreviewTaskbarButton && cfg2.MinimizePreviewToTray &&
+                cfg2.PreviewX == 123 && cfg2.PreviewY == 234 && cfg2.PreviewWidth == 1111 &&
+                cfg2.PreviewHeight == 777 && cfg2.PreviewMaximized)
+                Pass("MirrorConfig production atomic write -> reload/read -> compare including X/Y/W/H/state");
+            else Fail("MirrorConfig production atomic write -> reload/read -> compare including X/Y/W/H/state");
+
+            // MergePatch must preserve unknown/forward-compatible data while changing only requested keys.
+            var raw = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(mirrorPath))!.AsObject();
+            raw["future_unknown_key"] = "keep-me";
+            SettingsPersistence.WriteTextAtomicVerified(mirrorPath, raw.ToJsonString(new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+            MirrorConfig.MergePatch(mirrorPath, new System.Text.Json.Nodes.JsonObject { ["fps_limit"] = 30 });
+            var merged = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(mirrorPath))!.AsObject();
+            if ((int?)merged["fps_limit"] == 30 && (string?)merged["future_unknown_key"] == "keep-me")
+                Pass("MirrorConfig production MergePatch updates requested key and preserves unknown data");
+            else Fail("MirrorConfig production MergePatch updates requested key and preserves unknown data");
+
+            SettingsActions.SetDebugLogging(mirrorPath, true);
+            if (MirrorConfig.Load(mirrorPath).DebugLogging) Pass("shared Debug Mode setter applies immediately to saved state");
+            else Fail("shared Debug Mode setter applies immediately to saved state");
+
+            SettingsActions.SetHidePreviewTaskbarButton(mirrorPath, false);
+            if (!MirrorConfig.Load(mirrorPath).HidePreviewTaskbarButton) Pass("shared preview taskbar setter persists without separate Save/restart");
+            else Fail("shared preview taskbar setter persists without separate Save/restart");
+
+            SettingsActions.SetMinimizePreviewToTray(mirrorPath, false);
+            if (!MirrorConfig.Load(mirrorPath).MinimizePreviewToTray) Pass("shared preview minimize-to-tray setter persists without separate Save/restart");
+            else Fail("shared preview minimize-to-tray setter persists without separate Save/restart");
+
+            SettingsActions.SetNotifications(app, appPath, true);
+            if (app.NotificationsEnabled && AppSettings.Load(appPath).NotificationsEnabled)
+                Pass("shared notifications setter updates runtime object and persisted state");
+            else Fail("shared notifications setter updates runtime object and persisted state");
+
+            SettingsActions.SetMainSettingsMinimizeToTray(app, appPath, false);
+            if (!app.MinimizeSettingsToTray && !AppSettings.Load(appPath).MinimizeSettingsToTray)
+                Pass("shared main Settings minimize-to-tray setter updates runtime object and persisted state");
+            else Fail("shared main Settings minimize-to-tray setter updates runtime object and persisted state");
+
+            // Reset Window Layout uses the same production action as the Settings button.
+            var beforeReset = MirrorConfig.Load(mirrorPath);
+            beforeReset.PreviewX = 900; beforeReset.PreviewY = 800;
+            beforeReset.PreviewWidth = 1600; beforeReset.PreviewHeight = 900;
+            beforeReset.PreviewMaximized = true; beforeReset.FpsLimit = 47;
+            beforeReset.Save(mirrorPath);
+            SettingsActions.ResetPreviewWindowLayout(mirrorPath);
+            var reset = MirrorConfig.Load(mirrorPath);
+            if (reset.PreviewX == int.MinValue && reset.PreviewY == int.MinValue &&
+                reset.PreviewWidth == 0 && reset.PreviewHeight == 0 && !reset.PreviewMaximized && reset.FpsLimit == 47)
+                Pass("Reset Preview Window Layout production action resets geometry only and preserves unrelated settings");
+            else Fail("Reset Preview Window Layout production action resets geometry only and preserves unrelated settings");
+
+            // Startup decisions use the exact helper consumed by TrayContext.
+            app.AutostartMirror = false; app.OpenSettingsAtStartup = false; app.StartMinimizedToTray = true;
+            var p0 = StartupBehavior.Resolve(app, Array.Empty<string>());
+            if (!p0.AutostartMirror && !p0.OpenSettings && !p0.HideSettingsToTray)
+                Pass("startup decision preserves default tray-only behavior");
+            else Fail("startup decision preserves default tray-only behavior");
+
+            app.OpenSettingsAtStartup = true; app.StartMinimizedToTray = true;
+            var p1 = StartupBehavior.Resolve(app, Array.Empty<string>());
+            if (p1.OpenSettings && p1.HideSettingsToTray) Pass("startup decision honors Open Settings + Start Minimized independently");
