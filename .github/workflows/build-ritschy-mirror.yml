@@ -2,6 +2,7 @@ name: Build RitschyMirror English installer
 
 on:
   push:
+    branches: [main]
     paths:
       - 'RitschyMirror/Source/**'
       - '.github/workflows/build-ritschy-mirror.yml'
@@ -16,6 +17,8 @@ jobs:
     env:
       RITSCHY_SOURCE: _upstream/ritschy-mirror
       RITSCHY_INSTALLER: RitschyMirror/Source/RitschyMirror-English.iss
+      RITSCHY_WORKFLOW: .github/workflows/build-ritschy-mirror.yml
+      MASTER_RULES_PATH: MASTER_RULES.md
 
     steps:
       - name: Check out App-Builds
@@ -76,11 +79,27 @@ jobs:
             if ($LASTEXITCODE -ne 0) { throw "Established patch failed: $patch" }
           }
 
-      - name: Apply Build 3 current Custom Instructions patch set
+      - name: Apply completed Build 3 patch set
         shell: pwsh
         run: |
           python RitschyMirror/Source/current_instructions_build3.py
-          if ($LASTEXITCODE -ne 0) { throw "Build 3 current-instructions patch failed" }
+          if ($LASTEXITCODE -ne 0) { throw "Build 3 patch set failed" }
+
+      - name: Apply Build 4 MASTER_RULES corrective patches
+        shell: pwsh
+        run: |
+          python RitschyMirror/Source/master_rules_build4_core_types.py
+          if ($LASTEXITCODE -ne 0) { throw "Build 4 core helper-types patch failed" }
+          python RitschyMirror/Source/master_rules_build4_core_patch.py
+          if ($LASTEXITCODE -ne 0) { throw "Build 4 core source patch failed" }
+          python RitschyMirror/Source/master_rules_build4_selftest.py
+          if ($LASTEXITCODE -ne 0) { throw "Build 4 Safe Self-Test patch failed" }
+          python RitschyMirror/Source/master_rules_build4_layout.py
+          if ($LASTEXITCODE -ne 0) { throw "Build 4 layout/persistence patch failed" }
+          python RitschyMirror/Source/master_rules_build4_controls.py
+          if ($LASTEXITCODE -ne 0) { throw "Build 4 control/close regression patch failed" }
+          python RitschyMirror/Source/master_rules_build4_controls2.py
+          if ($LASTEXITCODE -ne 0) { throw "Build 4 Settings-control regression patch failed" }
 
       - name: Run least-privilege AV and isolation static audit
         shell: pwsh
@@ -90,13 +109,16 @@ jobs:
           python RitschyMirror/Source/reliability_av_safety.py
           if ($LASTEXITCODE -ne 0) { throw "Reliability / AV-safety audit failed" }
 
-      - name: Run full current Custom Instructions static audit
+      - name: Run current MASTER_RULES static audit
         shell: pwsh
         env:
-          RITSCHY_BUILD3_AUDIT_REPORT: _upstream/ritschy-mirror/BUILD3-CURRENT-INSTRUCTIONS-AUDIT.txt
+          RITSCHY_BUILD4_AUDIT_REPORT: _upstream/ritschy-mirror/BUILD4-MASTER-RULES-AUDIT.txt
         run: |
-          python RitschyMirror/Source/build3_current_instructions_audit.py
-          if ($LASTEXITCODE -ne 0) { throw "Build 3 current-instructions audit failed" }
+          python RitschyMirror/Source/build4_master_rules_audit.py
+          if ($LASTEXITCODE -ne 0) { throw "Build 4 current MASTER_RULES static audit failed" }
+          $audit = Get-Content '_upstream/ritschy-mirror/BUILD4-MASTER-RULES-AUDIT.txt' -Raw
+          if ($audit -notmatch 'STATIC TOTAL: PASS=\d+ FAIL=0 N/A=\d+') { throw 'Static audit did not report FAIL=0' }
+          if ($audit -notmatch 'RESULT: PASS') { throw 'Static audit did not report PASS' }
 
       - name: Set up .NET 9 SDK
         uses: actions/setup-dotnet@v4
@@ -119,7 +141,7 @@ jobs:
           Remove-Item '_upstream/ritschy-mirror/EnglishBuild/app_settings.json' -Force -ErrorAction SilentlyContinue
           Get-ChildItem '_upstream/ritschy-mirror/EnglishBuild' -Filter '*.pdb' -Recurse | Remove-Item -Force
           if (!(Test-Path '_upstream/ritschy-mirror/EnglishBuild/coreclr.dll')) { throw "Private self-contained runtime files missing" }
-          if (Test-Path '_upstream/ritschy-mirror/EnglishBuild/mirror_config.json') { throw "Publish output must not contain a user config" }
+          if (Test-Path '_upstream/ritschy-mirror/EnglishBuild/mirror_config.json') { throw "Publish output must not contain user config" }
 
       - name: Package final patched source
         shell: pwsh
@@ -129,23 +151,16 @@ jobs:
           New-Item -ItemType Directory -Path $stage | Out-Null
           Get-ChildItem '_upstream/ritschy-mirror' -Force | Where-Object {
             $_.Name -notin @('.git','bin','obj','EnglishBuild','EnglishInstaller','install.ps1','publish.ps1')
-          } | ForEach-Object {
-            Copy-Item $_.FullName $stage -Recurse -Force
-          }
+          } | ForEach-Object { Copy-Item $_.FullName $stage -Recurse -Force }
           @'
-          RitschyMirror 1.3.2 English - Build 3
-          CURRENT Custom Instructions reliability / diagnostics / UI / tray audit build.
-
-          This archive contains the final patched source compiled by this workflow.
-          Existing rendering, preview, tray-click, install/data identity and settings
-          behavior are preserved unless a new backward-compatible setting explicitly
-          controls the new behavior. Legacy admin install.ps1/publish.ps1 helpers are
-          intentionally omitted; the release installer is the least-privilege path.
-          No user settings, user logs, tokens, messages, clipboard data, or keystrokes
-          are included in this source archive.
+          RitschyMirror 1.3.2 English - Build 4
+          Corrective build for the current MASTER_RULES.md.
+          Preserves established project identity, install/data/settings/log paths,
+          rendering/tray behavior, and in-place update compatibility. Adds only
+          required reliability/regression coverage and backward-compatible state.
           '@ | Set-Content (Join-Path $stage 'BUILD-NOTES.txt') -Encoding UTF8
-          Compress-Archive -Path "$stage\*" -DestinationPath 'RitschyMirror-1.3.2-Build3-CurrentInstructions-Source.zip' -CompressionLevel Optimal
-          if (!(Test-Path 'RitschyMirror-1.3.2-Build3-CurrentInstructions-Source.zip')) { throw 'Build 3 source ZIP not generated' }
+          Compress-Archive -Path "$stage\*" -DestinationPath 'RitschyMirror-1.3.2-Build4-MasterRules-Source.zip' -CompressionLevel Optimal
+          if (!(Test-Path 'RitschyMirror-1.3.2-Build4-MasterRules-Source.zip')) { throw 'Build 4 source ZIP not generated' }
 
       - name: Install Inno Setup compiler when needed
         shell: pwsh
@@ -157,25 +172,25 @@ jobs:
           }
           if (!(Test-Path $iscc)) { throw 'Inno Setup compiler not found' }
 
-      - name: Package Build 3 installer
+      - name: Package Build 4 installer
         shell: pwsh
         run: |
           $iscc = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
           & $iscc 'RitschyMirror/Source/RitschyMirror-English.iss'
           if ($LASTEXITCODE -ne 0) { throw 'Installer compilation failed' }
           $base = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2.exe'
-          $final = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build3-CurrentInstructions.exe'
+          $final = '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build4-MasterRules.exe'
           if (!(Test-Path $base)) { throw 'Base setup EXE not generated' }
           Rename-Item $base (Split-Path $final -Leaf)
-          if (!(Test-Path $final)) { throw 'Build 3 installer setup not generated' }
+          if (!(Test-Path $final)) { throw 'Build 4 installer setup not generated' }
 
-      - name: Verify Build 2 to Build 3 update, shortcuts, startup, Safe Self-Test and uninstall
+      - name: Verify Build 3 to Build 4 update, shortcuts, startup, Safe Self-Test and uninstall
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $appDir = Join-Path $env:LOCALAPPDATA 'Programs\RitschyMirror'
-          $installer = (Resolve-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build3-CurrentInstructions.exe').Path
+          $installer = (Resolve-Path '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build4-MasterRules.exe').Path
           $programs = [Environment]::GetFolderPath('Programs')
           $desktop = [Environment]::GetFolderPath('Desktop')
           $mainShortcut = Join-Path $programs 'RitschyMirror\RitschyMirror.lnk'
@@ -189,25 +204,25 @@ jobs:
           Remove-ItemProperty $runKey -Name 'RitschyMirror' -ErrorAction SilentlyContinue
 
           New-Item -ItemType Directory -Path '_previous-build' | Out-Null
-          gh release download 'ritschymirror-english-1.3.2-build2-reliabilitysafety' --repo 'Fireworkstars46/App-Builds' --pattern 'RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe' --dir '_previous-build'
-          if ($LASTEXITCODE -ne 0) { throw 'Could not download completed Build 2 for real update test' }
-          $build2 = (Resolve-Path '_previous-build/RitschyMirror-English-Setup-1.3.2-Build2-ReliabilitySafety.exe').Path
+          gh release download 'ritschymirror-english-1.3.2-build3-currentinstructions' --repo 'Fireworkstars46/App-Builds' --pattern 'RitschyMirror-English-Setup-1.3.2-Build3-CurrentInstructions.exe' --dir '_previous-build'
+          if ($LASTEXITCODE -ne 0) { throw 'Could not download completed Build 3 for real update test' }
+          $build3 = (Resolve-Path '_previous-build/RitschyMirror-English-Setup-1.3.2-Build3-CurrentInstructions.exe').Path
 
-          $oldInstall = Start-Process -FilePath $build2 -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/TASKS=""') -Wait -PassThru
-          if ($oldInstall.ExitCode -ne 0) { throw "Build 2 baseline install failed: $($oldInstall.ExitCode)" }
-          if (!(Test-Path (Join-Path $appDir 'RitschyMirror.exe'))) { throw 'Build 2 baseline EXE missing' }
+          $oldInstall = Start-Process -FilePath $build3 -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/TASKS=""') -Wait -PassThru
+          if ($oldInstall.ExitCode -ne 0) { throw "Build 3 baseline install failed: $($oldInstall.ExitCode)" }
+          if (!(Test-Path (Join-Path $appDir 'RitschyMirror.exe'))) { throw 'Build 3 baseline EXE missing' }
 
-          $mirrorSentinel = '{"audit_preserve":"mirror_config","build":2}'
-          $appSentinel = '{"audit_preserve":"app_settings","build":2}'
+          $mirrorSentinel = '{"audit_preserve":"mirror_config","build":3}'
+          $appSentinel = '{"audit_preserve":"app_settings","build":3}'
           Set-Content (Join-Path $appDir 'mirror_config.json') $mirrorSentinel -NoNewline -Encoding UTF8
           Set-Content (Join-Path $appDir 'app_settings.json') $appSentinel -NoNewline -Encoding UTF8
 
           $update = Start-Process -FilePath $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -Wait -PassThru
-          if ($update.ExitCode -ne 0) { throw "Build 2 -> Build 3 in-place update failed: $($update.ExitCode)" }
-          if ((Get-Content (Join-Path $appDir 'mirror_config.json') -Raw) -ne $mirrorSentinel) { throw 'mirror_config.json changed during Build 2 -> Build 3 update' }
-          if ((Get-Content (Join-Path $appDir 'app_settings.json') -Raw) -ne $appSentinel) { throw 'app_settings.json changed during Build 2 -> Build 3 update' }
-          if (!(Test-Path (Join-Path $appDir 'RitschyMirror.exe'))) { throw 'Build 3 installed EXE missing' }
-          if (!(Test-Path (Join-Path $appDir 'coreclr.dll'))) { throw 'Build 3 private runtime missing' }
+          if ($update.ExitCode -ne 0) { throw "Build 3 -> Build 4 in-place update failed: $($update.ExitCode)" }
+          if ((Get-Content (Join-Path $appDir 'mirror_config.json') -Raw) -ne $mirrorSentinel) { throw 'mirror_config.json changed during Build 3 -> Build 4 update' }
+          if ((Get-Content (Join-Path $appDir 'app_settings.json') -Raw) -ne $appSentinel) { throw 'app_settings.json changed during Build 3 -> Build 4 update' }
+          if (!(Test-Path (Join-Path $appDir 'RitschyMirror.exe'))) { throw 'Build 4 installed EXE missing' }
+          if (!(Test-Path (Join-Path $appDir 'coreclr.dll'))) { throw 'Build 4 private runtime missing' }
 
           if (!(Test-Path $mainShortcut) -or !(Test-Path $settingsShortcut)) { throw 'Start Menu shortcuts missing' }
           $wsh = New-Object -ComObject WScript.Shell
@@ -218,15 +233,18 @@ jobs:
           if ($settingsLnk.TargetPath -ne $expectedExe -or $settingsLnk.Arguments -ne '--settings') { throw 'Bad Settings shortcut target/arguments' }
           if ([string]::IsNullOrWhiteSpace($mainLnk.IconLocation) -or [string]::IsNullOrWhiteSpace($settingsLnk.IconLocation)) { throw 'Shortcut icon path missing' }
           $runValue = (Get-ItemProperty $runKey -Name 'RitschyMirror' -ErrorAction SilentlyContinue).RitschyMirror
-          if ($runValue) { throw 'Autostart unexpectedly enabled when Build 2 had it disabled' }
+          if ($runValue) { throw 'Autostart unexpectedly enabled when Build 3 had it disabled' }
 
           $selfTestExe = Join-Path $appDir 'RitschyMirror.exe'
           $selfTest = Start-Process -FilePath $selfTestExe -ArgumentList '--safe-self-test' -Wait -PassThru
           if ($selfTest.ExitCode -ne 0) { throw "Installed Safe Self-Test failed: $($selfTest.ExitCode)" }
           $selfTestReport = Join-Path $appDir 'Diagnostics\Safe-Self-Test-Last.txt'
           if (!(Test-Path $selfTestReport)) { throw 'Safe Self-Test report missing' }
-          if ((Get-Content $selfTestReport -Raw) -notmatch 'RESULT: PASS') { throw 'Safe Self-Test did not report PASS' }
-          Copy-Item $selfTestReport 'RitschyMirror-1.3.2-Build3-Safe-Self-Test-CI.txt' -Force
+          $selfText = Get-Content $selfTestReport -Raw
+          if ($selfText -notmatch 'RESULT: PASS') { throw 'Safe Self-Test did not report PASS' }
+          if ($selfText -notmatch 'TOTAL: PASS=\d+ FAIL=0 SKIPPED=\d+') { throw 'Safe Self-Test did not report FAIL=0 totals' }
+          if ($selfText -notmatch 'Version: v1\.3\.2 Build 4') { throw 'Safe Self-Test did not run Build 4' }
+          Copy-Item $selfTestReport 'RitschyMirror-1.3.2-Build4-Safe-Self-Test-CI.txt' -Force
 
           $taskInstall = Start-Process -FilePath $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/TASKS="desktopicon,autostart"') -Wait -PassThru
           if ($taskInstall.ExitCode -ne 0) { throw "Optional shortcut/startup task install failed: $($taskInstall.ExitCode)" }
@@ -257,56 +275,71 @@ jobs:
           Remove-Item $appDir -Recurse -Force -ErrorAction SilentlyContinue
           Remove-Item '_previous-build' -Recurse -Force -ErrorAction SilentlyContinue
 
-      - name: Copy audit reports and create SHA-256 checksums
+      - name: Create verification summary, audit copies and SHA-256 checksums
         shell: pwsh
         run: |
-          Copy-Item '_upstream/ritschy-mirror/RELIABILITY-AV-SAFETY-AUDIT.txt' 'RitschyMirror-1.3.2-Build3-AV-Safety-Audit.txt'
-          Copy-Item '_upstream/ritschy-mirror/BUILD3-CURRENT-INSTRUCTIONS-AUDIT.txt' 'RitschyMirror-1.3.2-Build3-CurrentInstructions-Audit.txt'
+          Copy-Item '_upstream/ritschy-mirror/RELIABILITY-AV-SAFETY-AUDIT.txt' 'RitschyMirror-1.3.2-Build4-AV-Safety-Audit.txt'
+          Copy-Item '_upstream/ritschy-mirror/BUILD4-MASTER-RULES-AUDIT.txt' 'RitschyMirror-1.3.2-Build4-MasterRules-Audit.txt'
+          $staticText = Get-Content 'RitschyMirror-1.3.2-Build4-MasterRules-Audit.txt' -Raw
+          $selfText = Get-Content 'RitschyMirror-1.3.2-Build4-Safe-Self-Test-CI.txt' -Raw
+          $staticMatch = [regex]::Match($staticText, 'STATIC TOTAL: PASS=(\d+) FAIL=(\d+) N/A=(\d+)')
+          $selfMatch = [regex]::Match($selfText, 'TOTAL: PASS=(\d+) FAIL=(\d+) SKIPPED=(\d+)')
+          if (!$staticMatch.Success -or !$selfMatch.Success) { throw 'Could not parse verification totals' }
+          @(
+            'RitschyMirror 1.3.2 Build 4 verification summary'
+            "Static: PASS=$($staticMatch.Groups[1].Value) FAIL=$($staticMatch.Groups[2].Value) N/A=$($staticMatch.Groups[3].Value)"
+            "Safe Self-Test: PASS=$($selfMatch.Groups[1].Value) FAIL=$($selfMatch.Groups[2].Value) SKIPPED=$($selfMatch.Groups[3].Value)"
+            'Compiler: 0 warnings required by TreatWarningsAsErrors; successful build means 0 errors.'
+          ) | Set-Content 'RitschyMirror-1.3.2-Build4-Verification-Summary.txt' -Encoding UTF8
+
           $files = @(
-            '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build3-CurrentInstructions.exe',
-            'RitschyMirror-1.3.2-Build3-CurrentInstructions-Source.zip',
-            'RitschyMirror-1.3.2-Build3-AV-Safety-Audit.txt',
-            'RitschyMirror-1.3.2-Build3-CurrentInstructions-Audit.txt',
-            'RitschyMirror-1.3.2-Build3-Safe-Self-Test-CI.txt'
+            '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build4-MasterRules.exe',
+            'RitschyMirror-1.3.2-Build4-MasterRules-Source.zip',
+            'RitschyMirror-1.3.2-Build4-AV-Safety-Audit.txt',
+            'RitschyMirror-1.3.2-Build4-MasterRules-Audit.txt',
+            'RitschyMirror-1.3.2-Build4-Safe-Self-Test-CI.txt',
+            'RitschyMirror-1.3.2-Build4-Verification-Summary.txt'
           )
           $lines = foreach ($file in $files) {
             $h = Get-FileHash $file -Algorithm SHA256
             "$($h.Hash)  $(Split-Path $file -Leaf)"
           }
-          $lines | Set-Content 'RitschyMirror-1.3.2-Build3-SHA256.txt' -Encoding ASCII
+          $lines | Set-Content 'RitschyMirror-1.3.2-Build4-SHA256.txt' -Encoding ASCII
 
-      - name: Upload Build 3 installer, source, audits and self-test
+      - name: Upload Build 4 installer, source, audits and self-test
         uses: actions/upload-artifact@v4
         with:
-          name: RitschyMirror-1.3.2-Build3-CurrentInstructions
+          name: RitschyMirror-1.3.2-Build4-MasterRules
           path: |
-            _upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build3-CurrentInstructions.exe
-            RitschyMirror-1.3.2-Build3-CurrentInstructions-Source.zip
-            RitschyMirror-1.3.2-Build3-AV-Safety-Audit.txt
-            RitschyMirror-1.3.2-Build3-CurrentInstructions-Audit.txt
-            RitschyMirror-1.3.2-Build3-Safe-Self-Test-CI.txt
-            RitschyMirror-1.3.2-Build3-SHA256.txt
+            _upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build4-MasterRules.exe
+            RitschyMirror-1.3.2-Build4-MasterRules-Source.zip
+            RitschyMirror-1.3.2-Build4-AV-Safety-Audit.txt
+            RitschyMirror-1.3.2-Build4-MasterRules-Audit.txt
+            RitschyMirror-1.3.2-Build4-Safe-Self-Test-CI.txt
+            RitschyMirror-1.3.2-Build4-Verification-Summary.txt
+            RitschyMirror-1.3.2-Build4-SHA256.txt
           if-no-files-found: error
           retention-days: 90
 
-      - name: Publish Build 3 GitHub Release
+      - name: Publish Build 4 GitHub Release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = 'ritschymirror-english-1.3.2-build3-currentinstructions'
+          $tag = 'ritschymirror-english-1.3.2-build4-masterrules'
           $assets = @(
-            '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build3-CurrentInstructions.exe',
-            'RitschyMirror-1.3.2-Build3-CurrentInstructions-Source.zip',
-            'RitschyMirror-1.3.2-Build3-AV-Safety-Audit.txt',
-            'RitschyMirror-1.3.2-Build3-CurrentInstructions-Audit.txt',
-            'RitschyMirror-1.3.2-Build3-Safe-Self-Test-CI.txt',
-            'RitschyMirror-1.3.2-Build3-SHA256.txt'
+            '_upstream/ritschy-mirror/EnglishInstaller/RitschyMirror-English-Setup-1.3.2-Build4-MasterRules.exe',
+            'RitschyMirror-1.3.2-Build4-MasterRules-Source.zip',
+            'RitschyMirror-1.3.2-Build4-AV-Safety-Audit.txt',
+            'RitschyMirror-1.3.2-Build4-MasterRules-Audit.txt',
+            'RitschyMirror-1.3.2-Build4-Safe-Self-Test-CI.txt',
+            'RitschyMirror-1.3.2-Build4-Verification-Summary.txt',
+            'RitschyMirror-1.3.2-Build4-SHA256.txt'
           )
           gh release view $tag 2>$null
           if ($LASTEXITCODE -eq 0) {
             gh release upload $tag @assets --clobber
           } else {
-            gh release create $tag @assets --target $env:GITHUB_SHA --title 'RitschyMirror 1.3.2 English — Build 3 Current Instructions Audit (unofficial)' --notes 'Build 3 preserves the existing RitschyMirror identity, rendering/preview behavior, settings/data paths, tray click behavior, AppId, install path and update compatibility while filling gaps found by the current Custom Instructions audit. Added: bounded/versioned privacy-sanitized logging; Debug Mode default OFF; isolated Safe Self-Test; app-local Diagnostics/exports/crash reports; Settings and tray access to diagnostics; configurable main-X-to-tray vs Exit; Open Settings at startup; Start Minimized to Tray; tray notification ON/OFF; Explorer TaskbarCreated tray recovery; responsive bottom Settings layout with Exit App; explicit shortcut icons; full static audit. The previous low-level fullscreen mouse hook was replaced by documented ClipCursor confinement. The existing HTTP agent remains the only intentional listener and no new firewall/admin/service/task/process-injection/hook/debugger behavior was added. CI compiles with warnings as errors, installs the previous Build 2 then updates to Build 3 with byte-exact config preservation, runs the installed Safe Self-Test, verifies shortcuts/startup task preservation, and checks data-preserving uninstall. This unsigned build can still receive SmartScreen/AV reputation warnings; no AV exclusions are added. Real GPU/capture-card behavior, actual Explorer restart visuals, and third-party AV reputation were not hardware/runtime-tested by CI.' --prerelease
+            gh release create $tag @assets --target $env:GITHUB_SHA --title 'RitschyMirror 1.3.2 English — Build 4 MASTER_RULES Corrective (unofficial)' --notes 'Corrective build required by the latest MASTER_RULES.md audit; no intentional mirroring/rendering feature change. Preserves AppId, install path, single-instance design, app_settings.json/mirror_config.json, logs/data, shortcuts, startup identity, tray/taskbar behavior, and Build 3 update compatibility. Fixes real audit gaps: verified atomic settings writes, early single-instance restore-signal race, single-vs-double tray-click arbitration, shared duplicate-setting production setters, remembered/off-screen-safe/resettable Settings window geometry, explicit close-decision path, and much broader production-path Safe Self-Test coverage with per-item PASS/FAIL/SKIPPED. Multi-instance stale-writer/runtime-mode rules are N/A because RitschyMirror intentionally remains single-instance. CI compiles with warnings as errors, performs a real Build 3 -> Build 4 in-place update with byte-exact config preservation, runs the installed Safe Self-Test, verifies shortcuts/startup choices, and verifies data-preserving uninstall. No AV exclusions are added. Real GPU/capture hardware, physical Explorer tray behavior, and SmartScreen/Bitdefender reputation remain manual/interactive.' --prerelease
           }
-          if ($LASTEXITCODE -ne 0) { throw 'Build 3 release publish failed' }
+          if ($LASTEXITCODE -ne 0) { throw 'Build 4 release publish failed' }
