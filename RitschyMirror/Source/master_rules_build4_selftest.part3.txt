@@ -1,0 +1,114 @@
+                    bool expected = mainMinBox.Checked;
+                    if (app.MinimizeSettingsToTray == expected && AppSettings.Load(appPath).MinimizeSettingsToTray == expected)
+                        Pass("Settings main-minimize checkbox updates same runtime object + persisted state immediately");
+                    else Fail("Settings main-minimize checkbox updates same runtime object + persisted state immediately");
+                }
+                else Fail("Settings main-minimize checkbox production test", "control not found");
+
+                var agentBox = FindCheck("Enable HTTP agent");
+                if (agentBox != null)
+                {
+                    agentBox.Checked = true;
+                    agentBox.Checked = false;
+                    bool persisted = !AppSettings.Load(appPath).AgentEnabled;
+                    bool notice = ContainsControlText(form, "Agent/bind/port changes require restarting the app.");
+                    if (persisted && notice) Pass("restart-required HTTP-agent setting persists and UI explicitly states restart requirement");
+                    else Fail("restart-required HTTP-agent setting persists and UI explicitly states restart requirement",
+                              $"persisted={persisted}, notice={notice}");
+                }
+                else Fail("restart-required HTTP-agent setting production test", "control not found");
+
+                var copyBox = FindCheck("Copy mode");
+                if (copyBox != null)
+                {
+                    copyBox.Checked = !copyBox.Checked;
+                    bool persisted = MirrorConfig.Load(mirrorPath).CopyMode == copyBox.Checked;
+                    bool notice = copyBox.Text.Contains("restart required", StringComparison.OrdinalIgnoreCase);
+                    if (persisted && notice) Pass("restart-required Copy mode persists and control explicitly states restart requirement");
+                    else Fail("restart-required Copy mode persists and control explicitly states restart requirement",
+                              $"persisted={persisted}, notice={notice}");
+                }
+                else Fail("restart-required Copy mode production test", "control not found");
+
+                // Production Reset button path, not just SettingsActions directly.
+                var dirty = MirrorConfig.Load(mirrorPath);
+                dirty.PreviewX = 444; dirty.PreviewY = 555; dirty.PreviewWidth = 1200; dirty.PreviewHeight = 700; dirty.PreviewMaximized = true;
+                dirty.Save(mirrorPath);
+                var resetButton = FindButton("Reset Preview Window Layout");
+                resetButton?.PerformClick();
+                var afterButtonReset = MirrorConfig.Load(mirrorPath);
+                if (resetButton != null && afterButtonReset.PreviewX == int.MinValue && afterButtonReset.PreviewY == int.MinValue &&
+                    afterButtonReset.PreviewWidth == 0 && afterButtonReset.PreviewHeight == 0 && !afterButtonReset.PreviewMaximized)
+                    Pass("Reset Preview Window Layout Settings button exercises production reset path");
+                else Fail("Reset Preview Window Layout Settings button exercises production reset path");
+
+                bool exitRequested = false;
+                form.ExitAppRequested += () => exitRequested = true;
+                var exitButton = FindButton("Exit App");
+                exitButton?.PerformClick();
+                if (exitButton != null && exitRequested) Pass("Settings Exit App button invokes the production exit request event");
+                else Fail("Settings Exit App button invokes the production exit request event");
+            }
+
+            // Login-autostart production helper with an isolated value name, then clean it.
+            string testRunValue = "RitschyMirror.SafeSelfTest." + Guid.NewGuid().ToString("N");
+            try
+            {
+                LoginAutostart.SetEnabled(testRunValue, true, Application.ExecutablePath);
+                bool enabled = LoginAutostart.IsEnabled(testRunValue);
+                LoginAutostart.SetEnabled(testRunValue, false, Application.ExecutablePath);
+                bool disabled = !LoginAutostart.IsEnabled(testRunValue);
+                if (enabled && disabled) Pass("login-autostart production registry path set -> read -> delete -> verify using isolated value");
+                else Fail("login-autostart production registry path set -> read -> delete -> verify using isolated value");
+            }
+            finally
+            {
+                try { LoginAutostart.SetEnabled(testRunValue, false, Application.ExecutablePath); } catch { }
+            }
+
+            // Production logger: pre-size the file, then one normal Log call must rotate it.
+            File.WriteAllBytes(engine.LogPath, new byte[2 * 1024 * 1024]);
+            engine.Log("[SELFTEST] rotation trigger path=" + Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+            string archive = engine.LogPath + ".1";
+            if (File.Exists(archive) && File.Exists(engine.LogPath) && new FileInfo(engine.LogPath).Length < 128 * 1024)
+                Pass("bounded project log rotates through production MirrorEngine.Log path");
+            else Fail("bounded project log rotates through production MirrorEngine.Log path");
+            string currentLog = File.ReadAllText(engine.LogPath);
+            if (currentLog.Contains(AppInfo.BuildLabel, StringComparison.Ordinal) && currentLog.Contains("%USERPROFILE%", StringComparison.OrdinalIgnoreCase))
+                Pass("production log includes Version+Build/timestamp format and sanitizes user-profile path");
+            else Fail("production log includes Version+Build/timestamp format and sanitizes user-profile path");
+
+            string diagnostic = CreateDiagnosticReport(temp, app, MirrorConfig.Load(mirrorPath), engineRunning: false);
+            if (File.Exists(diagnostic) && File.ReadAllText(diagnostic).Contains(AppInfo.BuildLabel, StringComparison.Ordinal))
+                Pass("diagnostic report uses project-local production path and includes Version+Build");
+            else Fail("diagnostic report uses project-local production path and includes Version+Build");
+
+            string export = ExportLogsAndDiagnostics(temp, app, MirrorConfig.Load(mirrorPath), engineRunning: false);
+            if (File.Exists(export))
+            {
+                using var zip = System.IO.Compression.ZipFile.OpenRead(export);
+                bool hasReport = zip.Entries.Any(e => e.Name.Equals("Diagnostic-Report-Latest.txt", StringComparison.OrdinalIgnoreCase));
+                bool hasLog = zip.Entries.Any(e => e.Name.Equals("mirror.log", StringComparison.OrdinalIgnoreCase));
+                if (hasReport && hasLog) Pass("diagnostic export production path creates ZIP with report and bounded log");
+                else Fail("diagnostic export production path creates ZIP with report and bounded log",
+                          $"report={hasReport}, log={hasLog}");
+            }
+            else Fail("diagnostic export production path creates ZIP with report and bounded log", "ZIP missing");
+
+            // Corrupt input must fall back safely without modifying/deleting the source file.
+            File.WriteAllText(appPath, "{broken-app-json");
+            string corruptAppBefore = File.ReadAllText(appPath);
+            var fallbackApp = AppSettings.Load(appPath);
+            if (File.Exists(appPath) && File.ReadAllText(appPath) == corruptAppBefore && fallbackApp.AgentPort == new AppSettings().AgentPort)
+                Pass("corrupt app settings recover to defaults without deleting/rewriting original file");
+            else Fail("corrupt app settings recover to defaults without deleting/rewriting original file");
+
+            File.WriteAllText(mirrorPath, "{broken-mirror-json");
+            string corruptMirrorBefore = File.ReadAllText(mirrorPath);
+            var fallbackMirror = MirrorConfig.Load(mirrorPath);
+            if (File.Exists(mirrorPath) && File.ReadAllText(mirrorPath) == corruptMirrorBefore && fallbackMirror.FpsLimit == new MirrorConfig().FpsLimit)
+                Pass("corrupt mirror settings recover to defaults without deleting/rewriting original file");
+            else Fail("corrupt mirror settings recover to defaults without deleting/rewriting original file");
+
+            // Shared production exit primitive is exercised by an isolated child process.
+            try
