@@ -1,5 +1,5 @@
 #define MyAppVersion "1.3.2"
-#define MyBuildNumber "3"
+#define MyBuildNumber "4"
 #define MyAppName "RitschyMirror"
 #define MyAppExeName "RitschyMirror.exe"
 #define SrcDir SourcePath + "..\..\_upstream\ritschy-mirror"
