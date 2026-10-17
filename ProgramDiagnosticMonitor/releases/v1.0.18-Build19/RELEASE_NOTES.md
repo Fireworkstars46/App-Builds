@@ -44,7 +44,7 @@ Build 19 is a corrective/recovery release produced from the preserved v1.0.15 so
 - Uninstaller guards deletion to exact isolated project roots and preserves Logs/Diagnostics as recovery evidence.
 
 ## Validation
-Static/release audit: **99 PASS, 0 FAIL**.
+Static/release audit: **100 PASS, 0 FAIL**.
 
 A clean rebuild from the Build 19 source ZIP produced byte-identical deterministic main EXE, uninstaller, and setup binaries.
 
