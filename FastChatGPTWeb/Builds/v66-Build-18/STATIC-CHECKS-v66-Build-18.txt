@@ -1,0 +1,122 @@
+Fast ChatGPT Web v66 Build 18 — Static Checks
+
+113 PASS / 0 FAIL
+
+PASS  Required file App.xaml
+PASS  Required file App.xaml.cs
+PASS  Required file MainWindow.xaml
+PASS  Required file MainWindow.xaml.cs
+PASS  Required file FastChatGPTWeb.csproj
+PASS  Required file UninstallManager.cs
+PASS  Required file SingleInstanceCoordinator.cs
+PASS  Required file InstanceRegistryCoordinator.cs
+PASS  Required file SetupBuilder/Program.cs
+PASS  Required file SetupBuilder/FastChatGPTWebSetup.csproj
+PASS  Required file Assets/AppIcon.ico
+PASS  Required file BUILD-REAL-SETUP-EXE.bat
+PASS  Required file README.txt
+PASS  XML/XAML parse App.xaml
+PASS  XML/XAML parse MainWindow.xaml
+PASS  XML/XAML parse FastChatGPTWeb.csproj
+PASS  XML/XAML parse SetupBuilder/FastChatGPTWebSetup.csproj
+PASS  XAML event handlers resolve (55 handlers)
+PASS  XAML x:Name unique
+PASS  C# lexical balance MainWindow.xaml.cs
+PASS  C# lexical balance App.xaml.cs
+PASS  C# lexical balance SingleInstanceCoordinator.cs
+PASS  C# lexical balance InstanceRegistryCoordinator.cs
+PASS  C# lexical balance UninstallManager.cs
+PASS  C# lexical balance SetupBuilder/Program.cs
+PASS  No duplicate exact MainWindow method signatures
+PASS  Main AppBuild=18
+PASS  Main FileVersion 66.0.0.18
+PASS  Main InformationalVersion Build 18
+PASS  Setup FileVersion 66.0.0.18
+PASS  Setup InformationalVersion Build 18
+PASS  Builder output Build 18
+PASS  Setup UI Build 18
+PASS  README Build 18
+PASS  Multi-instance default ON preserved
+PASS  Multi-instance checkbox wired
+PASS  OFF UI says oldest stays open
+PASS  OFF UI says newer auto-close
+PASS  ON UI says no automatic reopen
+PASS  Project-local instance registry
+PASS  Unique transition mutex
+PASS  Unique per-instance command event
+PASS  Unique survivor-ready event
+PASS  Launch-order sequence persisted
+PASS  Launch-order allocation locked
+PASS  Oldest selection uses launch sequence
+PASS  No unrelated process enumeration
+PASS  No forced process kill
+PASS  Newer instances self-close
+PASS  Newer close bypasses tray and setting rewrite
+PASS  Survivor readiness handshake before closing newer
+PASS  Survivor acquires normal single-instance guard
+PASS  Survivor starts focus watcher
+PASS  Survivor reloads shared settings
+PASS  Survivor reload does not move window
+PASS  New launch waits transition gate
+PASS  Transition holds same gate during survivor handoff
+PASS  Enable immediately releases single-instance guard
+PASS  Enable does not reopen process
+PASS  Enable clears stale transition
+PASS  Safe Self-Test checkbox suppresses live coordination
+PASS  Isolated transition production-core test
+PASS  Isolated transition test checks oldest survivor
+PASS  Isolated transition test checks newer signal
+PASS  Isolated transition test checks startup race gate
+PASS  MultiInstance serializer
+PASS  MultiInstance parser
+PASS  MultiInstance write-read-compare test
+PASS  Import mode change uses runtime coordination
+PASS  Restore Defaults mode change uses runtime coordination
+PASS  Optional single-instance decision preserved
+PASS  Second-launch focus behavior preserved
+PASS  Request failure clears transition state
+PASS  Request failure restores Multi-instance ON
+PASS  Project-local shared-settings mutex
+PASS  Shared settings saves serialized by mutex
+PASS  Shared settings write reloads latest before merge
+PASS  Shared settings merge starts from latest committed state
+PASS  Shared settings merge compares local state to instance baseline
+PASS  Stale local baseline retained after merged save
+PASS  Initial shared-settings baseline loaded from disk
+PASS  Import explicitly replaces all shared settings
+PASS  Restore Defaults explicitly replaces all shared settings
+PASS  Consolidation reload refreshes shared-settings baseline
+PASS  Safe Self-Test covers shared-setting conflict merge
+PASS  Safe Self-Test covers stale instance close/save conflict
+PASS  Shared-setting conflict tests use isolated temporary file
+PASS  Immediate multi-instance setting saves before runtime transition
+PASS  Immediate setting production handlers have persistence verification
+PASS  Future-launch Start Minimized behavior is explicitly stated
+PASS  Atomic verified settings writes preserved
+PASS  No direct real settings write bypasses shared merge
+PASS  Preserved Stable EXE name
+PASS  Preserved App data root
+PASS  Preserved settings.ini
+PASS  Preserved WebView2Profile
+PASS  Preserved Logs
+PASS  Preserved Diagnostics
+PASS  Preserved AppUserModelID
+PASS  Preserved install root
+PASS  No PowerShell execution
+PASS  No taskkill
+PASS  No Process.Kill
+PASS  No service creation
+PASS  No firewall changes
+PASS  No AV exclusions
+PASS  No network listener APIs
+PASS  Builder stage [1/4] Building the app
+PASS  Builder stage [2/4] Preparing the installer payload
+PASS  Builder stage [3/4] Building the reusable setup EXE
+PASS  Builder stage [4/4] Copying the finished installer
+PASS  Installer outer compression disabled
+PASS  Main app single-file publish
+
+Runtime status
+--------------
+Windows .NET 8 WPF/WebView2 compilation and the in-app Build 18 Safe Self-Test were NOT RUN in this environment.
+Per current MASTER_RULES.md, static checks alone do not make Build 18 DONE. A real Windows build, Safe Self-Test with 0 FAIL, and the shared-settings stale-writer regression must be verified on the user's PC.

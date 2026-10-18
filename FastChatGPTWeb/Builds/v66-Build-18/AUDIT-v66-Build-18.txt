@@ -1,0 +1,119 @@
+Fast ChatGPT Web v66 Build 18 — Latest MASTER_RULES.md Audit
+=============================================================
+
+MASTER_RULES basis
+------------------
+- Latest MASTER_RULES.md fetched from Fireworkstars46/App-Builds before this audit.
+- Git blob SHA observed: 05e4162a5e5874a063f0fe1599d8d8923fa1affe
+- The newest relevant rules are conditional and apply here because Fast ChatGPT Web intentionally supports multiple live instances sharing settings/state.
+- Existing project-specific behavior remains binding, including Multi-instance mode default ON and deterministic oldest-instance survivor behavior when switching OFF.
+
+Audit decision
+--------------
+Build 17 does NOT fully satisfy the newest MASTER_RULES.md.
+
+A real shared-settings stale-writer case remained:
+1. Two Fast ChatGPT Web instances can be open with the same initial settings baseline.
+2. Instance B can change and commit a setting.
+3. Instance A can still hold the older value in memory.
+4. Build 17 SaveAppSettings captured and rewrote the entire in-memory snapshot.
+5. Therefore a later save/close by stale Instance A could revert an unrelated newer value committed by Instance B.
+
+Build 17 already protected the special consolidation exit path by suppressing settings-save-on-close for newer instances, but that did not cover ordinary shared settings saves while Multi-instance mode remained ON.
+
+The newest MASTER_RULES.md explicitly requires relevant multi-instance projects to prevent stale instances from overwriting newer committed shared settings/state and, when safely automatable, add matching stale-writer regression coverage.
+
+Corrective revision
+-------------------
+An actual code/artifact change is required, so the separate Build advances from 17 to 18. Normal app version remains v66.
+
+Build 18 shared-settings correction
+-----------------------------------
+PASS — Added project-local named settings-write mutex Local\FastChatGPTWeb.Settings.v1.
+PASS — Normal real settings saves are serialized across Fast ChatGPT Web instances.
+PASS — Before each shared save, the production path reloads the newest settings.ini from disk.
+PASS — Each instance tracks the local settings baseline it last loaded/committed.
+PASS — Shared saves merge only values locally changed relative to that instance baseline onto the newest disk snapshot.
+PASS — A stale instance therefore cannot rewrite unrelated newer settings committed by another instance.
+PASS — Window placement/state can still be updated locally without reverting another instance's newer app settings.
+PASS — Import Settings and Restore Defaults remain intentional full-replacement operations and explicitly bypass merge preservation for their selected/default values.
+PASS — Atomic temp write -> verify -> replace -> verify remains preserved.
+PASS — The survivor's post-consolidation shared-settings reload also refreshes its local baseline.
+PASS — Safe Self-Test settings override continues using isolated temporary settings and does not participate in live cross-process settings coordination.
+
+Newest runtime-setting rules
+----------------------------
+PASS — Multi-instance mode still saves immediately through the production settings path before runtime coordination.
+PASS — Turning Multi-instance mode OFF still immediately invokes production consolidation behavior.
+PASS — Turning it ON still immediately releases the single-instance guard for future manual launches and does not reopen closed instances.
+PASS — Start Minimized continues to explicitly state that it applies to future launches.
+PASS — Existing Settings/UI/tray production-handler persistence checks remain in Safe Self-Test.
+
+Matching Safe Self-Test regression coverage
+-------------------------------------------
+PASS — Added isolated production-path shared-settings conflict test:
+       another simulated instance commits a newer AppTheme value, then a stale instance saves a different local setting; the newer theme must remain.
+PASS — Added isolated stale close/save regression:
+       another instance commits a newer setting, then a stale instance applies only a local window placement change; newer shared settings must remain while the local window update is written.
+PASS — Both regressions use project-owned temporary files and unique Safe Self-Test mutex names.
+PASS — Existing multi-instance transition tests remain intact: oldest survivor, survivor-ready handshake, newer close signal, transition state, and startup gate.
+PASS — Existing write -> reload/read -> compare, import validation, UI/tray sync, startup, window, pin/topmost, diagnostics, logging, tray, and WebView-related Safe Self-Test coverage remains preserved.
+
+Preserved identity / compatibility
+----------------------------------
+PASS — App version remains v66.
+PASS — Stable installed EXE remains FastChatGPTWebFinal.exe.
+PASS — Install root remains %LOCALAPPDATA%\Programs\FastChatGPTWebFinal\.
+PASS — App data root remains %LOCALAPPDATA%\FastChatGPTWeb\.
+PASS — settings.ini path and existing format remain backward-compatible.
+PASS — WebView2Profile login/session path remains unchanged.
+PASS — Logs, Diagnostics, Temp, AppUserModelID, shortcut/uninstall identities, and installer/update identity remain unchanged.
+PASS — No package/signing/update identity change.
+PASS — Existing theme, tray, startup, Close/Minimize, pin, window persistence, Recent Downloads, branch/OAuth, diagnostics, recovery, and uninstall behavior are preserved.
+PASS — Build 17 deterministic oldest-instance survivor behavior is preserved unchanged.
+
+Safety / least privilege
+------------------------
+PASS — No administrator requirement added.
+PASS — No service, task, firewall change, AV exclusion, hook/injection, debugger attachment, unrelated process scan, Process.Kill, or taskkill added.
+PASS — New settings synchronization is project-local and per-user.
+PASS — No unrelated user/project files are scanned or modified.
+PASS — Logs remain bounded and redacted.
+
+Static audit
+------------
+Result: 113 PASS / 0 FAIL
+See STATIC-CHECKS-v66-Build-18.txt.
+
+Runtime status
+--------------
+NOT RUN in this environment:
+- Windows .NET 8 WPF compilation/publish.
+- Setup EXE compilation/publish.
+- In-app Build 18 Safe Self-Test.
+- Live two-instance stale-settings regression on Windows.
+- Re-verification of live oldest-instance consolidation/focus behavior.
+- SmartScreen/AV reputation behavior.
+
+Historical Build 17 evidence
+----------------------------
+Build 17 previously built successfully and its Safe Self-Test reported 44 PASS / 0 FAIL / 7 SKIPPED, with live oldest-instance consolidation confirmed in logs. That evidence remains useful for preserved behavior, but it cannot be counted as Build 18 runtime evidence because Build 18 changes the settings-save path.
+
+MASTER_RULES DONE status
+------------------------
+NOT DONE.
+
+Reason:
+Build 18 is a corrective artifact and the newest MASTER_RULES.md requires real runtime evidence for safely testable required behavior. Static checks pass, but the Build 18 Windows build and Safe Self-Test have not yet been run.
+
+Required Windows verification
+-----------------------------
+1. Run BUILD-REAL-SETUP-EXE.bat and confirm app + setup compile/publish successfully.
+2. Install/run v66 Build 18.
+3. With Multi-instance mode ON, open two instances.
+4. In one instance, change a normal persisted setting (for example theme or Start Minimized).
+5. Without changing that same setting in the other stale instance, close/save the stale instance.
+6. Reopen/check Settings and confirm the newer committed value was not reverted.
+7. Re-check Build 17 behavior: turn Multi-instance OFF and confirm only the oldest instance remains; while OFF a new launch focuses the survivor; re-enable and confirm no closed instance reopens automatically.
+8. Enable Safe Test Mode and run Safe Self-Test.
+9. DONE requires 0 FAIL and only genuinely justified SKIPPED/NOT TESTED items.
