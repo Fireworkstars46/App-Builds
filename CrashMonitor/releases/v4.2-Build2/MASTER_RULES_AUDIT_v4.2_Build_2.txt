@@ -1,0 +1,66 @@
+Crash Monitor v4.2 Build 2 - newest MASTER_RULES.md audit
+=========================================================
+Master rules source: https://github.com/Fireworkstars46/App-Builds/blob/main/MASTER_RULES.md
+Audited rules blob SHA: 1dea293c9f507235eb4c8bb28b67307aba3f0813
+
+Audit finding
+-------------
+Corrective Build 2 WAS required. Build 1 had an actual required-coverage/artifact gap rather than merely a rules-file change:
+- no production Safe Self-Test command/tray path existed;
+- its bundled Safe Self-Test report counted several static wiring assertions as PASS even though MASTER_RULES says
+  callback/function existence or static wiring alone is not a functional PASS;
+- duplicate Settings and tray controls for immediate states used separate logic instead of a single production setter path;
+- persistent immediate setting writes were checked at the API-call level but were not read back and verified through
+  the production getters.
+
+Build 2 correction
+------------------
+- Added an isolated production-path Windows Safe Self-Test with 11 individual automated tests.
+- Added a tray action and --safe-self-test command.
+- Consolidated duplicate Settings/tray setters for Start with Windows, Pause, Minimize-to-tray, and taskbar+tray.
+- Added write -> read-back verification for TrayOnly/display mode, MinimizeToTray, KeepTrayWithTaskbar, DetailsHeight,
+  and Start with Windows registry state.
+- Display mode now refuses to claim/apply the requested persistent mode if persistence verification fails.
+- Preserved all update-critical paths, IDs, identities, data/settings formats, WER/dump backends, AV-sensitive scope,
+  signing state, installer behavior, and established UI behavior.
+
+Immediate/restart-setting applicability
+---------------------------------------
+APPLIES.
+- Start with Windows: immediate; production setter now verifies registry state. No app restart required.
+- Minimize to tray: immediate + persistent; shared setter + write/read verification added.
+- Show tray icon with taskbar: immediate + persistent; shared setter + write/read verification added.
+- Move to tray/taskbar display mode: immediate + persistent; persistence verified before the visible state change.
+- Details-height divider: applies immediately while dragging and persists at drag completion; save/readback is verified.
+- Pause monitoring: intentionally session-only established behavior; immediate runtime state, not a persistent setting.
+No Crash Monitor setting is intentionally documented as restart/relaunch-required, so the restart-required setting rule
+is not applicable to current settings.
+
+Multi-instance/shared-state applicability
+-----------------------------------------
+NOT APPLICABLE. Crash Monitor is intentionally single-instance and preserves Local\Crash_Monitor_31. Build 2 does not
+add multi-instance support. The Safe Self-Test includes a mutex-collision regression check for the established
+single-instance identity. Stale multi-instance settings-writer rules therefore do not apply.
+
+Static/release audit
+--------------------
+PASS: 86
+FAIL: 0
+
+Safe Self-Test execution in this build environment
+--------------------------------------------------
+PASS: 0
+FAIL: 0
+SKIPPED: 0
+NOT TESTED: 21
+The Win64 executable cannot be run in this Linux build environment. 11 items are implemented in the in-app Safe
+Self-Test and 10 remain real Windows/manual checks. None are falsely counted as PASS.
+
+Remaining completion blockers
+-----------------------------
+- Run the Build 2 Safe Self-Test on Windows and obtain 0 FAIL.
+- Complete the listed Windows update/installer/shortcut/startup/WER/dump/ZIP/Explorer/tray/Exit/security checks.
+- After runtime checks pass, permanently archive and retrieve/verify the completed Build 2 artifacts in
+  Fireworkstars46/App-Builds as required by Rule 27.
+
+Final tracker status: NOT DONE.
