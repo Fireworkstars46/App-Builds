@@ -1,0 +1,44 @@
+name: Archive Crash Monitor v4.2 Build 2 binaries
+
+on:
+  push:
+    paths:
+      - '.archive-staging/crashmonitor-v4.2-build2/COMPLETE'
+
+permissions:
+  contents: write
+
+jobs:
+  assemble-and-archive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct exact Build 2 binary artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          release='CrashMonitor/releases/v4.2-Build2'
+          staging='.archive-staging/crashmonitor-v4.2-build2'
+          mkdir -p "$release"
+          cat "$staging"/setup/part* | base64 --decode > "$release/Crash_Monitor_v4.2_Build_2_Setup.exe"
+          cat "$staging"/source/part* | base64 --decode > "$release/Crash_Monitor_v4.2_Build_2_Source.zip"
+          echo '7b40893841d33d13d4ee003029fd5fec789fc09130b0b83605aad1a581e7404b  CrashMonitor/releases/v4.2-Build2/Crash_Monitor_v4.2_Build_2_Setup.exe' | sha256sum -c -
+          echo '6b8af33ec7a386d493791d058d20010aeaa2b8d5387b49e531081bebf5b47ce7  CrashMonitor/releases/v4.2-Build2/Crash_Monitor_v4.2_Build_2_Source.zip' | sha256sum -c -
+
+      - name: Commit permanent archive artifacts and remove staging helper
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -rf .archive-staging/crashmonitor-v4.2-build2
+          git rm .github/workflows/archive-crashmonitor-v42-build2.yml
+          git add CrashMonitor/releases/v4.2-Build2/Crash_Monitor_v4.2_Build_2_Setup.exe
+          git add CrashMonitor/releases/v4.2-Build2/Crash_Monitor_v4.2_Build_2_Source.zip
+          git add -A .archive-staging || true
+          git commit -m 'Archive Crash Monitor v4.2 Build 2 binary artifacts'
+          git push
