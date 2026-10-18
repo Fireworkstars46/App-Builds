@@ -1,0 +1,23 @@
+Crash Monitor v4.2 Build 2 - safe recovery metadata
+===================================================
+Project: Crash Monitor (Windows)
+App version: 4.2
+Build: 2
+Baseline: Crash Monitor v4.2 Build 1
+Architecture: Windows x64
+Installed executable: %LOCALAPPDATA%\Programs\Crash Monitor\Crash Monitor.exe
+Data folder: %LOCALAPPDATA%\Crash Monitor
+Settings: %LOCALAPPDATA%\Crash Monitor\targets.ini
+Log: %LOCALAPPDATA%\Crash Monitor\monitor.log
+Dumps: %LOCALAPPDATA%\Crash Monitor\Dumps
+Startup registry value name: Crash Monitor
+Uninstall registry identity: Crash Monitor
+App Paths executable identity: Crash Monitor.exe
+Mutex: Local\Crash_Monitor_31
+Main window class: CrashMonitorMainClass411
+Setup window class: CrashMonitorSetupClass411
+Manifest identity: CrashMonitor.Application
+Signing: unsigned Windows baseline preserved; no private signing key exists in this release archive.
+MASTER_RULES.md blob SHA audited: 1dea293c9f507235eb4c8bb28b67307aba3f0813
+
+No password, token, private key, or secret is stored in this metadata file.
