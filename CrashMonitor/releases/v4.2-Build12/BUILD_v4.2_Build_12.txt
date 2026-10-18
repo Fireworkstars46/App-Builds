@@ -1,0 +1,31 @@
+Crash Monitor v4.2 Build 12 - reproducible build notes
+======================================================
+Target: Windows x64, freestanding Win32 C++.
+No Visual C++ runtime dependency is intentionally linked.
+
+Build 12 is a corrective build for the Build 11 Safe Self-Test startup regression observed on Windows.
+Build 11 exited with 0xC0000005 before creating its persistent self-test report. The Build 11 source expansion
+increased RunSafeSelfTest's compiler-reported static stack frame from 28,856 bytes (Build 10) to 41,016 bytes
+while the established freestanding compile uses -mno-stack-arg-probe. Build 12 keeps the 39-test body unchanged
+but runs it on a dedicated CreateThread worker with an explicit 262,144-byte committed stack. The tiny wrapper
+uses 72 bytes of static stack and the worker entry uses 40 bytes in compiler stack-usage output.
+
+Build steps:
+1) Build import libraries from included .def files using lld-link /lib.
+2) Compile:
+   clang++ -target x86_64-pc-windows-msvc -std=c++17 -ffreestanding -fno-exceptions -fno-rtti \
+     -fno-stack-protector -fno-threadsafe-statics -mno-stack-arg-probe \
+     -Wall -Wextra -Wpedantic -c crash_monitor_42_build12-source.cpp -o cm42b12.obj
+3) Link:
+   lld-link /subsystem:windows /entry:wWinMainCRTStartup /nodefaultlib \
+     cm42b12.obj KERNEL32.lib USER32.lib GDI32.lib SHELL32.lib ADVAPI32.lib COMDLG32.lib OLE32.lib \
+     /out:Crash_Monitor_v4.2_Build_12_Setup-noicon.exe
+4) Embed icon + manifest:
+   python embed_resources_42_build12.py
+
+Build 12 also corrects the launcher-side displayed Safe Self-Test total from the stale value 36 to 39.
+Build 10's archive-split fixes and Build 11's safe automation remain preserved.
+
+Latest authoritative MASTER_RULES.md checked before this corrective build: Git blob 8dfded979df65ded2f84757cf8a678c664225186.
+Final installer/setup package: Crash_Monitor_v4.2_Build_12_Setup.exe
+Signing: established unsigned state preserved.

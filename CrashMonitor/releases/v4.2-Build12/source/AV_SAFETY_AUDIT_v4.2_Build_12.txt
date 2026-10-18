@@ -1,0 +1,6 @@
+Crash Monitor v4.2 Build 12 - AV/safety audit
+=============================================
+No new process injection, remote code execution, keyboard/input capture, clipboard capture, credential access, or broad security exclusions introduced.
+The Build 12 change creates one dedicated in-process Safe Self-Test worker thread with an explicit committed stack; it does not target or modify another process.
+Existing OBS debugger/PSS behavior remains scoped to established Crash Monitor functionality.
+Existing unsigned state is preserved; SmartScreen/AV reputation remains environment-owned and NOT TESTED.

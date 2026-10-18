@@ -1,0 +1,17 @@
+Crash Monitor v4.2 Build 12 - recovery metadata
+================================================
+Project identity preserved from prior builds.
+Data/settings: %LOCALAPPDATA%\Crash Monitor
+Installed EXE: %LOCALAPPDATA%\Programs\Crash Monitor\Crash Monitor.exe
+Settings: %LOCALAPPDATA%\Crash Monitor\targets.ini
+Log: %LOCALAPPDATA%\Crash Monitor\monitor.log
+Dumps: %LOCALAPPDATA%\Crash Monitor\Dumps
+Mutex: Local\Crash_Monitor_31
+Main window class: CrashMonitorMainClass411
+Setup class: CrashMonitorSetupClass411
+Manifest identity: CrashMonitor.Application
+Startup value: Crash Monitor
+Uninstall key: Software\Microsoft\Windows\CurrentVersion\Uninstall\Crash Monitor
+App Paths key: Software\Microsoft\Windows\CurrentVersion\App Paths\Crash Monitor.exe
+
+Build 12 change is isolated to the Safe Self-Test execution-stack regression fix plus correct 39-test launcher progress initialization.

@@ -1,0 +1,12 @@
+Crash Monitor v4.2 Build 12 - MASTER_RULES audit
+================================================
+Authoritative MASTER_RULES.md checked before corrective build work.
+Git blob: 8dfded979df65ded2f84757cf8a678c664225186
+
+Key compliance points:
+- Legitimate new Build number used because code/artifact contents changed to fix a confirmed Build 11 regression.
+- Existing identity/settings/data/update compatibility preserved.
+- Safe Self-Test remains isolated from real project settings/data and reports environment-owned items honestly.
+- Static/release validation completed with 174 PASS / 0 FAIL and 0 compiler warnings/errors.
+- Build 12 is NOT DONE until real Windows runtime evidence and permanent Section 27 archive verification are complete.
+- No claim is made that unperformed Windows/environment checks passed.

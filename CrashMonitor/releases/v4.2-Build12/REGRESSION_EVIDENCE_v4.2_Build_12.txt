@@ -1,0 +1,20 @@
+Crash Monitor v4.2 Build 12 - regression evidence
+=================================================
+Observed Build 11 Windows evidence:
+- Safe Self-Test child exited abnormally with 0xC0000005 on three consecutive runs.
+- monitor.log recorded three "Safe Self-Test child ended abnormally; partial report retained" events.
+- The expected Build 11 persistent report was not created, placing the failure before normal first-report progress could be relied on.
+
+Static root-cause evidence:
+- Build 10 compiler stack-usage: RunSafeSelfTest = 28,856 bytes; user runtime completed normally.
+- Build 11 compiler stack-usage: RunSafeSelfTest = 41,016 bytes after the expanded automation.
+- Established compiler flags include -mno-stack-arg-probe; PE stack commit is 4 KiB.
+- This combination makes the Build 11 larger one-shot frame a credible cause of a pre-report access violation on Windows.
+
+Build 12 correction:
+- Tiny RunSafeSelfTest wrapper static frame = 72 bytes.
+- SafeSelfTestExecutionWorker static frame = 40 bytes.
+- 39-check body remains 41,016 bytes but runs on a dedicated CreateThread worker with SELFTEST_EXEC_STACK_COMMIT=262144.
+- Initial displayed progress total corrected from 36 to 39.
+
+Windows runtime verification is still pending and must not be reported PASS until the user runs Build 12.

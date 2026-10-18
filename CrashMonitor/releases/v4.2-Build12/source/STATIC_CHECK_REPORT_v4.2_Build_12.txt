@@ -1,0 +1,14 @@
+Crash Monitor v4.2 Build 12 - static/release check summary
+==========================================================
+Result: 174 PASS / 0 FAIL
+Compiler: 0 warnings / 0 errors
+PE imports: only expected Windows DLLs
+Manifest: 4.2.12.0, asInvoker, CrashMonitor.Application
+Established project identity/resources preserved.
+Build 10 archive-split stack/boundary regressions preserved.
+Build 11 automation preserved.
+Build 12 regression protection verified in source: 39-check body is separated from the tiny process-entry wrapper and launched with SELFTEST_EXEC_STACK_COMMIT=262144.
+Launcher-side initial Safe Self-Test total verified as 39.
+Compiler stack-usage evidence: wrapper=72 bytes; worker entry=40 bytes; body=41016 bytes.
+
+See static_raw_b12.txt for all individual checks.

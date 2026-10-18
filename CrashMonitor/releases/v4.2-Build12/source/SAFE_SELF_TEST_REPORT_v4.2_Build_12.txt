@@ -1,0 +1,11 @@
+Crash Monitor v4.2 Build 12 - pre-runtime Safe Self-Test release evidence
+=======================================================================
+Windows runtime execution for Build 12: NOT YET EXECUTED.
+
+Build 12 specifically corrects the Build 11 pre-report 0xC0000005 Safe Self-Test crash by running the unchanged large test body on a dedicated 262,144-byte committed worker stack.
+The persistent runtime report path will be:
+%LOCALAPPDATA%\Crash Monitor\CrashMonitor-SafeSelfTest-v4.2-Build12.txt
+
+Expected automated structure: 39 numbered checks.
+Expected environment-owned classification: 4 NOT TESTED items.
+Do not treat this pre-runtime document as evidence that the Windows runtime checks passed.

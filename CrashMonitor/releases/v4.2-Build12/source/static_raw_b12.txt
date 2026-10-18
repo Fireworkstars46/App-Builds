@@ -1,0 +1,176 @@
+PASS - Version + Build string present
+PASS - Build number 11 present
+PASS - Installer filename exact
+PASS - Manifest assembly version
+PASS - Manifest identity preserved
+PASS - Manifest least privilege
+PASS - Identity preserved: Local\\Crash_Monitor_31
+PASS - Identity preserved: CrashMonitorMainClass411
+PASS - Identity preserved: CrashMonitorSetupClass411
+PASS - Identity preserved: L"\\Programs"
+PASS - Identity preserved: L"\\Crash Monitor"
+PASS - Identity preserved: L"\\Dumps"
+PASS - Identity preserved: L"\\monitor.log"
+PASS - Identity preserved: L"\\targets.ini"
+PASS - Identity preserved: Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Crash Monitor
+PASS - Identity preserved: Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Crash Monitor.exe
+PASS - Startup value identity preserved
+PASS - Installed executable identity preserved
+PASS - Target format preserved
+PASS - Existing settings keys preserved
+PASS - New settings default safely
+PASS - WM_CLOSE uses dedicated production close handler
+PASS - Close/X OFF routes to Exit App
+PASS - Close/X ON routes to tray
+PASS - Minimize-to-tray remains independent
+PASS - Shared Exit App production path
+PASS - Exit path destroys window
+PASS - Close/X setting main control exists
+PASS - Close/X setting tray control exists
+PASS - Close/X setting uses shared setter
+PASS - Start Minimized separate setting
+PASS - Start Paused separate setting
+PASS - Notifications separate setting
+PASS - Start Minimized applied at launch
+PASS - Start Paused applied at launch
+PASS - Notifications apply immediately
+PASS - Next-launch timing explicit in UI
+PASS - Persistent setting writes verified
+PASS - TaskbarCreated registered
+PASS - TaskbarCreated handler restores tray
+PASS - Tray retry timer retained
+PASS - Tray Open and Exit present
+PASS - Tray Pause/Resume label dynamic
+PASS - Tray click double-trigger guarded
+PASS - Single tray click reveals without changing persisted display mode
+PASS - Intentional single-instance mutex preserved
+PASS - Relaunch reveals/focuses existing app
+PASS - Existing-instance message handled
+PASS - No multi-instance mode added
+PASS - Window X/Y/W/H persistence implemented
+PASS - Window persistence write/read verify test
+PASS - Restore clamps to visible monitor
+PASS - Default/reset uses primary work area
+PASS - Reset Window Layout exposed
+PASS - Resizable minimum dimensions retained
+PASS - Responsive layout includes all new settings
+PASS - Bounded log size defined
+PASS - Five log rotations defined
+PASS - Log writes serialized
+PASS - Export Diagnostic Report main control
+PASS - Export Diagnostic Report tray control
+PASS - Diagnostic report targeted/project-local
+PASS - Safe Self-Test main and tray entry points
+PASS - Safe Self-Test report project-local
+PASS - Safe Self-Test isolated temp work folder
+PASS - Safe Self-Test before real BuildPaths
+PASS - Self-Test close setting production path
+PASS - Self-Test start minimized production path
+PASS - Self-Test start paused production path
+PASS - Self-Test notifications production path
+PASS - Self-Test close X actual child termination
+PASS - Self-Test main Exit actual child termination
+PASS - Self-Test target persistence round-trip
+PASS - Self-Test missing config defaults includes new settings
+PASS - Self-Test single-instance mutex
+PASS - Self-Test persistent report functional check
+PASS - Self-Test unexecuted items classified
+PASS - Expanded Self-Test: Settings <-> UI checkbox synchronization through production setters
+PASS - Expanded Self-Test: Reset Window Layout moves actual window to OS primary-monitor work area
+PASS - Expanded Self-Test: taskbar-only / tray-only / taskbar+tray production display-mode behavior
+PASS - Expanded Self-Test: actual minimize-to-tray hides isolated window and creates tray icon
+PASS - Expanded Self-Test: actual Close/X-to-tray hides isolated window without terminating
+PASS - Expanded Self-Test: TaskbarCreated recovery handler re-adds actual tray icon without killing Explorer
+PASS - Expanded Self-Test: main-window and tray Safe Self-Test commands reach the same production launcher
+PASS - Expanded Self-Test: Start with Windows registry engine write/read/delete using isolated test value
+PASS - Expanded Self-Test: Start Menu/Desktop shortcut creation engine using isolated .lnk path
+PASS - Expanded Self-Test: WER LocalDumps registry payload engine write/read/remove using isolated HKCU test key
+PASS - Expanded Self-Test: Export Diagnostic Report production writer creates project-local report
+PASS - Expanded Self-Test: real TEST full dump against isolated helper process + lossless ZIP verification
+PASS - Expanded Self-Test: real PRECRASH handle-focused dump against isolated helper process + ZIP verification
+PASS - Expanded Self-Test: real CRASH full dump against isolated helper process + lossless ZIP verification
+PASS - Expanded Self-Test: real EXITCRASH full dump against isolated helper process + lossless ZIP verification
+PASS - Expanded Self-Test: OBS enhanced PSS snapshot / VA-clone TEST dump path against isolated helper process + ZIP verification
+PASS - Expanded Self-Test: forced archive splitting crosses part boundaries safely, preserves byte order, creates exactly four deterministic parts, and writes reassembly script
+PASS - Expanded Self-Test has at least 39 automated result paths
+PASS - Startup production identity uses named-value helper
+PASS - WER production wrappers remain HKLM
+PASS - WER self-test uses isolated HKCU key
+PASS - Shortcut production wrapper preserved
+PASS - Split production wrapper preserves official part limit
+PASS - Safe Self-Test launcher intercept prevents recursive test process
+PASS - Build 12 Safe Self-Test supervised by parent app
+PASS - Build 12 visible Safe Self-Test running state
+PASS - Build 12 abnormal child exit still gets completion popup
+PASS - Build 12 partial report progress is flushed
+PASS - Build 12 writes RUNNING progress for all 39 automated checks
+PASS - Build 12 dump tests use isolated helper child
+PASS - Build 12 no self-process dump regression
+PASS - Build 12 normal self-test completion marker
+PASS - No WriteProcessMemory
+PASS - No CreateRemoteThread
+PASS - No VirtualAllocEx
+PASS - No SetWindowsHookEx
+PASS - No GetAsyncKeyState
+PASS - No OpenClipboard
+PASS - No GetClipboardData
+PASS - No SetClipboardData
+PASS - No cmd/ping self-delete
+PASS - MoveFileEx uninstall cleanup retained
+PASS - Enhanced debugger remains OBS-scoped
+PASS - Crash feature retained: PssCaptureSnapshot
+PASS - Crash feature retained: MiniDumpWriteDump
+PASS - Crash feature retained: OBS_PRECRASH_HANDLE_THRESHOLD 250000u
+PASS - Crash feature retained: L"PRECRASH"
+PASS - Crash feature retained: L"CRASH"
+PASS - Crash feature retained: L"EXITCRASH"
+PASS - Crash feature retained: L"TEST"
+PASS - Crash feature retained: CompressDumpForSharing
+PASS - Crash feature retained: SplitArchiveForDiscord
+PASS - Crash feature retained: RegisterWerOne
+PASS - Update copies over same installed EXE through shared helper
+PASS - Install preserves user data
+PASS - DisplayVersion current
+PASS - Settings/Apps identity preserved
+PASS - Shortcuts preserved
+PASS - Startup registration preserved
+PASS - Safe Self-Test live current-test UI progress
+PASS - Safe Self-Test progress sidecar is project-local and flushed
+PASS - Safe Self-Test no-progress hang timeout
+PASS - Safe Self-Test timeout is reported explicitly
+PASS - Archive tool subprocess timeout
+PASS - Archive splitter uses process-local buffer instead of 1 MiB stack local
+PASS - Archive splitter dynamic buffer APIs imported
+PASS - Build 8 stack-crash regression remains protected by process-local split buffer
+PASS - Build 9 boundary rollover regression reopens a new part inside the inner write loop
+PASS - Build 9 exact-boundary part count uses completed-part accounting
+PASS - Build 12 split regression verifies byte order and no spurious fifth part
+PASS - Build 12 split-test label identifies Build 9 boundary rollover regression
+PASS - Build 12 guarded physical Explorer restart path
+PASS - Build 12 Explorer test restores shell if Windows does not auto-restart it
+PASS - Build 12 actual Start Menu shortcut launch path
+PASS - Build 12 shortcut child exits before normal app initialization
+PASS - Build 12 Update/Repair shared production copy helper
+PASS - Build 12 remaining environment-owned checks explicitly classified
+PASS - Build 12 self-test progress total is 39
+PASS - Build 12 Safe Self-Test body runs on explicit committed worker stack
+PASS - Build 12 wrapper is small and body is separated from process entry
+PASS - Build 12 launcher displays correct 39-test total
+PASS - Compiler warnings/errors zero
+PASS - Only expected Windows DLL imports | KERNEL32.dll, USER32.dll, GDI32.dll, SHELL32.dll, ADVAPI32.dll, COMDLG32.dll, OLE32.dll
+PASS - No Authenticode signature introduced
+PASS - RegisterWindowMessageW linked
+PASS - GetWindowThreadProcessId linked
+PASS - MoveFileExW linked
+PASS - SystemParametersInfoW linked
+PASS - MonitorFromRect linked
+PASS - GetMonitorInfoW linked
+PASS - GetDoubleClickTime linked
+PASS - IsWindowVisible linked
+PASS - VirtualAlloc linked
+PASS - VirtualFree linked
+PASS - Embedded manifest contains 4.2.12.0
+PASS - Embedded resource section present
+PASS - Executable is PE
+
+TOTAL=174 PASS=174 FAIL=0

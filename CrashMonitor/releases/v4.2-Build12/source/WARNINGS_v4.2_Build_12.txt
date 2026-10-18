@@ -1,0 +1,5 @@
+Crash Monitor v4.2 Build 12 warnings
+=====================================
+- Unsigned executable: Windows SmartScreen/AV reputation may vary.
+- Windows runtime Safe Self-Test has not yet been executed for Build 12 in the user's Windows environment.
+- Four environment-owned checks remain NOT TESTED by design: real sign-in/reboot startup, asynchronous Windows Search indexing timing, UAC approval, and Bitdefender/SmartScreen reputation.
