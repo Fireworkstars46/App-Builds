@@ -1,0 +1,18 @@
+Crash Monitor v4.2 Build 10 - STATIC / RELEASE CHECK REPORT
+===========================================================
+Result: 163 PASS / 0 FAIL
+Compiler: 0 warnings / 0 errors
+Executable: PE32+ Windows x64
+Manifest: CrashMonitor.Application, version 4.2.10.0, asInvoker
+Established unsigned state preserved.
+Expected import DLL set only: KERNEL32, USER32, GDI32, SHELL32, ADVAPI32, COMDLG32, OLE32.
+
+Build 10-specific checks PASS:
+- Build 9 process-local archive split buffer remains in place.
+- Splitter reopens the next numbered output part from inside the inner write loop.
+- Explicit completed-part accounting is used for exact-boundary counts.
+- Test 36 verifies byte order and rejects a spurious fifth part.
+- Test 36 identifies the Build 9 boundary-rollover regression.
+
+The full per-check output is in static_raw_b10.txt.
+Static checks do not substitute for Windows Safe Self-Test execution.

@@ -1,0 +1,32 @@
+Crash Monitor v4.2 Build 10 - SAFE SELF-TEST RELEASE EVIDENCE
+=============================================================
+Build 10 Windows runtime Safe Self-Test has NOT been executed yet.
+Do not count unexecuted checks as PASS.
+
+Prior real Windows evidence from Build 9:
+PASS=35
+FAIL=1
+SKIPPED=0
+NOT_TESTED=6
+Failure: automated check 36/36, forced archive splitting boundary rollover.
+
+Build 10 keeps 36 automated checks. Test 36 is strengthened to use the real production splitter and verify:
+- a forced 8 KiB input split at a 2 KiB limit;
+- exactly 4 numbered parts;
+- each part exactly 2048 bytes;
+- byte-for-byte order/integrity across the parts;
+- no spurious .005 part;
+- reassembly script creation.
+
+Expected successful Windows totals after execution (expectation only, not a PASS claim):
+PASS=36 FAIL=0 SKIPPED=0 NOT_TESTED=6
+
+Remaining NOT TESTED/manual by design:
+1. Actual Update / Repair over an installed older build and user-data preservation.
+2. Actual Windows sign-out/reboot proving Start with Windows launches at sign-in.
+3. Actual Windows Search indexing/discovery and user-visible shortcut launch.
+4. Real HKLM WER enable/disable UAC elevation flow (isolated registry engine is automated).
+5. Physical Explorer.exe/taskbar termination/restart (TaskbarCreated recovery path is automated without killing Explorer).
+6. Bitdefender/SmartScreen reputation result.
+
+Status: NOT DONE pending real Windows Build 10 Safe Self-Test and required release/archive gates.

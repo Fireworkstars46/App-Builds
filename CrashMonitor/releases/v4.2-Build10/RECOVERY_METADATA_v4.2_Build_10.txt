@@ -1,0 +1,22 @@
+Crash Monitor v4.2 Build 10 - recovery metadata
+================================================
+Project: Crash Monitor
+Version: 4.2
+Build: 10
+Corrective predecessor: v4.2 Build 9
+Build 9 Windows regression: Safe Self-Test 36/36 archive splitting FAIL (35 PASS / 1 FAIL / 6 NOT TESTED).
+Build 10 fix: output-part rollover inside inner split write loop + explicit completed-part counting.
+
+Stable identity:
+Data: %LOCALAPPDATA%\Crash Monitor
+Settings: %LOCALAPPDATA%\Crash Monitor\targets.ini
+Log: %LOCALAPPDATA%\Crash Monitor\monitor.log
+Dumps: %LOCALAPPDATA%\Crash Monitor\Dumps
+Installed EXE: %LOCALAPPDATA%\Programs\Crash Monitor\Crash Monitor.exe
+Mutex: Local\Crash_Monitor_31
+Main window class: CrashMonitorMainClass411
+Setup window class: CrashMonitorSetupClass411
+Manifest identity: CrashMonitor.Application
+Signing state: unsigned (preserved)
+
+Build 10 runtime verification and permanent GitHub archive remain pending before DONE.

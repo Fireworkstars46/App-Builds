@@ -1,0 +1,24 @@
+Crash Monitor v4.2 Build 10 - reproducible build notes
+======================================================
+Target: Windows x64, freestanding Win32 C++.
+No Visual C++ runtime dependency is intentionally linked.
+
+1) Build import libraries from included .def files using lld-link /lib.
+2) Compile:
+   clang++ -target x86_64-pc-windows-msvc -std=c++17 -ffreestanding -fno-exceptions -fno-rtti \
+     -fno-stack-protector -fno-threadsafe-statics -mno-stack-arg-probe \
+     -Wall -Wextra -Wpedantic -c crash_monitor_42_build10-source.cpp -o cm42b10.obj
+3) Link:
+   lld-link /subsystem:windows /entry:wWinMainCRTStartup /nodefaultlib \
+     cm42b10.obj KERNEL32.lib USER32.lib GDI32.lib SHELL32.lib ADVAPI32.lib COMDLG32.lib OLE32.lib \
+     /out:Crash_Monitor_v4.2_Build_10_Setup-noicon.exe
+4) Embed icon + manifest:
+   python embed_resources_42_build10.py
+
+Build 10 preserves the Build 9 VirtualAlloc/VirtualFree process-local split buffer and fixes the
+production part-boundary rollover logic. When one ReadFile call contains bytes spanning multiple
+archive parts, the splitter now opens the next numbered part inside the inner write loop before
+writing leftover bytes. Completed-part accounting avoids an extra empty part at exact boundaries.
+
+Final installer/setup package: Crash_Monitor_v4.2_Build_10_Setup.exe
+Signing: established unsigned state preserved.

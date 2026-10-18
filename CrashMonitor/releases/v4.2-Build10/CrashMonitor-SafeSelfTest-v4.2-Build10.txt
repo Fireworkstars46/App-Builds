@@ -1,0 +1,90 @@
+Crash Monitor v4.2 Build 10 - SAFE SELF-TEST
+==============================================
+Persistent report location: %LOCALAPPDATA%\Crash Monitor (next to monitor.log).
+Uses isolated project-owned temporary settings/data and real production code paths wherever safe.
+Build 10 flushes progress/result lines continuously, shows current-test progress, and verifies boundary-safe archive splitting with byte-order integrity.
+No real Crash Monitor settings, monitored-program data, startup registration, WER LocalDumps registration, or dump files are modified by this test.
+
+RUNNING 1/36 - persistent Safe Self-Test report creation
+PASS - persistent Safe Self-Test report created in Crash Monitor data/log folder
+RUNNING 2/36 - isolated temporary test folder
+PASS - isolated project-owned temporary test folder
+RUNNING 3/36 - Minimize-to-tray setter + persistence
+PASS - Minimize-to-tray immediate production setter + write/read persistence
+RUNNING 4/36 - taskbar+tray setter + persistence
+PASS - taskbar+tray immediate production setter + write/read persistence
+RUNNING 5/36 - display-mode persistence
+PASS - display-mode persistence write/read production path
+RUNNING 6/36 - Close/X-to-tray setter + persistence
+PASS - Close/X-to-tray immediate production setter + write/read persistence
+RUNNING 7/36 - Start-minimized persistence
+PASS - Start-minimized next-launch setting + write/read persistence
+RUNNING 8/36 - Start-paused persistence
+PASS - Start-paused next-launch setting + write/read persistence
+RUNNING 9/36 - Notifications setter + persistence
+PASS - Notifications immediate production setter + write/read persistence
+RUNNING 10/36 - window X/Y/W/H persistence
+PASS - window X/Y/W/H write -> reload/read -> compare
+RUNNING 11/36 - details-height persistence
+PASS - details-height persistence write/read production path
+RUNNING 12/36 - session Pause production state
+PASS - session-only Pause production setter immediate runtime state
+RUNNING 13/36 - isolated X-to-exit termination
+PASS - main-window X with Close/X-to-tray OFF terminates isolated child through production WM_CLOSE -> RequestExit path
+RUNNING 14/36 - isolated Exit App termination
+PASS - main Exit App control terminates isolated child through shared production RequestExit path
+RUNNING 15/36 - monitored-program persistence round-trip
+PASS - monitored-program persistence write -> reload/read -> compare
+RUNNING 16/36 - project-local production logging
+PASS - project-local production logging path
+RUNNING 17/36 - bounded monitor.log rotation
+PASS - bounded monitor.log rotation through production AppendLog path
+RUNNING 18/36 - missing-settings default recovery
+PASS - missing settings recover to established defaults without touching real data
+RUNNING 19/36 - single-instance mutex collision
+PASS - intentional single-instance mutex collision detection
+RUNNING 20/36 - Settings/UI checkbox synchronization
+PASS - Settings <-> UI checkbox synchronization through production setters
+RUNNING 21/36 - Reset Window Layout on primary monitor
+PASS - Reset Window Layout moves actual window to OS primary-monitor work area
+RUNNING 22/36 - taskbar-only / tray-only / both display modes
+PASS - taskbar-only / tray-only / taskbar+tray production display-mode behavior
+RUNNING 23/36 - actual minimize-to-tray behavior
+PASS - actual minimize-to-tray hides isolated window and creates tray icon
+RUNNING 24/36 - actual Close/X-to-tray behavior
+PASS - actual Close/X-to-tray hides isolated window without terminating
+RUNNING 25/36 - TaskbarCreated tray recovery handler
+PASS - TaskbarCreated recovery handler re-adds actual tray icon without killing Explorer
+RUNNING 26/36 - main and tray Safe Self-Test command equivalence
+PASS - main-window and tray Safe Self-Test commands reach the same production launcher
+RUNNING 27/36 - Start with Windows isolated registry engine
+PASS - Start with Windows registry engine write/read/delete using isolated test value
+RUNNING 28/36 - shortcut creation engine
+PASS - Start Menu/Desktop shortcut creation engine using isolated .lnk path
+RUNNING 29/36 - WER isolated registry engine
+PASS - WER LocalDumps registry payload engine write/read/remove using isolated HKCU test key
+RUNNING 30/36 - diagnostic report writer
+PASS - Export Diagnostic Report production writer creates project-local report
+RUNNING 31/36 - isolated helper TEST full dump + ZIP verification
+PASS - real TEST full dump against isolated helper process + lossless ZIP verification
+RUNNING 32/36 - isolated helper PRECRASH dump + ZIP verification
+PASS - real PRECRASH handle-focused dump against isolated helper process + ZIP verification
+RUNNING 33/36 - isolated helper CRASH full dump + ZIP verification
+PASS - real CRASH full dump against isolated helper process + lossless ZIP verification
+RUNNING 34/36 - isolated helper EXITCRASH full dump + ZIP verification
+PASS - real EXITCRASH full dump against isolated helper process + lossless ZIP verification
+RUNNING 35/36 - isolated helper OBS PSS snapshot / VA-clone TEST dump + ZIP verification
+PASS - OBS enhanced PSS snapshot / VA-clone TEST dump path against isolated helper process + ZIP verification
+RUNNING 36/36 - forced archive splitting + reassembly regression (Build 9 boundary rollover)
+PASS - forced archive splitting crosses part boundaries safely, preserves byte order, creates exactly four deterministic parts, and writes reassembly script
+RUNNING 36/36 - cleanup and final report
+
+NOT TESTED - actual Update / Repair over an installed older build and user-data preservation
+NOT TESTED - actual Windows sign-out/reboot proving Start with Windows launches at sign-in
+NOT TESTED - actual Windows Search indexing/discovery and user-visible shortcut launch
+NOT TESTED - real HKLM WER enable/disable UAC elevation flow (isolated registry engine is tested above)
+NOT TESTED - physical Explorer.exe/taskbar termination/restart (TaskbarCreated recovery path is tested above without killing Explorer)
+NOT TESTED - Bitdefender/SmartScreen reputation result
+
+RUNTIME SAFE SELF-TEST TOTALS: PASS=36 FAIL=0 SKIPPED=0 NOT_TESTED=6
+SAFE SELF-TEST FINISHED

@@ -1,0 +1,6 @@
+Crash Monitor v4.2 Build 10 - compiler warnings
+================================================
+Compiler: clang++ 17, -Wall -Wextra -Wpedantic
+Warnings: 0
+Errors: 0
+compile.err: empty
