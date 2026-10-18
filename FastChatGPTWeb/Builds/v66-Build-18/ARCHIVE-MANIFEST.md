@@ -26,7 +26,7 @@ The following exact files were recovered from the Build 18 release and verified 
 | `FastChatGPT_WebView_v66_Build_18_Setup.exe` | 234,102,403 bytes | `bb2fe8db82508b353f0b7bbeece1a004d4202b00aaa1aac76e291c4dc5776988` | Valid x64 PE; embedded version strings include `66.0.0.18`, `66 Build 18`, and `Fast ChatGPT Web Setup`. |
 | `FastChatGPTWebFinal.exe` | 72,213,017 bytes | `b3dff53c33a6d9b2e8b47462f73bc2367e1db86280a7799d129f325ea84f8848` | Valid x64 PE; embedded version strings include `66.0.0.18` and `66 Build 18`. |
 
-These exact binary files are **recovered and hash-verified**, but they are not yet retrievable as GitHub-hosted files. The current ChatGPT GitHub connector can update repository text/tree content but does not expose a direct local-file upload action for GitHub Release assets. The 234 MB installer also exceeds GitHub's normal repository-file size limit, so the correct archival destination for the three binary artifacts is a GitHub Release.
+These exact files are now published as assets on [Fast ChatGPT Web v66 Build 18](https://github.com/Fireworkstars46/App-Builds/releases/tag/fastchatgptweb-v66-build18). Each public GitHub copy was independently downloaded after publication on 2026-10-18 and verified against the original file's byte count and SHA-256 above. All three match exactly. No source, executable, installer, or Build number was changed.
 
 ## Safe Self-Test evidence
 
@@ -60,12 +60,34 @@ The original runtime logs are retained as exact recovered evidence but are not s
 
 ## Archive status
 
-**INCOMPLETE — one GitHub-hosting step remains**
+**COMPLETE / verified — 2026-10-18**
 
-All three previously missing exact Build 18 release binaries/source are now recovered and locally hash-verified. To make the GitHub archive **COMPLETE / verified**, upload these exact three files as assets on a GitHub Release without rebuilding, renaming their contents, or repacking them:
+- Release: [Fast ChatGPT Web v66 Build 18](https://github.com/Fireworkstars46/App-Builds/releases/tag/fastchatgptweb-v66-build18)
+- Tag: `fastchatgptweb-v66-build18`
+- GitHub Release ID: `416328813`
+- App status: **DONE**, retained from the established historical Build 18 validation.
+- Version remains **v66**; Build remains **18**. This operation only archives and verifies existing artifacts.
 
-1. `FastChatGPT_WebView_v66_Build_18_Source.zip`
-2. `FastChatGPT_WebView_v66_Build_18_Setup.exe`
-3. `FastChatGPTWebFinal.exe`
+### Verified GitHub Release assets
 
-After those exact GitHub Release assets are available, compare their SHA-256 values to the hashes above, record the Release/tag and asset URLs here, verify the assets are retrievable, and change the archive status to **COMPLETE / verified**.
+| Exact artifact | GitHub asset ID | Downloaded bytes | SHA-256 | Result |
+| --- | ---: | ---: | --- | --- |
+| [FastChatGPT_WebView_v66_Build_18_Source.zip](https://github.com/Fireworkstars46/App-Builds/releases/download/fastchatgptweb-v66-build18/FastChatGPT_WebView_v66_Build_18_Source.zip) | 652944456 | 214,748 | `6aedf0b0327bd50e7ac22c22c45fe51696773332bc7030925ca67d9c2174eb95` | **MATCH** |
+| [FastChatGPT_WebView_v66_Build_18_Setup.exe](https://github.com/Fireworkstars46/App-Builds/releases/download/fastchatgptweb-v66-build18/FastChatGPT_WebView_v66_Build_18_Setup.exe) | 652944477 | 234,102,403 | `bb2fe8db82508b353f0b7bbeece1a004d4202b00aaa1aac76e291c4dc5776988` | **MATCH** |
+| [FastChatGPTWebFinal.exe](https://github.com/Fireworkstars46/App-Builds/releases/download/fastchatgptweb-v66-build18/FastChatGPTWebFinal.exe) | 652944685 | 72,213,017 | `b3dff53c33a6d9b2e8b47462f73bc2367e1db86280a7799d129f325ea84f8848` | **MATCH** |
+
+### Verification performed
+
+1. The three supplied original files matched the historical Build 18 checksums recorded above. The original source ZIP passed its archive integrity check.
+2. GitHub confirmed that this release is published and each named asset is in the `uploaded` state. GitHub's reported SHA-256 digest for each asset matches its original.
+3. Each asset was independently downloaded in full from its public GitHub Release download URL. All three returned HTTP **200**. The downloaded byte counts and independently computed SHA-256 hashes match the originals exactly.
+4. The five existing historical repository files in the first table were re-fetched and their SHA-256 hashes match that table. The README, audit, and static-check report also match the corresponding entries in the exact original source ZIP byte-for-byte.
+5. The existing archival metadata files were re-fetched successfully:
+   - `SAFE-SELF-TEST-ARCHIVE-EVIDENCE.md`: SHA-256 `30729f78c2043b6093479c73f6746c7f95ddcd2ddee95edf9cabe5fd346dad85`.
+   - `RECOVERED-ARTIFACTS-SHA256.txt`: SHA-256 `d0479d20baa4fde0651249bd1d31bbf8cf7695e6a1193d75640f934c5bbc284b`.
+6. Historical validation remains **113 static PASS / 0 FAIL** and **46 Safe Self-Test PASS / 0 FAIL / 7 justified SKIPPED**. No rebuild, new static audit, or new Windows runtime test was performed or claimed for this archival operation.
+7. Private runtime/navigation logs remain intentionally unpublished; the existing privacy-safe historical evidence above is preserved.
+
+GitHub's automatically generated “Source code” downloads are repository snapshots at the archival tag. The exact original Build 18 source is the specifically named `FastChatGPT_WebView_v66_Build_18_Source.zip` release asset linked above.
+
+No required public release artifact remains missing from this archive.
