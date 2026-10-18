@@ -1,0 +1,23 @@
+Crash Monitor v4.2 Build 10 - regression evidence
+==================================================
+Trigger: real Windows Safe Self-Test from v4.2 Build 9.
+
+Observed Build 9 result:
+- Tests 1-35: PASS
+- Test 36/36: FAIL
+- Test: forced archive splitting + reassembly regression
+- Final runtime totals: PASS=35 FAIL=1 SKIPPED=0 NOT_TESTED=6
+- Safe Self-Test completed normally and reported the failure rather than crashing.
+
+Root cause found in Build 9 production SplitArchiveForLimit:
+- ReadFile could return a buffer containing bytes spanning multiple part boundaries.
+- After filling a part, the code closed that part and set the output handle invalid.
+- The inner write loop then continued with leftover bytes without reopening the next part.
+- The next WriteFile therefore used an invalid handle and the splitter returned failure.
+
+Build 10 correction:
+- Open/reopen the next numbered part inside the inner write loop whenever the output handle is invalid.
+- Track completedParts explicitly.
+- Preserve the process-local 1 MiB VirtualAlloc buffer from Build 9.
+- Keep exact-boundary part counts deterministic.
+- Safe Self-Test 36 verifies exact part sizes, byte order, no spurious fifth part, and reassembly script creation.

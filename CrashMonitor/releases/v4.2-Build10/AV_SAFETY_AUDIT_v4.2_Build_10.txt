@@ -1,0 +1,11 @@
+Crash Monitor v4.2 Build 10 - AV / safety audit
+===============================================
+Static result: PASS for established safety invariants.
+- Runs asInvoker; no always-admin manifest.
+- No CreateRemoteThread, WriteProcessMemory, VirtualAllocEx, SetWindowsHookEx, clipboard capture, or raw key capture.
+- OBS debugger/PSS behavior remains scoped to the established OBS enhanced capture path.
+- No cmd.exe/ping self-delete sequence; existing MoveFileEx cleanup retained.
+- Build 10 archive fix only changes project-local archive splitting logic and Safe Self-Test verification.
+- Test data is isolated under project-owned temporary working data.
+
+Real Bitdefender/SmartScreen reputation is environment-owned and remains NOT TESTED until observed on Windows.

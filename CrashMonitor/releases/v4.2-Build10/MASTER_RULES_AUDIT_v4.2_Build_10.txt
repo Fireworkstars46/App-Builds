@@ -1,0 +1,32 @@
+Crash Monitor v4.2 Build 10 - MASTER_RULES audit
+================================================
+Authoritative rules source checked immediately before this corrective build:
+https://github.com/Fireworkstars46/App-Builds/blob/main/MASTER_RULES.md
+
+Reason Build 10 is legitimate:
+Build 9 had a real Windows automated Safe Self-Test failure at 36/36. This is an actual production
+archive-splitting code defect, so a corrective Build increment is required. Build 10 was not created
+merely because MASTER_RULES.md changed.
+
+Preserved project identity / update compatibility:
+- %LOCALAPPDATA%\Crash Monitor
+- %LOCALAPPDATA%\Crash Monitor\targets.ini
+- %LOCALAPPDATA%\Crash Monitor\monitor.log
+- %LOCALAPPDATA%\Crash Monitor\Dumps
+- %LOCALAPPDATA%\Programs\Crash Monitor\Crash Monitor.exe
+- mutex Local\Crash_Monitor_31
+- main class CrashMonitorMainClass411
+- setup class CrashMonitorSetupClass411
+- manifest identity CrashMonitor.Application
+- existing uninstall/App Paths/startup identities
+- existing settings keys and target data format
+
+Applicable static/release audit: 163 PASS / 0 FAIL.
+Compiler: 0 warnings / 0 errors.
+Safe Self-Test: Build 10 Windows runtime not executed yet; no unexecuted item is counted PASS.
+Expected automated checks: 36. Remaining deliberate NOT TESTED/manual items: 6 (documented separately).
+
+Section 27: Build 10 is subject to permanent GitHub archival before DONE. Archive is not complete yet.
+No further Build should be created solely because archive work remains.
+
+Current final status: NOT DONE / pending Windows runtime verification and Section 27 archive completion.
