@@ -1,0 +1,338 @@
+name: Fast ChatGPT Web staged release
+
+on:
+  create:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fastchatgptweb-release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  stage:
+    if: github.event.ref_type == 'branch' && startsWith(github.ref_name, 'fastchatgptweb-stage-')
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out release source
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Parse and validate release identity
+        id: identity
+        shell: pwsh
+        run: |
+          $branch = '${{ github.ref_name }}'
+          if ($branch -notmatch '^fastchatgptweb-stage-v(?<version>\d+)-build(?<build>\d+)$') {
+            throw "Unexpected stage branch name: $branch"
+          }
+
+          $version = $Matches.version
+          $build = $Matches.build
+          $source = Join-Path $env:GITHUB_WORKSPACE 'FastChatGPTWeb\Source\Current'
+          if (-not (Test-Path $source)) {
+            throw "Missing canonical source directory: $source"
+          }
+
+          $appProject = Join-Path $source 'FastChatGPTWeb.csproj'
+          $setupProject = Join-Path $source 'SetupBuilder\FastChatGPTWebSetup.csproj'
+          $builder = Join-Path $source 'BUILD-REAL-SETUP-EXE.bat'
+          foreach ($required in @($appProject, $setupProject, $builder)) {
+            if (-not (Test-Path $required)) { throw "Missing required release file: $required" }
+          }
+
+          [xml]$appXml = Get-Content -Raw $appProject
+          [xml]$setupXml = Get-Content -Raw $setupProject
+          $expectedFileVersion = "$version.0.0.$build"
+          $expectedInfo = "$version Build $build"
+
+          if ($appXml.Project.PropertyGroup.FileVersion -ne $expectedFileVersion) {
+            throw "App FileVersion mismatch. Expected $expectedFileVersion."
+          }
+          if ($appXml.Project.PropertyGroup.InformationalVersion -ne $expectedInfo) {
+            throw "App InformationalVersion mismatch. Expected '$expectedInfo'."
+          }
+          if ($setupXml.Project.PropertyGroup.FileVersion -ne $expectedFileVersion) {
+            throw "Setup FileVersion mismatch. Expected $expectedFileVersion."
+          }
+          if ($setupXml.Project.PropertyGroup.InformationalVersion -ne $expectedInfo) {
+            throw "Setup InformationalVersion mismatch. Expected '$expectedInfo'."
+          }
+
+          $builderText = Get-Content -Raw $builder
+          $expectedInstaller = "FastChatGPT_WebView_v${version}_Build_${build}_Setup.exe"
+          if ($builderText -notmatch [regex]::Escape("v$version Build $build")) {
+            throw "Builder does not identify v$version Build $build."
+          }
+          if ($builderText -notmatch [regex]::Escape($expectedInstaller)) {
+            throw "Builder does not reference expected installer $expectedInstaller."
+          }
+
+          $tag = "fastchatgptweb-v${version}-build${build}"
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "build=$build" >> $env:GITHUB_OUTPUT
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          "source=$source" >> $env:GITHUB_OUTPUT
+          "installer=$expectedInstaller" >> $env:GITHUB_OUTPUT
+
+      - name: Refuse to overwrite an existing release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.identity.outputs.tag }}
+        run: |
+          gh release view $env:TAG --repo '${{ github.repository }}' *> $null
+          if ($LASTEXITCODE -eq 0) {
+            throw "Release/tag $env:TAG already exists. Build numbers are never overwritten or reused."
+          }
+          exit 0
+
+      - name: Create exact source archive before build outputs exist
+        id: sourcezip
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.identity.outputs.version }}
+          BUILD: ${{ steps.identity.outputs.build }}
+          SOURCE: ${{ steps.identity.outputs.source }}
+        run: |
+          $releaseDir = Join-Path $env:RUNNER_TEMP 'FastChatGPTWebRelease'
+          $archiveParent = Join-Path $env:RUNNER_TEMP 'SourceArchive'
+          $archiveRootName = "FastChatGPT_WebView_v${env:VERSION}_Build_${env:BUILD}_Source"
+          $archiveRoot = Join-Path $archiveParent $archiveRootName
+
+          Remove-Item $releaseDir -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item $archiveParent -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $releaseDir | Out-Null
+          New-Item -ItemType Directory -Path $archiveRoot | Out-Null
+          Copy-Item (Join-Path $env:SOURCE '*') $archiveRoot -Recurse -Force
+
+          $zip = Join-Path $releaseDir "${archiveRootName}.zip"
+          Compress-Archive -Path $archiveRoot -DestinationPath $zip -CompressionLevel Optimal
+          if (-not (Test-Path $zip)) { throw 'Source ZIP was not created.' }
+
+          "release_dir=$releaseDir" >> $env:GITHUB_OUTPUT
+          "source_zip=$zip" >> $env:GITHUB_OUTPUT
+
+      - name: Build app and installer through the established builder
+        shell: cmd
+        env:
+          SOURCE: ${{ steps.identity.outputs.source }}
+        run: |
+          cd /d "%SOURCE%"
+          (echo N)|call BUILD-REAL-SETUP-EXE.bat
+          if exist "SetupOutput\BUILD_FAILED.txt" (
+            type "SetupOutput\BUILD_FAILED.txt"
+            exit /b 1
+          )
+          findstr /x /c:"Build completed successfully" "SetupOutput\BUILD-STAGE.txt" >nul || (
+            echo BUILD-STAGE.txt does not report successful completion.
+            exit /b 1
+          )
+
+      - name: Collect and verify exact release artifacts
+        id: artifacts
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.identity.outputs.version }}
+          BUILD: ${{ steps.identity.outputs.build }}
+          SOURCE: ${{ steps.identity.outputs.source }}
+          INSTALLER: ${{ steps.identity.outputs.installer }}
+          RELEASE_DIR: ${{ steps.sourcezip.outputs.release_dir }}
+          SOURCE_ZIP: ${{ steps.sourcezip.outputs.source_zip }}
+        run: |
+          $app = Join-Path $env:SOURCE 'bin\Release\net8.0-windows\win-x64\publish\FastChatGPTWebFinal.exe'
+          $setup = Join-Path $env:SOURCE "SetupOutput\$env:INSTALLER"
+          foreach ($required in @($env:SOURCE_ZIP, $app, $setup)) {
+            if (-not (Test-Path $required)) { throw "Missing release artifact: $required" }
+            if ((Get-Item $required).Length -lt 1) { throw "Empty release artifact: $required" }
+          }
+
+          $releaseApp = Join-Path $env:RELEASE_DIR 'FastChatGPTWebFinal.exe'
+          $releaseSetup = Join-Path $env:RELEASE_DIR $env:INSTALLER
+          Copy-Item $app $releaseApp -Force
+          Copy-Item $setup $releaseSetup -Force
+
+          $optionalFiles = @(
+            "README.txt",
+            "AUDIT-v${env:VERSION}-Build-${env:BUILD}.txt",
+            "STATIC-CHECKS-v${env:VERSION}-Build-${env:BUILD}.txt"
+          )
+          foreach ($name in $optionalFiles) {
+            $candidate = Join-Path $env:SOURCE $name
+            if (Test-Path $candidate) { Copy-Item $candidate (Join-Path $env:RELEASE_DIR $name) -Force }
+          }
+
+          $stage = Join-Path $env:SOURCE 'SetupOutput\BUILD-STAGE.txt'
+          if (Test-Path $stage) { Copy-Item $stage (Join-Path $env:RELEASE_DIR 'BUILD-STAGE.txt') -Force }
+
+          $hashFile = Join-Path $env:RELEASE_DIR "FastChatGPT_WebView_v${env:VERSION}_Build_${env:BUILD}_SHA256.txt"
+          $hashTargets = @($env:SOURCE_ZIP, $releaseSetup, $releaseApp)
+          foreach ($file in $hashTargets) {
+            $hash = (Get-FileHash -Algorithm SHA256 $file).Hash.ToLowerInvariant()
+            "$hash  $([IO.Path]::GetFileName($file))" | Add-Content -Encoding ascii $hashFile
+          }
+
+          "app=$releaseApp" >> $env:GITHUB_OUTPUT
+          "setup=$releaseSetup" >> $env:GITHUB_OUTPUT
+          "hashes=$hashFile" >> $env:GITHUB_OUTPUT
+
+      - name: Create draft GitHub Release with exact staged artifacts
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.identity.outputs.tag }}
+          VERSION: ${{ steps.identity.outputs.version }}
+          BUILD: ${{ steps.identity.outputs.build }}
+          RELEASE_DIR: ${{ steps.sourcezip.outputs.release_dir }}
+        run: |
+          $notes = Join-Path $env:RUNNER_TEMP 'release-notes.md'
+          @"
+          Staged archive for Fast ChatGPT Web **v$env:VERSION Build $env:BUILD**.
+
+          This release is intentionally a **draft** until the required Windows runtime/Safe Self-Test evidence is reviewed. The assets attached here are the exact outputs produced by the staged release workflow from the canonical source commit `${{ github.sha }}`.
+
+          Publishing is performed by the separate `fastchatgptweb-publish-v$env:VERSION-build$env:BUILD` gate only after required validation evidence is committed.
+          "@ | Set-Content -Encoding utf8 $notes
+
+          $assets = Get-ChildItem -File $env:RELEASE_DIR | ForEach-Object { $_.FullName }
+          gh release create $env:TAG $assets `
+            --repo '${{ github.repository }}' `
+            --target '${{ github.sha }}' `
+            --title "Fast ChatGPT Web v$env:VERSION Build $env:BUILD" `
+            --notes-file $notes `
+            --draft
+
+      - name: Preserve staged binaries as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FastChatGPTWeb-v${{ steps.identity.outputs.version }}-Build-${{ steps.identity.outputs.build }}-Staged
+          path: ${{ steps.sourcezip.outputs.release_dir }}
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    if: github.event.ref_type == 'branch' && startsWith(github.ref_name, 'fastchatgptweb-publish-')
+    runs-on: windows-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out validated release evidence
+        uses: actions/checkout@v4
+
+      - name: Parse release identity
+        id: identity
+        shell: pwsh
+        run: |
+          $branch = '${{ github.ref_name }}'
+          if ($branch -notmatch '^fastchatgptweb-publish-v(?<version>\d+)-build(?<build>\d+)$') {
+            throw "Unexpected publish branch name: $branch"
+          }
+          $version = $Matches.version
+          $build = $Matches.build
+          $tag = "fastchatgptweb-v${version}-build${build}"
+          $buildDir = Join-Path $env:GITHUB_WORKSPACE "FastChatGPTWeb\Builds\v${version}-Build-${build}"
+
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "build=$build" >> $env:GITHUB_OUTPUT
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          "build_dir=$buildDir" >> $env:GITHUB_OUTPUT
+
+      - name: Require zero-fail validation evidence
+        shell: pwsh
+        env:
+          BUILD_DIR: ${{ steps.identity.outputs.build_dir }}
+          VERSION: ${{ steps.identity.outputs.version }}
+          BUILD: ${{ steps.identity.outputs.build }}
+        run: |
+          $evidence = Join-Path $env:BUILD_DIR 'SAFE-SELF-TEST-ARCHIVE-EVIDENCE.md'
+          $static = Join-Path $env:BUILD_DIR "STATIC-CHECKS-v${env:VERSION}-Build-${env:BUILD}.txt"
+
+          if (-not (Test-Path $evidence)) {
+            throw "Missing Safe Self-Test evidence: $evidence"
+          }
+          if (-not (Test-Path $static)) {
+            throw "Missing static-check report: $static"
+          }
+
+          $evidenceText = Get-Content -Raw $evidence
+          $staticText = Get-Content -Raw $static
+
+          if ($evidenceText -notmatch '(?i)Safe Self-Test.*PASS') {
+            throw 'Safe Self-Test evidence does not record PASS.'
+          }
+          if ($evidenceText -notmatch '(?i)(failed\s*[=:]\s*0|0\s+FAIL)') {
+            throw 'Safe Self-Test evidence does not prove zero FAIL.'
+          }
+          if ($staticText -notmatch '(?i)\b0\s+FAIL\b') {
+            throw 'Static report does not prove zero FAIL.'
+          }
+
+      - name: Download and hash-verify the exact draft release assets
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.identity.outputs.tag }}
+          VERSION: ${{ steps.identity.outputs.version }}
+          BUILD: ${{ steps.identity.outputs.build }}
+        run: |
+          $verifyDir = Join-Path $env:RUNNER_TEMP 'VerifyRelease'
+          Remove-Item $verifyDir -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $verifyDir | Out-Null
+
+          $json = gh release view $env:TAG --repo '${{ github.repository }}' --json isDraft,tagName | ConvertFrom-Json
+          if (-not $json.isDraft) {
+            throw "Release $env:TAG is not a draft; refusing to republish or overwrite it."
+          }
+
+          gh release download $env:TAG --repo '${{ github.repository }}' --dir $verifyDir
+          if ($LASTEXITCODE -ne 0) { throw 'Failed to download draft release assets.' }
+
+          $hashFile = Join-Path $verifyDir "FastChatGPT_WebView_v${env:VERSION}_Build_${env:BUILD}_SHA256.txt"
+          if (-not (Test-Path $hashFile)) { throw "Missing release hash file: $hashFile" }
+
+          $expected = @{}
+          foreach ($line in Get-Content $hashFile) {
+            if ($line -match '^(?<hash>[0-9a-fA-F]{64})\s+\*?(?<name>.+)$') {
+              $expected[$Matches.name.Trim()] = $Matches.hash.ToLowerInvariant()
+            }
+          }
+
+          foreach ($name in $expected.Keys) {
+            $file = Join-Path $verifyDir $name
+            if (-not (Test-Path $file)) { throw "Missing hashed release asset: $name" }
+            $actual = (Get-FileHash -Algorithm SHA256 $file).Hash.ToLowerInvariant()
+            if ($actual -ne $expected[$name]) {
+              throw "SHA-256 mismatch for $name. Expected $($expected[$name]); actual $actual"
+            }
+          }
+
+          $required = @(
+            "FastChatGPT_WebView_v${env:VERSION}_Build_${env:BUILD}_Source.zip",
+            "FastChatGPT_WebView_v${env:VERSION}_Build_${env:BUILD}_Setup.exe",
+            "FastChatGPTWebFinal.exe"
+          )
+          foreach ($name in $required) {
+            if (-not (Test-Path (Join-Path $verifyDir $name))) {
+              throw "Required release asset is missing: $name"
+            }
+          }
+
+      - name: Publish the already-verified draft release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.identity.outputs.tag }}
+        run: |
+          gh release edit $env:TAG --repo '${{ github.repository }}' --draft=false
+          if ($LASTEXITCODE -ne 0) { throw "Failed to publish release $env:TAG." }
+
+          $json = gh release view $env:TAG --repo '${{ github.repository }}' --json isDraft,tagName,url | ConvertFrom-Json
+          if ($json.isDraft) { throw "Release $env:TAG still reports draft=true after publish." }
+          Write-Host "Published and verified: $($json.url)"
