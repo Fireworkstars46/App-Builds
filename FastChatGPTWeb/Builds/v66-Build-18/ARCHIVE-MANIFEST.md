@@ -1,10 +1,10 @@
 # Fast ChatGPT Web v66 Build 18 — Archive Manifest
 
-> Archival metadata created on 2026-10-18. This file is **not** a new app Build and is **not** an original Build 18 release artifact. Version remains **v66** and Build remains **18**.
+> Archival metadata created on 2026-10-18 and updated after the exact Build 18 source ZIP, installer EXE, standalone app EXE, and runtime logs were recovered. This file is **not** a new app Build and is **not** an original Build 18 release artifact. Version remains **v66** and Build remains **18**.
 
 ## Exact artifacts archived in this repository
 
-The following files are byte-for-byte copies of existing Build 18 files that were still available at archival time:
+The following files are byte-for-byte copies of existing Build 18 files that were available at archival time:
 
 | File | SHA-256 |
 | --- | --- |
@@ -16,27 +16,38 @@ The following files are byte-for-byte copies of existing Build 18 files that wer
 
 `README.txt` is the exact Build 18 README extracted byte-for-byte from the existing source ZIP, so the original Build 18 change notes/history remain preserved without rewriting them.
 
-## Exact artifacts known locally but not committed
+## Exact recovered Build 18 binaries/source
 
-These files were still available locally during archival, but were **not** substituted, rebuilt, redacted, or relabeled as exact GitHub artifacts:
+The following exact files were recovered from the Build 18 release and verified locally during archival:
 
-| File | SHA-256 | Reason not committed |
+| File | Size | SHA-256 | Identity/integrity verification |
+| --- | ---: | --- | --- |
+| `FastChatGPT_WebView_v66_Build_18_Source.zip` | 214,748 bytes | `6aedf0b0327bd50e7ac22c22c45fe51696773332bc7030925ca67d9c2174eb95` | Matches the previously archived Build 18 source checksum exactly; ZIP integrity test passed with no bad entries. |
+| `FastChatGPT_WebView_v66_Build_18_Setup.exe` | 234,102,403 bytes | `bb2fe8db82508b353f0b7bbeece1a004d4202b00aaa1aac76e291c4dc5776988` | Valid x64 PE; embedded version strings include `66.0.0.18`, `66 Build 18`, and `Fast ChatGPT Web Setup`. |
+| `FastChatGPTWebFinal.exe` | 72,213,017 bytes | `b3dff53c33a6d9b2e8b47462f73bc2367e1db86280a7799d129f325ea84f8848` | Valid x64 PE; embedded version strings include `66.0.0.18` and `66 Build 18`. |
+
+These exact binary files are **recovered and hash-verified**, but they are not yet retrievable as GitHub-hosted files. The current ChatGPT GitHub connector can update repository text/tree content but does not expose a direct local-file upload action for GitHub Release assets. The 234 MB installer also exceeds GitHub's normal repository-file size limit, so the correct archival destination for the three binary artifacts is a GitHub Release.
+
+## Safe Self-Test evidence
+
+The exact recovered runtime logs were inspected locally:
+
+| File | SHA-256 | Publication status |
 | --- | --- | --- |
-| `FastChatGPT_WebView_v66_Build_18_Source.zip` | `6aedf0b0327bd50e7ac22c22c45fe51696773332bc7030925ca67d9c2174eb95` | Exact binary ZIP was available, but the current GitHub connector did not provide a reliable direct local-file binary upload path. No reconstructed/repacked ZIP was substituted. |
-| `APP-BUILD-LOG.txt` | `bf0605019ccebf79594d72e249d660ed747b947e087f1f4f6821c995f0dcc116` | Contains a local Windows user path; not published to the public repository as an exact log without redaction. Redaction would no longer be exact. |
-| `SETUP-BUILD-LOG.txt` | `28ea42af841bd0e0e86c9b0f2ed8146d1c40c5bad36c017bd9844c68b81a0334` | Contains a local Windows user path; not published to the public repository as an exact log without redaction. Redaction would no longer be exact. |
-| `app.log` | `561f9668ccc7f0e6132165347c9d2f356aa2f2729d9fd8f94e24dcd9af9d1b0e` | Contains historical ChatGPT conversation/branch URLs and other private runtime navigation history. Not published to the public repository. |
-| `debug.log` | `e65fab46536e1fb7680c17f3316e6b6cd24f150fdb3deb9c6492fb2f9335d1cf` | Contains historical ChatGPT conversation/branch URLs and other private runtime navigation history. Not published to the public repository. |
+| `app.log` | `c817234cc0933de61bef76014bad44df9fc2a32e2446ccaa4a91b42ef1f68bed` | Not published verbatim because it contains private ChatGPT navigation/conversation identifiers. |
+| `debug.log` | `b6212659ce8ddde28669809c77f6e61c75e06773d0f55158985d5eeb38d2ffad` | Not published verbatim because it contains private runtime/navigation history. |
 
-The local runtime logs contained the Build 18 Safe Self-Test result `46 PASS / 0 FAIL / 7 SKIPPED`, but there was no separate standalone exact Safe Self-Test report file available. I did not manufacture one from the logs and label it as historical evidence.
+The exact Build 18 result present in the recovered `app.log` is:
 
-## Missing exact historical release artifacts
+`2026-10-17 05:17:21.505 [v66 Build 18] [TEST] Safe Self-Test completed: PASS; passed=46; failed=0; skipped=7.`
 
-The following applicable release artifacts were not available in the current conversation/container and therefore were not reconstructed:
+No Build 18 `[ERROR]` or `[WARN]` log entries were found in the supplied Build 18 runtime logs during archival verification.
 
-- compiled app EXE/package;
-- finished installer `FastChatGPT_WebView_v66_Build_18_Setup.exe`;
-- separate standalone Safe Self-Test report/evidence file, apart from the private runtime logs noted above.
+`SAFE-SELF-TEST-ARCHIVE-EVIDENCE.md` in this directory records that verification. It is clearly archival metadata derived from the exact recovered logs, not a fabricated or relabeled original historical report.
+
+## Exact historical files intentionally not published
+
+The original runtime logs are retained as exact recovered evidence but are not suitable for this public repository because they contain private navigation/conversation identifiers. Earlier build/setup logs also contained local Windows user paths. Redacting any of those files would change their bytes, so no redacted file is presented as an exact historical artifact.
 
 ## Build identity and status
 
@@ -49,6 +60,12 @@ The following applicable release artifacts were not available in the current con
 
 ## Archive status
 
-**INCOMPLETE**
+**INCOMPLETE — one GitHub-hosting step remains**
 
-Reason: exact source ZIP and compiled installer/app artifacts are not all present as retrievable GitHub files, and the exact runtime logs were intentionally not published to this public repository because they contain private navigation identifiers. The files listed under “Exact artifacts archived” are preserved byte-for-byte and should be hash-verified after commit.
+All three previously missing exact Build 18 release binaries/source are now recovered and locally hash-verified. To make the GitHub archive **COMPLETE / verified**, upload these exact three files as assets on a GitHub Release without rebuilding, renaming their contents, or repacking them:
+
+1. `FastChatGPT_WebView_v66_Build_18_Source.zip`
+2. `FastChatGPT_WebView_v66_Build_18_Setup.exe`
+3. `FastChatGPTWebFinal.exe`
+
+After those exact GitHub Release assets are available, compare their SHA-256 values to the hashes above, record the Release/tag and asset URLs here, verify the assets are retrievable, and change the archive status to **COMPLETE / verified**.
