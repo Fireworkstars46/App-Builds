@@ -1,10 +1,10 @@
 {
-  "enabled": true,
-  "archive": false,
+  "enabled": false,
+  "archive": true,
   "base_release_folder": "v4.2-Build12",
   "target_version": "4.2",
-  "target_build": 12,
+  "target_build": 13,
   "patch_file": "",
-  "expected_static_pass": 174,
-  "automation_revision": 3
+  "expected_static_pass": null,
+  "automation_revision": 4
 }
