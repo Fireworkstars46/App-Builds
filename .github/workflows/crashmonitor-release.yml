@@ -1,0 +1,113 @@
+name: Crash Monitor release builder
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - CrashMonitor/automation/request.json
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: crashmonitor-release-builder
+  cancel-in-progress: false
+
+jobs:
+  build-release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Prepare pinned build dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --no-input Pillow==11.3.0
+          if ! command -v clang++ >/dev/null 2>&1 || ! command -v lld-link >/dev/null 2>&1 || ! command -v llvm-objdump >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y clang lld llvm
+          fi
+          # Existing Crash Monitor release_checks scripts use this established path.
+          if [ ! -x /usr/local/swift/usr/bin/llvm-objdump ]; then
+            OBJDUMP="$(command -v llvm-objdump)"
+            sudo mkdir -p /usr/local/swift/usr/bin
+            sudo ln -sf "$OBJDUMP" /usr/local/swift/usr/bin/llvm-objdump
+          fi
+          clang++ --version | head -n 1
+          lld-link --version | head -n 1
+          /usr/local/swift/usr/bin/llvm-objdump --version | head -n 1
+          python --version
+
+      - name: Build, validate, and stage release
+        id: build
+        run: python CrashMonitor/automation/build_release.py CrashMonitor/automation/request.json
+
+      - name: Upload exact generated files as Actions artifact
+        if: steps.build.outputs.built == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: CrashMonitor-${{ steps.build.outputs.target_folder }}
+          path: ${{ steps.build.outputs.release_dir }}
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
+
+      - name: Commit permanent release archive
+        if: steps.build.outputs.built == 'true' && steps.build.outputs.archive == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "${{ steps.build.outputs.release_dir }}"
+          if git diff --cached --quiet; then
+            echo "No release archive changes were staged; refusing empty release commit." >&2
+            exit 1
+          fi
+          git commit -m "Archive Crash Monitor ${{ steps.build.outputs.target_folder }} from CI"
+          git push origin HEAD:main
+
+      - name: Retrieve committed binaries and verify exact hashes
+        if: steps.build.outputs.built == 'true' && steps.build.outputs.archive == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --force
+          DIR="${{ steps.build.outputs.release_dir }}"
+          INSTALLER="${{ steps.build.outputs.installer_name }}"
+          SOURCEZIP="${{ steps.build.outputs.source_name }}"
+          git show "origin/main:${DIR}/${INSTALLER}" > /tmp/crashmonitor-installer.bin
+          git show "origin/main:${DIR}/${SOURCEZIP}" > /tmp/crashmonitor-source.zip
+          echo "${{ steps.build.outputs.installer_sha256 }}  /tmp/crashmonitor-installer.bin" | sha256sum -c -
+          echo "${{ steps.build.outputs.source_sha256 }}  /tmp/crashmonitor-source.zip" | sha256sum -c -
+          unzip -t /tmp/crashmonitor-source.zip >/tmp/crashmonitor-ziptest.txt
+          cat /tmp/crashmonitor-ziptest.txt
+
+      - name: Record remote archive verification
+        if: steps.build.outputs.built == 'true' && steps.build.outputs.archive == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          STATUS="${{ steps.build.outputs.release_dir }}/ARCHIVE_STATUS.md"
+          python - "$STATUS" <<'PY'
+          from pathlib import Path
+          import sys
+          p = Path(sys.argv[1])
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('- Post-commit retrieval/hash verification: **PENDING**', '- Post-commit retrieval/hash verification: **COMPLETE — both binaries retrieved from `origin/main` and SHA-256 matched**')
+          p.write_text(s, encoding='utf-8')
+          PY
+          git add -- "$STATUS"
+          git commit -m "Verify Crash Monitor ${{ steps.build.outputs.target_folder }} archive retrieval"
+          git push origin HEAD:main
