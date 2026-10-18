@@ -1,0 +1,34 @@
+Crash Monitor v4.2 Build 2 - AV / SmartScreen safety audit
+==========================================================
+
+PASS - No WriteProcessMemory.
+PASS - No CreateRemoteThread.
+PASS - No VirtualAllocEx.
+PASS - No SetWindowsHookEx / keyboard hook.
+PASS - No GetAsyncKeyState / keylogging.
+PASS - No clipboard APIs.
+PASS - No DLL injection or remote-code-execution path found.
+PASS - No hidden cmd.exe + ping self-delete sequence.
+PASS - Uninstall final-file cleanup continues to use documented MoveFileEx APIs.
+PASS - Normal executable manifest remains asInvoker.
+PASS - Final PE imports only expected Windows system DLLs: KERNEL32, USER32, GDI32, SHELL32, ADVAPI32, COMDLG32, OLE32.
+PASS - No new service, scheduled task, firewall rule, network listener, port, driver, or shared helper introduced.
+PASS - Project paths/registry/mutex/window classes remain Crash Monitor-owned and unchanged.
+PASS - Safe Self-Test uses isolated project-named temporary files and ordinary documented Win32/INI/mutex APIs.
+PASS - Safe Self-Test does not request elevation, modify WER, attach to OBS, or capture process dumps.
+
+INTENTIONALLY RETAINED - OBS enhanced crash-event detection uses DebugActiveProcess, WaitForDebugEvent,
+ContinueDebugEvent, and DebugSetProcessKillOnExit(FALSE). This pre-existing OBS-only fallback preserves established
+crash-time capture when OBS's own crash handling makes WER-only reporting unreliable. It remains scoped to
+obs64.exe and does not write remote process memory, create remote threads, inject DLLs, or install hooks.
+
+INTENTIONALLY RETAINED - Windows tar.exe is launched through CreateProcessW only after a dump is successfully
+created, to losslessly compress/verify large dumps and preserve the established sharing workflow.
+
+INTENTIONALLY RETAINED - WER LocalDumps HKLM changes use explicit UAC because Windows stores those settings
+under HKLM. Normal app monitoring and Safe Self-Test remain non-elevated.
+
+SmartScreen / antivirus note:
+This build remains unsigned because the trusted project baseline is unsigned. Static review cannot promise
+reputation-based SmartScreen/AV results on another machine. If Bitdefender reports a specific behavior, redesign
+that behavior first rather than disabling protection or excluding the whole app/folder.
