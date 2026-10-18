@@ -1,0 +1,32 @@
+Crash Monitor v4.2 Build 2 - static/release check report
+========================================================
+
+Result: PASS
+Automated regression checks: 86 PASS, 0 FAIL.
+Compiler: PASS (clang++ x86_64-pc-windows-msvc, C++17 freestanding).
+Warnings audit: PASS (-Wall -Wextra -Wpedantic produced 0 warnings).
+Linker: PASS (lld-link, /nodefaultlib).
+Resource embedding: PASS (icon + Windows compatibility/asInvoker manifest).
+PE import audit: PASS; only expected Windows system DLLs are linked.
+Manifest identity: PASS; CrashMonitor.Application preserved, assembly version 4.2.2.0.
+Installer filename: PASS; Crash_Monitor_v4.2_Build_2_Setup.exe.
+Version/build strings: PASS; 4.2 / Build 2 included in logs/footer/release metadata.
+Update-critical identities: PASS; install/data/config paths, startup value, uninstall/App Paths registry IDs,
+mutex, main/setup window classes and config key names are preserved.
+Update path: STATIC PASS; installer copies over the same installed Crash Monitor.exe and does not call data
+removal from the install/update path.
+Settings format: PASS; existing Settings/Targets INI keys are preserved.
+Persistent immediate setting write/read verification: PASS (static wiring).
+Duplicate Settings/tray production setter consolidation: PASS (static wiring).
+Integrated Safe Self-Test command/tray action: PASS (static wiring).
+Safe Self-Test isolation and production persistence/logging paths: PASS (static wiring).
+Single-instance identity/regression harness: PASS (static wiring); no multi-instance mode added.
+Explorer/taskbar recovery wiring: STATIC PASS; documented TaskbarCreated message + retry path remain wired.
+Bounded logs: PASS; monitor.log rotates through monitor.1.log ... monitor.5.log at ~5 MiB.
+AV-sensitive API scan: PASS for injection/hooks/input/clipboard exclusions; expected OBS-only debugger APIs retained.
+Uninstall AV cleanup: PASS; cmd.exe/ping self-delete remains absent and MoveFileEx cleanup remains in use.
+Signing state: PASS; no Authenticode signature was introduced because the trusted baseline is unsigned.
+
+Raw automated output is included as STATIC-CHECK-RAW.txt.
+
+Important: these are static/release checks. They do not count Windows-only behavior as functionally tested.
