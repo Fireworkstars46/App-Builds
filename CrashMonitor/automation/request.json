@@ -5,5 +5,6 @@
   "target_version": "4.2",
   "target_build": 13,
   "patch_file": "",
-  "expected_static_pass": null
+  "expected_static_pass": null,
+  "automation_revision": 1
 }
