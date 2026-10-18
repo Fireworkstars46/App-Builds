@@ -1,0 +1,9 @@
+{
+  "enabled": false,
+  "archive": true,
+  "base_release_folder": "v4.2-Build12",
+  "target_version": "4.2",
+  "target_build": 13,
+  "patch_file": "",
+  "expected_static_pass": null
+}
