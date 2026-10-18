@@ -1,0 +1,342 @@
+{
+  "project": "Crash Monitor",
+  "version": "4.2",
+  "build": 12,
+  "section27": "COMPLETE",
+  "checked_date": "2026-10-18",
+  "authoritative_master_rules": {
+    "path": "MASTER_RULES.md",
+    "git_blob_sha": "8dfded979df65ded2f84757cf8a678c664225186"
+  },
+  "repository": "Fireworkstars46/App-Builds",
+  "retrieved_commit": "2bded51901702ad8c4791cff24fc6539ad916dd9",
+  "method": "GitHub fetch_file encoding=base64 at immutable commit; decode retrieved bytes; recompute size, SHA-256, Git blob SHA; compare exact bytes to originals",
+  "verified_paths": 39,
+  "source_zip_crc": "PASS",
+  "expanded_source_matches_zip": true,
+  "sha256_manifest": "PASS",
+  "files": [
+    {
+      "path": "AV_SAFETY_AUDIT_v4.2_Build_12.txt",
+      "bytes": 606,
+      "sha256": "bc948f1809869153464302992ec017071110311aa4b2499111b434def756cd43",
+      "git_blob_sha": "65225af2e2d02f2caa37b160eb417315024f6422",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "BUILD_v4.2_Build_12.txt",
+      "bytes": 1940,
+      "sha256": "32a1e4a4ea341c831c462220510f6e0548a6bd13c9bfd90d3d0358ba4512c813",
+      "git_blob_sha": "be743096dac2ab1e033008a271dce838a5a61e66",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "CrashMonitor-SafeSelfTest-v4.2-Build12.txt",
+      "bytes": 6911,
+      "sha256": "6a2447fd995fdc1c6991ed419b8370816cde11270ad7e04a2803645486b38b45",
+      "git_blob_sha": "69faeb5bece9d72eece9efd2c8bc531208eaea57",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "Crash_Monitor_v4.2_Build_12_Setup.exe",
+      "bytes": 162304,
+      "sha256": "50b4f02cb7340bd938d9261966f27b1d4f2e48311a98428a466b7f96469ad8c7",
+      "git_blob_sha": "845036ec430f159d50e4c2925680a3c3de061ccb",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "Crash_Monitor_v4.2_Build_12_Source.zip",
+      "bytes": 106334,
+      "sha256": "70105e60904373c2725ed7a820195ea103a6182f1e8e59cc60a404572b68a5ed",
+      "git_blob_sha": "bce0450d4e12feb76f469707019fc3eb3867fb53",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "MASTER_RULES_AUDIT_v4.2_Build_12.txt",
+      "bytes": 816,
+      "sha256": "9f32830a967048e15310b3a5421d25e522f031e455a7b011b9b394844594744f",
+      "git_blob_sha": "d84fb4b0a2c370711c700600ad9384abd2cca3c3",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "README_FIRST_v4.2_Build_12.txt",
+      "bytes": 639,
+      "sha256": "b035b265a6893dcf40e8424320b85f9099a9d186da602483968840b9561963bf",
+      "git_blob_sha": "2efba1dea4335e6f89d30d9392da8347b5357ba1",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "RECOVERY_METADATA_v4.2_Build_12.txt",
+      "bytes": 886,
+      "sha256": "952a7e67746eb899bfc25323aa5b35f45b5f04f00b146e703ec26de54e1250fe",
+      "git_blob_sha": "395dab79db58d04150fbfb0cc85aae98b6fd1764",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "REGRESSION_EVIDENCE_v4.2_Build_12.txt",
+      "bytes": 1307,
+      "sha256": "7479de9ce34613356efb18f6cc52dcafcc76feabedc16a0c6321992f15b4f307",
+      "git_blob_sha": "625c3b5669ffda1ff90b34f2a13b108a8c5d7cf4",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "RELEASE_NOTES_v4.2_Build_12.md",
+      "bytes": 1478,
+      "sha256": "aed481cc56528d0952564fb63c9f4d628f2b0cc1847e2417f76e36ac71aa528a",
+      "git_blob_sha": "8ebc4880552a17ea0573595850b5fa6d3ae13b74",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "SAFE_SELF_TEST_REPORT_v4.2_Build_12.txt",
+      "bytes": 706,
+      "sha256": "6e16531fc5f5bc72d9018257bec89fcf7f42a6aee0c54309cb173a4abec9ad56",
+      "git_blob_sha": "757918ab05e72ded9a16e2e9251961e8db30821d",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "SHA256SUMS_v4.2_Build_12.txt",
+      "bytes": 3761,
+      "sha256": "603cad3b2763032826e48186a3b664b8f63e63246d3c246d2a70e8b976da7450",
+      "git_blob_sha": "d3fd05fbb2b5b86f612ff5ed56d91dd01cb55547",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "STATIC_CHECK_REPORT_v4.2_Build_12.txt",
+      "bytes": 780,
+      "sha256": "0cf7454a7a3e7a0f3f36e026a29d7a6d1d863051293508c4ec12abd21ba9555c",
+      "git_blob_sha": "5f15edc9bd7a69a29ca2d3930a72bc10bb684581",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "WARNINGS_v4.2_Build_12.txt",
+      "bytes": 438,
+      "sha256": "456ed8fa7a2d49e5daf753c26356684916d7e9ab82142b582327c54a06267168",
+      "git_blob_sha": "1ee539ac694031328ce1b881adf461a60adc0bc8",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/ADVAPI32.def",
+      "bytes": 134,
+      "sha256": "aaf4eefc03ddcf244bfe8a7c54f1d77a1236a074a9398f20fcf4b2ce132871c9",
+      "git_blob_sha": "9ef4031778638a8ed8c23fe8e83cc447fe53d50c",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/AV_SAFETY_AUDIT_v4.2_Build_12.txt",
+      "bytes": 606,
+      "sha256": "bc948f1809869153464302992ec017071110311aa4b2499111b434def756cd43",
+      "git_blob_sha": "65225af2e2d02f2caa37b160eb417315024f6422",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/BUILD_v4.2_Build_12.txt",
+      "bytes": 1940,
+      "sha256": "32a1e4a4ea341c831c462220510f6e0548a6bd13c9bfd90d3d0358ba4512c813",
+      "git_blob_sha": "be743096dac2ab1e033008a271dce838a5a61e66",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/COMDLG32.def",
+      "bytes": 46,
+      "sha256": "14459b819b1e0e404f2ba8a36e0a68b2ec2affd8d365deed893d4d7994df317f",
+      "git_blob_sha": "97fa09b68432f268718d7b57f61cfba2d8be7bd7",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/Crash-Monitor-icon.png",
+      "bytes": 11556,
+      "sha256": "c538dbeabe636cfa15f5c167135a5024ef31733ffc27e334d656284e988e90c4",
+      "git_blob_sha": "2ae5c10ce0a16ec7f67b2ab1fd5a1eddb20bc8b8",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/Crash-Monitor.ico",
+      "bytes": 25437,
+      "sha256": "40fcea278c70243eaca75b86d67a9e42d696843116870d5dde5a42db7d1c2378",
+      "git_blob_sha": "4b46a2fdbb120d5b8a9f68b0e48473b91f576675",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/Crash_Monitor_v4.2_Build_12.manifest",
+      "bytes": 956,
+      "sha256": "fbba664016dc494b81c84a50089906181d394e20d1b12257c5faf53b336fd213",
+      "git_blob_sha": "8ea7fc1fad865238087de21ee702461dcc46f768",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/GDI32.def",
+      "bytes": 51,
+      "sha256": "150dd8d8402ead47dc35cf2ddc9220d5d178ad15c9826231b960a73b53b72204",
+      "git_blob_sha": "9f109a945f0362b171f7ca4c29330148af4112c2",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/KERNEL32.def",
+      "bytes": 1003,
+      "sha256": "9347b594a2df3861c3aa44422a206d62954dd0e3d92933a276b051747c26b030",
+      "git_blob_sha": "0a154f55daf105632754fa99e82afb2374d745e5",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/MASTER_RULES_AUDIT_v4.2_Build_12.txt",
+      "bytes": 816,
+      "sha256": "9f32830a967048e15310b3a5421d25e522f031e455a7b011b9b394844594744f",
+      "git_blob_sha": "d84fb4b0a2c370711c700600ad9384abd2cca3c3",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/OLE32.def",
+      "bytes": 73,
+      "sha256": "1fdd0a05c24fb9b201f477f9e37066a53ac8f9713af45ab6faae51b553d7c951",
+      "git_blob_sha": "599998483d877107883faa2e0993a45ae81c7b93",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/README_FIRST_v4.2_Build_12.txt",
+      "bytes": 639,
+      "sha256": "b035b265a6893dcf40e8424320b85f9099a9d186da602483968840b9561963bf",
+      "git_blob_sha": "2efba1dea4335e6f89d30d9392da8347b5357ba1",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/RECOVERY_METADATA_v4.2_Build_12.txt",
+      "bytes": 886,
+      "sha256": "952a7e67746eb899bfc25323aa5b35f45b5f04f00b146e703ec26de54e1250fe",
+      "git_blob_sha": "395dab79db58d04150fbfb0cc85aae98b6fd1764",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/REGRESSION_EVIDENCE_v4.2_Build_12.txt",
+      "bytes": 1307,
+      "sha256": "7479de9ce34613356efb18f6cc52dcafcc76feabedc16a0c6321992f15b4f307",
+      "git_blob_sha": "625c3b5669ffda1ff90b34f2a13b108a8c5d7cf4",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/RELEASE_NOTES_v4.2_Build_12.md",
+      "bytes": 1478,
+      "sha256": "aed481cc56528d0952564fb63c9f4d628f2b0cc1847e2417f76e36ac71aa528a",
+      "git_blob_sha": "8ebc4880552a17ea0573595850b5fa6d3ae13b74",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/SAFE_SELF_TEST_REPORT_v4.2_Build_12.txt",
+      "bytes": 706,
+      "sha256": "6e16531fc5f5bc72d9018257bec89fcf7f42a6aee0c54309cb173a4abec9ad56",
+      "git_blob_sha": "757918ab05e72ded9a16e2e9251961e8db30821d",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/SHELL32.def",
+      "bytes": 77,
+      "sha256": "888c53a2207b71e245ede0058a6b54690e4d781678c29888ea3b656d6f3a6804",
+      "git_blob_sha": "7ebb94a3f9cf2137e2ca1eb3feccdcf718490d25",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/STATIC_CHECK_REPORT_v4.2_Build_12.txt",
+      "bytes": 780,
+      "sha256": "0cf7454a7a3e7a0f3f36e026a29d7a6d1d863051293508c4ec12abd21ba9555c",
+      "git_blob_sha": "5f15edc9bd7a69a29ca2d3930a72bc10bb684581",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/USER32.def",
+      "bytes": 681,
+      "sha256": "69eb562e40e26e443b35b154b405184d013d607f9837d2b3ebd6a5d56e198730",
+      "git_blob_sha": "6c544f96d763fffc5b4a4449ea04b54a3671c95b",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/WARNINGS_v4.2_Build_12.txt",
+      "bytes": 438,
+      "sha256": "456ed8fa7a2d49e5daf753c26356684916d7e9ab82142b582327c54a06267168",
+      "git_blob_sha": "1ee539ac694031328ce1b881adf461a60adc0bc8",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/crash_monitor_42_build12-source.cpp",
+      "bytes": 183552,
+      "sha256": "d7c191830edc1cab50fdfded98761740ab3f60222dc7b0033c42e448c6f6e354",
+      "git_blob_sha": "75a5e74698d3ea5f2283c5bb5af3db4f9fe345a2",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/embed_resources_42_build12.py",
+      "bytes": 6566,
+      "sha256": "3069f7ae9c9521b888481933cbe30cba9fed71ac7509588d2f97127257786ebb",
+      "git_blob_sha": "ce9df35cb102451f1f13944606c6d0c0151bf71b",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/release_checks_42_build12.py",
+      "bytes": 21322,
+      "sha256": "9a6c925de915a07acdb9c56cbf7017af1e59353eaa1c6d3b45f7d22df088a130",
+      "git_blob_sha": "b6a3e7ca52a08be3af6944078896f0781b0dd637",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "source/static_raw_b12.txt",
+      "bytes": 9247,
+      "sha256": "043d9c4f23cae13009f6182e5b196511394a28dcf418fbdd7e6ba51dc852753c",
+      "git_blob_sha": "605dd06d1919df05bb26aef30a53bb3049b4ba22",
+      "byte_for_byte_match": true
+    },
+    {
+      "path": "static_raw_b12.txt",
+      "bytes": 9247,
+      "sha256": "043d9c4f23cae13009f6182e5b196511394a28dcf418fbdd7e6ba51dc852753c",
+      "git_blob_sha": "605dd06d1919df05bb26aef30a53bb3049b4ba22",
+      "byte_for_byte_match": true
+    }
+  ],
+  "preservation": {
+    "all_existing_repository_files_unchanged": 97,
+    "older_crash_monitor_files_unchanged": 24
+  },
+  "validation_evidence": {
+    "static": {
+      "pass": 174,
+      "fail": 0,
+      "source": "STATIC_CHECK_REPORT_v4.2_Build_12.txt; static_raw_b12.txt"
+    },
+    "compiler": {
+      "warnings": 0,
+      "errors": 0,
+      "source": "Original build evidence; no recompilation in this archival session"
+    },
+    "windows_self_test": {
+      "pass": 39,
+      "fail": 0,
+      "skipped": 0,
+      "not_tested": 4,
+      "finished": true,
+      "source": "CrashMonitor-SafeSelfTest-v4.2-Build12.txt",
+      "source_sha256": "6a2447fd995fdc1c6991ed419b8370816cde11270ad7e04a2803645486b38b45"
+    },
+    "tests_rerun_during_archival": false
+  },
+  "environment_owned_not_tested": [
+    {
+      "item": "Actual sign-out/reboot startup",
+      "reason": "Requires a real session transition; isolated startup registration coverage cannot prove the next sign-in."
+    },
+    {
+      "item": "Windows Search indexing/discovery timing",
+      "reason": "Depends on the asynchronous Windows indexer; shortcut creation and launch are tested separately."
+    },
+    {
+      "item": "Actual HKLM WER UAC consent/elevation",
+      "reason": "Requires actual Windows consent and elevation; isolated registry-engine checks do not exercise approval."
+    },
+    {
+      "item": "Bitdefender/SmartScreen reputation",
+      "reason": "Depends on external security products and reputation services."
+    }
+  ],
+  "release_status": "DONE for the applicable static, safely testable runtime, and permanent archive requirements; four justified environment-owned checks remain NOT TESTED under MASTER_RULES section 23.",
+  "original_release_documents_preserved": true,
+  "original_preruntime_documents_note": "Pre-runtime notes are preserved exactly as authored. The later attached Windows runtime report and this archive status supersede their pending-runtime statements.",
+  "no_rebuild": true,
+  "no_build_increment": true
+}
