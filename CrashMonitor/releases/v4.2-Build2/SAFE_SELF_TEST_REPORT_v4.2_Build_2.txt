@@ -1,0 +1,46 @@
+Crash Monitor v4.2 Build 2 - Safe Self-Test execution status
+============================================================
+
+Build-environment execution totals
+----------------------------------
+PASS: 0
+FAIL: 0
+SKIPPED: 0
+NOT TESTED: 21
+
+Reason: this build environment is Linux and cannot execute the produced Win64 GUI executable. Static validation of
+the Safe Self-Test implementation is reported separately and is not counted here as functional PASS evidence.
+
+Integrated Windows Safe Self-Test tests (11) - NOT TESTED here
+--------------------------------------------------------------
+NOT TESTED - isolated project-owned temporary self-test folder creation/cleanup.
+NOT TESTED - Minimize-to-tray immediate production setter + write/read persistence.
+NOT TESTED - taskbar+tray immediate production setter + write/read persistence.
+NOT TESTED - display-mode persistence write/read production path.
+NOT TESTED - DetailsHeight persistence write/read production path.
+NOT TESTED - session-only Pause production setter immediate runtime state.
+NOT TESTED - monitored-program persistence: write -> reload/read -> compare.
+NOT TESTED - project-local production logging path.
+NOT TESTED - bounded monitor.log rotation through production AppendLog path.
+NOT TESTED - missing settings recovery to established defaults using isolated data.
+NOT TESTED - intentional single-instance mutex collision detection.
+
+When run on Windows, use the tray item "Run Safe Self-Test...". The app writes:
+%TEMP%\CrashMonitor-SafeSelfTest-v4.2-Build2.txt
+Each of the 11 automated items is then reported PASS or FAIL individually.
+
+Remaining Windows/manual/interactive checks (10) - NOT TESTED here
+-----------------------------------------------------------------
+NOT TESTED - actual Update / Repair over the current installed build and preservation/reload of existing targets.ini.
+NOT TESTED - real Start with Windows registry toggle and launch at sign-in.
+NOT TESTED - real Start Menu/Desktop shortcuts and Windows Search discovery.
+NOT TESTED - real HKLM WER enable/disable UAC flow.
+NOT TESTED - real TEST/PRECRASH/CRASH/EXITCRASH dump creation.
+NOT TESTED - real lossless ZIP verification/splitting on a newly produced dump.
+NOT TESTED - physical Explorer.exe/taskbar restart and tray-icon recovery.
+NOT TESTED - interactive taskbar-only/tray-only/both/minimize/close behavior after update.
+NOT TESTED - actual process termination from every Exit control/path.
+NOT TESTED - Bitdefender/SmartScreen result on the target Windows machine.
+
+No unavailable runtime check is counted as PASS.
+Tracker status: NOT DONE until the required Windows tests complete with 0 FAIL and Rule 27 archive verification is complete.
