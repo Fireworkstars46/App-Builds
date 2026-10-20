@@ -2,7 +2,7 @@
 from pathlib import Path
 import argparse, hashlib, os, tempfile, zipfile
 
-PATCH_SHA256 = "2f39d0ccf95bd2fc8509d37edab4cd7e8044b987f6ff173f1119562a9d87023f"
+PATCH_SHA256 = "37df687341c2bb553a85da5990621daa0f196c0768b4ed8a3b00a121a70a151d"
 EXPECTED_FILES = {
     "app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java",
     "app/build.gradle",
