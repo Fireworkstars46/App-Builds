@@ -19,13 +19,16 @@ jobs:
       - name: Check out App-Builds
         uses: actions/checkout@v7
 
-      - name: Extract exact Build 3 source package
+      - name: Reconstruct and verify exact Build 3 source package
         shell: bash
         run: |
           set -euo pipefail
+          cat DisneyNOWFireTV/Build3/SourceParts/part*.txt > /tmp/build3-source.b64
+          base64 -d /tmp/build3-source.b64 > /tmp/build3-source.zip
+          echo 'ac5b01e1ed50e280ebfb37357bda19bcef2f1f2501b9f2f69f08f096e9be0485  /tmp/build3-source.zip' | sha256sum -c -
           rm -rf _build3
           mkdir _build3
-          unzip -q DisneyNOWFireTV/Build3/DisneyNOW-Fire-TV-v0.1-Build3-Source.zip -d _build3
+          unzip -q /tmp/build3-source.zip -d _build3
           test -s _build3/DisneyNOWFireTV/Source/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java
           grep -q 'versionCode 3' _build3/DisneyNOWFireTV/Source/app/build.gradle
 
@@ -87,7 +90,7 @@ jobs:
           cp _build3/DisneyNOWFireTV/Source/app/build/outputs/apk/release/app-release-unsigned.apk _unsigned/DisneyNOW-Fire-TV-v0.1-Build3-UNSIGNED.apk
           cp _build3/DisneyNOWFireTV/Source/build/reports/STATIC-AUDIT-v0.1-Build3.txt _unsigned/
           cp _build3/DisneyNOWFireTV/Source/build/reports/lint-results-debug.txt _unsigned/LINT-v0.1-Build3.txt
-          cp DisneyNOWFireTV/Build3/DisneyNOW-Fire-TV-v0.1-Build3-Source.zip _unsigned/
+          cp /tmp/build3-source.zip _unsigned/DisneyNOW-Fire-TV-v0.1-Build3-Source.zip
           sha256sum _unsigned/* > _unsigned/SHA256SUMS-UNSIGNED.txt
 
       - name: Upload unsigned Build 3 signing input
