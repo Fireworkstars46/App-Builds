@@ -1,0 +1,80 @@
+DisneyNOW Fire TV Web Wrapper - STATIC / RELEASE AUDIT
+Version: 0.1 Build 2
+MASTER_RULES SHA-256: b1c7318bc10227eca9f991eeb34ae15d29f542017c624cab23980fcdf50ad34f
+
+1. PASS - Required source exists: app/build.gradle | /home/runner/work/App-Builds/App-Builds/DisneyNOWFireTV/Source/app/build.gradle
+2. PASS - Required source exists: app/src/main/AndroidManifest.xml | /home/runner/work/App-Builds/App-Builds/DisneyNOWFireTV/Source/app/src/main/AndroidManifest.xml
+3. PASS - Required source exists: app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java | /home/runner/work/App-Builds/App-Builds/DisneyNOWFireTV/Source/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java
+4. PASS - Required source exists: BUILD_INFO.md | /home/runner/work/App-Builds/App-Builds/DisneyNOWFireTV/Source/BUILD_INFO.md
+5. PASS - Required source exists: README.md | /home/runner/work/App-Builds/App-Builds/DisneyNOWFireTV/Source/README.md
+6. PASS - Package ID / namespace preserved | com.fireworkstars46.disneynowfiretv
+7. PASS - Version name preserved | 0.1
+8. PASS - Version code incremented | 2
+9. PASS - Build number incremented | 2
+10. PASS - Minimum SDK 22 preserved | Android 5.1 / Fire OS 5-era floor
+11. PASS - Target SDK 35 preserved | targetSdk 35
+12. PASS - Java 17 compile target | source/target compatibility
+13. PASS - Least privilege: INTERNET is the only permission | permissions=['android.permission.INTERNET']
+14. PASS - Cleartext HTTP disabled | usesCleartextTraffic=false
+15. PASS - Application hardware acceleration enabled | hardwareAccelerated=true
+16. PASS - Launcher activity explicitly exported | exported=true
+17. PASS - Fire TV leanback launcher category | ['android.intent.category.LAUNCHER', 'android.intent.category.LEANBACK_LAUNCHER']
+18. PASS - Standard launcher category | ['android.intent.category.LAUNCHER', 'android.intent.category.LEANBACK_LAUNCHER']
+19. PASS - AndroidManifest XML parses | well-formed XML
+20. PASS - JavaScript enabled through production WebView settings | setJavaScriptEnabled(true)
+21. PASS - DOM storage enabled | setDomStorageEnabled(true)
+22. PASS - Media playback user gesture relaxed for TV playback | setMediaPlaybackRequiresUserGesture(false)
+23. PASS - File access disabled | setAllowFileAccess(false)
+24. PASS - Content access disabled | setAllowContentAccess(false)
+25. PASS - Mixed content prohibited | MIXED_CONTENT_NEVER_ALLOW
+26. PASS - Third-party cookies explicitly enabled for provider auth | setAcceptThirdPartyCookies(webView, true)
+27. PASS - Fullscreen video production callback | onShowCustomView
+28. PASS - Fullscreen exit production callback | onHideCustomView
+29. PASS - Fire TV Menu key app controls | KEYCODE_MENU
+30. PASS - Native cursor overlay exists | private final class CursorView extends View
+31. PASS - D-pad cursor movement production path | moveCursor(keyCode
+32. PASS - Center/Enter cursor click production path | performCursorClick()
+33. PASS - Cursor click uses WebView touch dispatch | webView.dispatchTouchEvent(down)
+34. PASS - Cursor hides during fullscreen | cursorView.setVisibility(View.GONE)
+35. PASS - Cursor preference persisted | KEY_CURSOR_ENABLED
+36. PASS - Build 2 migration enables cursor | .putBoolean(KEY_CURSOR_ENABLED, true)
+37. PASS - Build 2 migration disables legacy focus default | .putBoolean(KEY_TV_FOCUS, false)
+38. PASS - Page Zoom setting exists | KEY_PAGE_ZOOM
+39. PASS - Page Zoom default is 75 percent | DEFAULT_PAGE_ZOOM = 75
+40. PASS - Page Zoom applies to WebView production path | webView.setInitialScale(percent)
+41. PASS - Page Zoom menu is exposed | showPageZoomDialog
+42. PASS - WebView hardware layer explicitly requested | setLayerType(View.LAYER_TYPE_HARDWARE, null)
+43. PASS - Default D-pad path avoids DOM focus scanning | if (customView == null && isCursorEnabled())
+44. PASS - Legacy focus fallback retained | moveWebFocus(boolean forward)
+45. PASS - Settings persistence uses synchronous verification path | .commit()
+46. PASS - Safe Self-Test present | runSafeSelfTest
+47. PASS - Settings persistence self-test write/reload/compare | Settings persistence write -> reload/read -> compare -> delete
+48. PASS - Cursor movement self-test through production method | Native cursor production movement path
+49. PASS - Page Zoom self-test write/reload/compare/restore | Page Zoom production persistence write -> reload/read -> compare -> restore
+50. PASS - Hardware acceleration runtime self-test | Hardware-accelerated WebView runtime
+51. PASS - Data persistence self-test write/reload/compare | Project data write -> reload/read -> compare -> delete
+52. PASS - Widevine runtime diagnostic | MediaDrm.isCryptoSchemeSupported(WIDEVINE_UUID)
+53. PASS - No WebView remote debugging | setWebContentsDebuggingEnabled(false)
+54. PASS - App-local web-data clear path | clearAppWebData
+55. PASS - Bounded log rotation | MAX_FILES = 5
+56. PASS - Log size bound | MAX_BYTES = 1024L * 1024L
+57. PASS - Forbidden/high-risk capability absent: android.permission.READ_CONTACTS | android.permission.READ_CONTACTS
+58. PASS - Forbidden/high-risk capability absent: android.permission.READ_SMS | android.permission.READ_SMS
+59. PASS - Forbidden/high-risk capability absent: android.permission.RECORD_AUDIO | android.permission.RECORD_AUDIO
+60. PASS - Forbidden/high-risk capability absent: android.permission.CAMERA | android.permission.CAMERA
+61. PASS - Forbidden/high-risk capability absent: android.permission.ACCESS_FINE_LOCATION | android.permission.ACCESS_FINE_LOCATION
+62. PASS - Forbidden/high-risk capability absent: android.permission.MANAGE_EXTERNAL_STORAGE | android.permission.MANAGE_EXTERNAL_STORAGE
+63. PASS - Forbidden/high-risk capability absent: setWebContentsDebuggingEnabled(true) | setWebContentsDebuggingEnabled(true)
+64. PASS - Forbidden/high-risk capability absent: onReceivedSslError | onReceivedSslError
+65. PASS - Navigation logging remains host-only | No full page URL in normal navigation log
+66. PASS - Diagnostics declare no credential/token collection | privacy statement present
+67. PASS - Corrective issues documented | Build 1 regression list
+68. PASS - Build info matches Version + Build | BUILD_INFO.md
+69. PASS - Build 2 self-test report filename | current build report path
+70. PASS - MainActivity brace balance | open=217 close=217
+71. PASS - MainActivity parenthesis count sanity | open=960 close=960
+
+STATIC TOTAL: PASS=71 FAIL=0
+RESULT: PASS
+
+Runtime Fire TV smoothness, real provider sign-in, DRM license negotiation, physical cursor/click behavior, Page Zoom appearance, and fullscreen protected video are not claimed by this static audit.

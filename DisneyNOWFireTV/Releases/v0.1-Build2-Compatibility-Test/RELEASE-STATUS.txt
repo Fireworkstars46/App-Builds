@@ -1,0 +1,16 @@
+DisneyNOW Fire TV Web Wrapper v0.1 Build 2
+STATUS: NOT DONE - COMPATIBILITY TEST
+
+Static/release checks are required to pass before this archive is committed.
+
+Remaining release blockers / required physical checks:
+1. Install the APK on the user's actual Fire TV Stick.
+2. Run the in-app Safe Self-Test and preserve its real PASS/FAIL/SKIPPED report.
+3. Verify DisneyNOW loads and the user's normal provider sign-in completes.
+4. Verify Page Zoom defaults to 75%, visibly reduces the over-zoomed layout, and each preset applies/persists.
+5. Verify the native cursor is visible, D-pad movement is smooth, Center/Select clicks accurately, edge scrolling works, Menu works, and Back behaves correctly on real hardware.
+6. Verify at least one DisneyNOW on-demand video actually starts, plays video + audio, seeks, and can enter/exit fullscreen.
+7. Confirm the Fire TV WebView/Widevine stack supports Disney's protected playback path.
+8. Before a stable DONE release, establish and safely preserve a private release-signing key. Build 2 is CI debug-signed; installing it may require uninstalling Build 1, and a later stable key may require uninstalling Build 2.
+
+Build 2 does not bypass DRM, authentication, subscription requirements, geographic restrictions, or Disney's service controls.
