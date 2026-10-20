@@ -1,3 +1,4 @@
+# Build 3 permanent-signing preparation workflow; private keystore is never committed.
 name: Build DisneyNOW Fire TV Build 3 unsigned release
 
 on:
