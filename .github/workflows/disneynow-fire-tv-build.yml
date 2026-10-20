@@ -1,0 +1,192 @@
+name: Build DisneyNOW Fire TV compatibility test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'DisneyNOWFireTV/SourceSeed/**'
+      - 'DisneyNOWFireTV/README.md'
+      - '.github/workflows/disneynow-fire-tv-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  android-compatibility-build:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_DIR: DisneyNOWFireTV/Source
+      RELEASE_DIR: DisneyNOWFireTV/Releases/v0.1-Build1-Compatibility-Test
+      APK_NAME: DisneyNOW-Fire-TV-v0.1-Build1-Compatibility-Test.apk
+      SOURCE_ZIP: DisneyNOW-Fire-TV-v0.1-Build1-Source.zip
+
+    steps:
+      - name: Check out App-Builds
+        uses: actions/checkout@v4
+
+      - name: Refuse to overwrite historical Build 1 archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -e "$RELEASE_DIR" ]; then
+            echo "Release archive already exists at $RELEASE_DIR. Historical Build 1 must not be overwritten."
+            exit 1
+          fi
+
+      - name: Reconstruct and verify exact source seed
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 DisneyNOWFireTV/SourceSeed/reconstruct.py --output "$PROJECT_DIR"
+          test -s "$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
+          test -s "$PROJECT_DIR/tools/static_audit.py"
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android platform and build tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+
+      - name: Set up Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Run current MASTER_RULES static audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PROJECT_DIR/tools/static_audit.py"
+          grep -q 'STATIC TOTAL: PASS=.* FAIL=0' "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build1.txt"
+          grep -q 'RESULT: PASS' "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build1.txt"
+
+      - name: Compile, lint, and run Android unit-test task
+        shell: bash
+        working-directory: DisneyNOWFireTV/Source
+        run: |
+          set -euo pipefail
+          gradle --no-daemon clean lintDebug testDebugUnitTest assembleDebug
+
+      - name: Verify APK identity and debug signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$PROJECT_DIR/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          APKSIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          BADGING="$($AAPT dump badging "$APK" | head -n 1)"
+          echo "$BADGING"
+          echo "$BADGING" | grep -q "name='com.fireworkstars46.disneynowfiretv'"
+          echo "$BADGING" | grep -q "versionCode='1'"
+          echo "$BADGING" | grep -q "versionName='0.1'"
+          "$APKSIGNER" verify --verbose "$APK"
+
+      - name: Stage exact Build 1 archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RELEASE_DIR"
+          cp "$PROJECT_DIR/app/build/outputs/apk/debug/app-debug.apk" "$RELEASE_DIR/$APK_NAME"
+          cp "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build1.txt" "$RELEASE_DIR/STATIC-AUDIT-v0.1-Build1.txt"
+          cp "$PROJECT_DIR/build/reports/lint-results-debug.txt" "$RELEASE_DIR/LINT-v0.1-Build1.txt"
+          cp "$PROJECT_DIR/build/reports/lint-results-debug.html" "$RELEASE_DIR/LINT-v0.1-Build1.html"
+
+          rm -rf _disneynow-source-package
+          mkdir -p _disneynow-source-package/DisneyNOWFireTV
+          cp -a "$PROJECT_DIR" _disneynow-source-package/DisneyNOWFireTV/Source
+          rm -rf _disneynow-source-package/DisneyNOWFireTV/Source/.gradle \
+                 _disneynow-source-package/DisneyNOWFireTV/Source/app/build \
+                 _disneynow-source-package/DisneyNOWFireTV/Source/build
+          cp DisneyNOWFireTV/README.md _disneynow-source-package/DisneyNOWFireTV/README.md
+          cp -a DisneyNOWFireTV/SourceSeed _disneynow-source-package/DisneyNOWFireTV/SourceSeed
+          mkdir -p _disneynow-source-package/.github/workflows
+          cp .github/workflows/disneynow-fire-tv-build.yml _disneynow-source-package/.github/workflows/disneynow-fire-tv-build.yml
+          cp MASTER_RULES.md _disneynow-source-package/MASTER_RULES.md
+          (cd _disneynow-source-package && zip -qr "../$RELEASE_DIR/$SOURCE_ZIP" .)
+
+          MASTER_SHA="$(sha256sum MASTER_RULES.md | awk '{print $1}')"
+          APK_SHA="$(sha256sum "$RELEASE_DIR/$APK_NAME" | awk '{print $1}')"
+          SOURCE_SHA="$(sha256sum "$RELEASE_DIR/$SOURCE_ZIP" | awk '{print $1}')"
+
+          cat > "$RELEASE_DIR/BUILD-METADATA.txt" <<META
+          Project: DisneyNOW Fire TV Web Wrapper
+          Version: 0.1
+          Build: 1
+          Android versionCode: 1
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Source commit: $GITHUB_SHA
+          MASTER_RULES SHA-256: $MASTER_SHA
+          APK SHA-256: $APK_SHA
+          Source ZIP SHA-256: $SOURCE_SHA
+          Build environment: GitHub Actions ubuntu-latest, Java 17, Gradle 8.7, Android SDK 35 / build-tools 35.0.0
+          Signing: CI-generated Android debug signing key (not archived; compatibility test only)
+          META
+
+          cat > "$RELEASE_DIR/RELEASE-STATUS.txt" <<'STATUS'
+          DisneyNOW Fire TV Web Wrapper v0.1 Build 1
+          STATUS: NOT DONE - COMPATIBILITY TEST
+
+          Static/release checks are required to pass before this archive is committed.
+
+          Remaining release blockers / required physical checks:
+          1. Install the APK on the user's actual Fire TV Stick.
+          2. Run the in-app Safe Self-Test and preserve its real PASS/FAIL/SKIPPED report.
+          3. Verify DisneyNOW loads and the user's normal provider sign-in completes.
+          4. Verify at least one DisneyNOW on-demand video actually starts, plays video + audio, seeks, and can enter/exit fullscreen.
+          5. Verify Fire TV remote Menu, D-pad focus helper, Center/Select, and Back behavior on real hardware.
+          6. Confirm the Fire TV WebView/Widevine stack supports Disney's protected playback path.
+          7. Before a stable DONE release, establish and safely preserve a private release-signing key. Build 1 is CI debug-signed; a later stable key may require uninstalling Build 1 before installation.
+
+          Build 1 does not bypass DRM, authentication, subscription requirements, geographic restrictions, or Disney's service controls.
+          STATUS
+
+          (
+            cd "$RELEASE_DIR"
+            sha256sum "$APK_NAME" "$SOURCE_ZIP" STATIC-AUDIT-v0.1-Build1.txt LINT-v0.1-Build1.txt LINT-v0.1-Build1.html BUILD-METADATA.txt RELEASE-STATUS.txt > SHA256SUMS.txt
+          )
+
+          test -s "$RELEASE_DIR/$APK_NAME"
+          test -s "$RELEASE_DIR/$SOURCE_ZIP"
+          test -s "$RELEASE_DIR/STATIC-AUDIT-v0.1-Build1.txt"
+          test -s "$RELEASE_DIR/SHA256SUMS.txt"
+
+      - name: Upload CI convenience artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DisneyNOW-Fire-TV-v0.1-Build1-Compatibility-Test
+          path: DisneyNOWFireTV/Releases/v0.1-Build1-Compatibility-Test/
+          if-no-files-found: error
+
+      - name: Permanently archive exact Build 1 artifacts in App-Builds
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git add "$RELEASE_DIR"
+          git commit -m 'Archive DisneyNOW Fire TV v0.1 Build 1 compatibility test'
+          git push origin HEAD:main
+
+      - name: Verify permanent archive is readable from committed tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git cat-file -e "origin/main:$RELEASE_DIR/$APK_NAME"
+          git cat-file -e "origin/main:$RELEASE_DIR/$SOURCE_ZIP"
+          git cat-file -e "origin/main:$RELEASE_DIR/STATIC-AUDIT-v0.1-Build1.txt"
+          git cat-file -e "origin/main:$RELEASE_DIR/SHA256SUMS.txt"
+          echo 'Permanent Build 1 compatibility-test archive verified in Fireworkstars46/App-Builds.'
