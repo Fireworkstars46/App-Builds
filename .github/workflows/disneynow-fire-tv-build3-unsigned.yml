@@ -1,0 +1,97 @@
+name: Build DisneyNOW Fire TV Build 3 unsigned release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'DisneyNOWFireTV/Build3/**'
+      - '.github/workflows/disneynow-fire-tv-build3-unsigned.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build3-unsigned:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out App-Builds
+        uses: actions/checkout@v7
+
+      - name: Extract exact Build 3 source package
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _build3
+          mkdir _build3
+          unzip -q DisneyNOWFireTV/Build3/DisneyNOW-Fire-TV-v0.1-Build3-Source.zip -d _build3
+          test -s _build3/DisneyNOWFireTV/Source/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java
+          grep -q 'versionCode 3' _build3/DisneyNOWFireTV/Source/app/build.gradle
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Install Android platform and build tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+
+      - name: Set up Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Run Build 3 static audit
+        shell: bash
+        working-directory: _build3/DisneyNOWFireTV/Source
+        run: |
+          set -euo pipefail
+          python3 tools/static_audit.py
+          grep -q 'STATIC TOTAL: PASS=.* FAIL=0' build/reports/STATIC-AUDIT-v0.1-Build3.txt
+          grep -q 'RESULT: PASS' build/reports/STATIC-AUDIT-v0.1-Build3.txt
+
+      - name: Compile, lint, unit-test, and produce unsigned release APK
+        shell: bash
+        working-directory: _build3/DisneyNOWFireTV/Source
+        run: |
+          set -euo pipefail
+          gradle --no-daemon clean lintDebug testDebugUnitTest assembleRelease
+          test -s app/build/outputs/apk/release/app-release-unsigned.apk
+
+      - name: Verify unsigned APK identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK='_build3/DisneyNOWFireTV/Source/app/build/outputs/apk/release/app-release-unsigned.apk'
+          AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          BADGING="$($AAPT dump badging "$APK" | head -n 1)"
+          echo "$BADGING"
+          echo "$BADGING" | grep -q "name='com.fireworkstars46.disneynowfiretv'"
+          echo "$BADGING" | grep -q "versionCode='3'"
+          echo "$BADGING" | grep -q "versionName='0.1'"
+
+      - name: Stage unsigned Build 3 signing input
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p _unsigned
+          cp _build3/DisneyNOWFireTV/Source/app/build/outputs/apk/release/app-release-unsigned.apk _unsigned/DisneyNOW-Fire-TV-v0.1-Build3-UNSIGNED.apk
+          cp _build3/DisneyNOWFireTV/Source/build/reports/STATIC-AUDIT-v0.1-Build3.txt _unsigned/
+          cp _build3/DisneyNOWFireTV/Source/build/reports/lint-results-debug.txt _unsigned/LINT-v0.1-Build3.txt
+          cp DisneyNOWFireTV/Build3/DisneyNOW-Fire-TV-v0.1-Build3-Source.zip _unsigned/
+          sha256sum _unsigned/* > _unsigned/SHA256SUMS-UNSIGNED.txt
+
+      - name: Upload unsigned Build 3 signing input
+        uses: actions/upload-artifact@v4
+        with:
+          name: DisneyNOW-Fire-TV-v0.1-Build3-UNSIGNED
+          path: _unsigned/
+          if-no-files-found: error
