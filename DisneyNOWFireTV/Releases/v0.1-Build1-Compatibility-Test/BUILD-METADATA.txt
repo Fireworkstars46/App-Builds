@@ -1,0 +1,11 @@
+Project: DisneyNOW Fire TV Web Wrapper
+Version: 0.1
+Build: 1
+Android versionCode: 1
+Package ID: com.fireworkstars46.disneynowfiretv
+Source commit: 1c16689bb7657bb93f3e9fa815fec192d21fea47
+MASTER_RULES SHA-256: b1c7318bc10227eca9f991eeb34ae15d29f542017c624cab23980fcdf50ad34f
+APK SHA-256: 3ef841d60f951cd38ae0e5363157883300289c3445884b5a98eac81e5c7b40a1
+Source ZIP SHA-256: f2c7dbf46bb11e7c3ded30f62e5e1ebe5c638a98729aabfa0dd2404564361147
+Build environment: GitHub Actions ubuntu-latest, Java 17, Gradle 8.7, Android SDK 35 / build-tools 35.0.0
+Signing: CI-generated Android debug signing key (not archived; compatibility test only)

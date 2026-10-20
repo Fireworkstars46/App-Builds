@@ -1,0 +1,59 @@
+DisneyNOW Fire TV Web Wrapper - STATIC / RELEASE AUDIT
+Version: 0.1 Build 1
+MASTER_RULES SHA-256: b1c7318bc10227eca9f991eeb34ae15d29f542017c624cab23980fcdf50ad34f
+
+1. PASS - Required source exists: app/build.gradle | /home/runner/work/App-Builds/App-Builds/DisneyNOWFireTV/Source/app/build.gradle
+2. PASS - Required source exists: app/src/main/AndroidManifest.xml | /home/runner/work/App-Builds/App-Builds/DisneyNOWFireTV/Source/app/src/main/AndroidManifest.xml
+3. PASS - Required source exists: app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java | /home/runner/work/App-Builds/App-Builds/DisneyNOWFireTV/Source/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java
+4. PASS - Required source exists: BUILD_INFO.md | /home/runner/work/App-Builds/App-Builds/DisneyNOWFireTV/Source/BUILD_INFO.md
+5. PASS - Package ID / namespace | com.fireworkstars46.disneynowfiretv
+6. PASS - Version name | 0.1
+7. PASS - Version code | 1
+8. PASS - Build number constant | 1
+9. PASS - Minimum SDK 22 | Android 5.1 / Fire OS 5-era floor
+10. PASS - Target SDK 35 | targetSdk 35
+11. PASS - Java 17 compile target | source/target compatibility
+12. PASS - Least privilege: INTERNET is requested | permissions=['android.permission.INTERNET']
+13. PASS - Cleartext HTTP disabled | usesCleartextTraffic=false
+14. PASS - Launcher activity explicitly exported | exported=true
+15. PASS - Fire TV leanback launcher category | ['android.intent.category.LAUNCHER', 'android.intent.category.LEANBACK_LAUNCHER']
+16. PASS - Standard launcher category | ['android.intent.category.LAUNCHER', 'android.intent.category.LEANBACK_LAUNCHER']
+17. PASS - AndroidManifest XML parses | well-formed XML
+18. PASS - JavaScript enabled through production WebView settings | setJavaScriptEnabled(true)
+19. PASS - DOM storage enabled | setDomStorageEnabled(true)
+20. PASS - Media playback user gesture relaxed for TV playback | setMediaPlaybackRequiresUserGesture(false)
+21. PASS - File access disabled | setAllowFileAccess(false)
+22. PASS - Content access disabled | setAllowContentAccess(false)
+23. PASS - Mixed content prohibited | MIXED_CONTENT_NEVER_ALLOW
+24. PASS - Third-party cookies explicitly enabled for provider auth | setAcceptThirdPartyCookies(webView, true)
+25. PASS - Fullscreen video production callback | onShowCustomView
+26. PASS - Fullscreen exit production callback | onHideCustomView
+27. PASS - Fire TV Menu key app controls | KEYCODE_MENU
+28. PASS - D-pad TV focus navigation | KEYCODE_DPAD_RIGHT
+29. PASS - Settings persistence uses synchronous verification path | .commit()
+30. PASS - Safe Self-Test present | runSafeSelfTest
+31. PASS - Settings persistence self-test write/reload/compare | Settings persistence write -> reload/read -> compare -> delete
+32. PASS - Data persistence self-test write/reload/compare | Project data write -> reload/read -> compare -> delete
+33. PASS - Widevine runtime diagnostic | MediaDrm.isCryptoSchemeSupported(WIDEVINE_UUID)
+34. PASS - No WebView remote debugging | setWebContentsDebuggingEnabled(false)
+35. PASS - App-local web-data clear path | clearAppWebData
+36. PASS - Bounded log rotation | MAX_FILES = 5
+37. PASS - Log size bound | MAX_BYTES = 1024L * 1024L
+38. PASS - Forbidden/high-risk capability absent: android.permission.READ_CONTACTS | android.permission.READ_CONTACTS
+39. PASS - Forbidden/high-risk capability absent: android.permission.READ_SMS | android.permission.READ_SMS
+40. PASS - Forbidden/high-risk capability absent: android.permission.RECORD_AUDIO | android.permission.RECORD_AUDIO
+41. PASS - Forbidden/high-risk capability absent: android.permission.CAMERA | android.permission.CAMERA
+42. PASS - Forbidden/high-risk capability absent: android.permission.ACCESS_FINE_LOCATION | android.permission.ACCESS_FINE_LOCATION
+43. PASS - Forbidden/high-risk capability absent: android.permission.MANAGE_EXTERNAL_STORAGE | android.permission.MANAGE_EXTERNAL_STORAGE
+44. PASS - Forbidden/high-risk capability absent: setWebContentsDebuggingEnabled(true) | setWebContentsDebuggingEnabled(true)
+45. PASS - Forbidden/high-risk capability absent: onReceivedSslError | onReceivedSslError
+46. PASS - Navigation logging is host-only | No full page URL in normal navigation log
+47. PASS - Diagnostics declare no credential/token collection | privacy statement present
+48. PASS - MainActivity brace balance | open=161 close=161
+49. PASS - MainActivity parenthesis count sanity | open=732 close=732
+50. PASS - Build info matches version/build | BUILD_INFO.md
+
+STATIC TOTAL: PASS=50 FAIL=0
+RESULT: PASS
+
+Runtime Fire TV playback, DRM license negotiation, real provider sign-in, physical remote behavior, and fullscreen protected video are not claimed by this static audit.
