@@ -7,25 +7,32 @@ This project does **not** bundle Disney video, Disney artwork, credentials, prov
 ## Current build
 
 - Version: **0.1**
-- Build: **1**
+- Build: **2**
 - Package ID: `com.fireworkstars46.disneynowfiretv`
-- Status: **Compatibility test / NOT DONE** until runtime testing is completed on the user's Fire TV Stick.
+- Status: **Corrective compatibility test / NOT DONE** until Build 2 is physically verified on the user's Fire TV Stick.
 
-Build 1 exists to answer one question first: can DisneyNOW web playback work through the Fire TV's Android WebView/DRM stack when iOS WebKit playback does not?
+Build 1 established that the DisneyNOW site could load on the user's Fire TV Stick, but real hardware testing found three defects: D-pad navigation was very laggy, there was no visible cursor, and the page was too zoomed in. Build 2 corrects those issues while preserving the same package ID and Disney authentication/DRM path.
 
 ## Fire TV controls
 
-- D-pad: TV-friendly focus navigation when enabled.
-- Center/Select: activate the focused web control.
+- D-pad: move the visible native cursor by default.
+- Center/Select: click the web control under the cursor.
+- Moving beyond the top/bottom edge: scroll the page.
 - Back: web back; exits fullscreen video first when applicable.
-- Menu (three-lines button): opens the app menu.
+- Menu (three-lines button): opens app controls.
 
-The app menu provides Home, Reload, user-agent profiles, TV Focus Navigation, clear app web data, diagnostics, diagnostic export, Safe Self-Test, About, and Exit.
+The app menu provides Home, Reload, Page Zoom, Cursor Navigation, optional Legacy Focus Navigation, user-agent profiles, clear app web data, diagnostics, diagnostic export, Safe Self-Test, About, and Exit.
 
-## Signing warning for Build 1
+Page Zoom defaults to **75%** and can be changed from 50% through 100% presets.
 
-Build 1 is an **experimental CI debug-signed APK**. The CI debug signing key is intentionally not archived in this public repository. A later stable release signed with a preserved private release key may therefore require uninstalling this compatibility-test APK first. This is intentional for the test build and is one reason Build 1 remains NOT DONE.
+## Build 2 performance/navigation change
+
+The old DOM focus-scanning navigation remains only as an optional fallback. The default D-pad path now moves a native overlay cursor and injects only the click event into the WebView, avoiding a full `querySelectorAll`/focus scan on every directional button press. Hardware acceleration remains enabled for the application and is explicitly requested on the WebView.
+
+## Signing warning
+
+Builds 1 and 2 are **experimental CI debug-signed APKs**. The CI debug signing key is intentionally not archived in this public repository. Because hosted runners can use different debug keys, Android may require Build 1 to be uninstalled before Build 2 can be installed. A final update-compatible release requires a preserved private signing key.
 
 ## Source seed
 
-The repository stores the exact Build 1 source as a SHA-256-verified split seed under `SourceSeed/` so it can be reconstructed deterministically by the build workflow. The permanent Build 1 archive contains a normal human-readable source ZIP after a successful compile.
+Build 2 preserves the original Build 1 `SourceSeed/` unchanged. The workflow deterministically reconstructs that known Build 1 source and then applies the SHA-256-verified `Build2/apply.py` corrective replacement set. The permanent Build 1 source/binaries remain preserved under its historical release archive, and the Build 2 release archive contains the fully patched human-readable source plus the reconstruction/patch inputs.
