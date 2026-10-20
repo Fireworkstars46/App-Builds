@@ -1,34 +1,17 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import argparse, hashlib, os, tempfile, zipfile
+import argparse, base64, hashlib, os, subprocess, tempfile, zlib
 
-PATCH_SHA256 = "37df687341c2bb553a85da5990621daa0f196c0768b4ed8a3b00a121a70a151d"
-EXPECTED_FILES = {
-    "app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java",
-    "app/build.gradle",
-    "tools/static_audit.py",
-    "BUILD_INFO.md",
-    "README.md",
-}
-
-def atomic_write(path: Path, data: bytes) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp = tempfile.mkstemp(prefix=path.name + ".", suffix=".tmp", dir=str(path.parent))
-    try:
-        with os.fdopen(fd, "wb") as handle:
-            handle.write(data); handle.flush(); os.fsync(handle.fileno())
-        os.replace(tmp, path)
-    except Exception:
-        try: os.unlink(tmp)
-        except OSError: pass
-        raise
+COMPRESSED_SHA256 = "eeb1f46d061c5a1e6308803292c1ec353806fc93d22c89476eef88320352b0d2"
+PATCH_SHA256 = "bb94b859fd960e79b37fef0d8a70db1072d387a3bb6adb0837a8609d1dc064fa"
+PART_NAMES = ("part01.txt", "part02.txt", "part03.txt")
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Apply DisneyNOW Fire TV v0.1 Build 2 corrective source replacements")
+    ap = argparse.ArgumentParser(description="Apply DisneyNOW Fire TV v0.1 Build 2 corrective patch")
     ap.add_argument("--source", required=True)
     args = ap.parse_args()
     source = Path(args.source).resolve()
-    patch = Path(__file__).resolve().with_name("patch.zip")
+    build2 = Path(__file__).resolve().parent
 
     build_gradle = source / "app" / "build.gradle"
     main_java = source / "app" / "src" / "main" / "java" / "com" / "fireworkstars46" / "disneynowfiretv" / "MainActivity.java"
@@ -37,19 +20,31 @@ def main() -> None:
     if "com.fireworkstars46.disneynowfiretv" not in build_gradle.read_text(encoding="utf-8"):
         raise SystemExit("Package identity mismatch; refusing to patch unrelated source")
 
-    actual = hashlib.sha256(patch.read_bytes()).hexdigest()
-    if actual != PATCH_SHA256:
-        raise SystemExit(f"Build 2 patch integrity failure: expected {PATCH_SHA256}, got {actual}")
+    encoded = "".join((build2 / "PatchParts" / name).read_text(encoding="ascii").strip() for name in PART_NAMES)
+    compressed = base64.b64decode(encoded, validate=True)
+    compressed_sha = hashlib.sha256(compressed).hexdigest()
+    if compressed_sha != COMPRESSED_SHA256:
+        raise SystemExit(f"Build 2 compressed patch integrity failure: expected {COMPRESSED_SHA256}, got {compressed_sha}")
+    patch_bytes = zlib.decompress(compressed)
+    patch_sha = hashlib.sha256(patch_bytes).hexdigest()
+    if patch_sha != PATCH_SHA256:
+        raise SystemExit(f"Build 2 patch integrity failure: expected {PATCH_SHA256}, got {patch_sha}")
 
-    with zipfile.ZipFile(patch) as archive:
-        names = set(archive.namelist())
-        if names != EXPECTED_FILES:
-            raise SystemExit(f"Unexpected Build 2 patch contents: {sorted(names)}")
-        for member in archive.infolist():
-            target = (source / member.filename).resolve()
-            if source != target and source not in target.parents:
-                raise SystemExit(f"Unsafe patch path: {member.filename}")
-            atomic_write(target, archive.read(member))
+    fd, tmp_name = tempfile.mkstemp(prefix="disneynow-build2-", suffix=".patch")
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(patch_bytes)
+            handle.flush()
+            os.fsync(handle.fileno())
+        result = subprocess.run(
+            ["patch", "-p1", "--batch", "--forward", "-i", tmp_name],
+            cwd=str(source), text=True, capture_output=True
+        )
+        if result.returncode != 0:
+            raise SystemExit("Build 2 patch application failed:\n" + result.stdout + result.stderr)
+    finally:
+        try: os.unlink(tmp_name)
+        except OSError: pass
 
     after_gradle = build_gradle.read_text(encoding="utf-8")
     after_main = main_java.read_text(encoding="utf-8")
@@ -64,7 +59,10 @@ def main() -> None:
     if failed:
         raise SystemExit("Build 2 patch verification failed: " + ", ".join(failed))
     print(f"Applied DisneyNOW Fire TV v0.1 Build 2 corrective patch to {source}")
-    print(f"Patch ZIP SHA-256: {actual}")
-    for name, _ in checks: print(f"PASS - {name}")
+    print(f"Compressed patch SHA-256: {compressed_sha}")
+    print(f"Decoded patch SHA-256: {patch_sha}")
+    for name, _ in checks:
+        print(f"PASS - {name}")
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()
