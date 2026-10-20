@@ -15,22 +15,101 @@ permissions:
 jobs:
   build3-unsigned:
     runs-on: ubuntu-latest
+    env:
+      PROJECT_DIR: _build3/DisneyNOWFireTV/Source
+
     steps:
       - name: Check out App-Builds
         uses: actions/checkout@v7
 
-      - name: Reconstruct and verify exact Build 3 source package
+      - name: Reconstruct Build 1 and apply verified Build 2 corrective source
         shell: bash
         run: |
           set -euo pipefail
-          cat DisneyNOWFireTV/Build3/SourceParts/part*.txt > /tmp/build3-source.b64
-          base64 -d /tmp/build3-source.b64 > /tmp/build3-source.zip
-          echo 'ac5b01e1ed50e280ebfb37357bda19bcef2f1f2501b9f2f69f08f096e9be0485  /tmp/build3-source.zip' | sha256sum -c -
           rm -rf _build3
-          mkdir _build3
-          unzip -q /tmp/build3-source.zip -d _build3
-          test -s _build3/DisneyNOWFireTV/Source/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java
-          grep -q 'versionCode 3' _build3/DisneyNOWFireTV/Source/app/build.gradle
+          mkdir -p _build3/DisneyNOWFireTV
+          python3 DisneyNOWFireTV/SourceSeed/reconstruct.py --output "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build2/apply.py --source "$PROJECT_DIR"
+          test -s "$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
+          grep -q 'versionCode 2' "$PROJECT_DIR/app/build.gradle"
+
+      - name: Apply Build 3 permanent-signing baseline metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          root = Path('_build3/DisneyNOWFireTV/Source')
+
+          def replace_exact(path, old, new, count=1):
+              p = root / path
+              text = p.read_text(encoding='utf-8')
+              actual = text.count(old)
+              if actual != count:
+                  raise SystemExit(f'{path}: expected {count} occurrence(s), found {actual}: {old!r}')
+              p.write_text(text.replace(old, new), encoding='utf-8')
+
+          replace_exact('app/build.gradle', 'versionCode 2', 'versionCode 3')
+          replace_exact('app/build.gradle', "buildConfigField 'int', 'APP_BUILD', '2'", "buildConfigField 'int', 'APP_BUILD', '3'")
+
+          main = 'app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java'
+          replace_exact(main,
+              'BuildConfig.APP_BUILD == 2 && BuildConfig.VERSION_CODE == 2',
+              'BuildConfig.APP_BUILD == 3 && BuildConfig.VERSION_CODE == 3')
+          replace_exact(main, 'SafeSelfTest-v0.1-Build2.txt', 'SafeSelfTest-v0.1-Build3.txt')
+          replace_exact(main,
+              'Build 2 fixes the reported Fire TV zoom, missing-cursor, and laggy D-pad navigation issues. It remains NOT DONE until this corrected build is tested on the actual Fire TV Stick.',
+              'Build 3 preserves the Build 2 Fire TV cursor, zoom, and performance corrections and establishes the permanent release-signing identity for future in-place updates. It remains NOT DONE until this signed build is tested on the actual Fire TV Stick.')
+
+          build_info = root / 'BUILD_INFO.md'
+          bi = build_info.read_text(encoding='utf-8')
+          bi = bi.replace('- Build: 2', '- Build: 3', 1)
+          bi = bi.replace('- Android versionCode: 2', '- Android versionCode: 3', 1)
+          bi = bi.replace(
+              '- Release state: NOT DONE pending real Fire TV runtime verification of the Build 2 cursor, zoom, smoothness, provider authentication, and protected playback.',
+              '- Release state: NOT DONE pending real Fire TV runtime verification of the Build 2 cursor/zoom/smoothness corrections plus Build 3 permanent-signing installation/update baseline.', 1)
+          bi += '\nBuild 3 preserves all Build 2 functional behavior and exists because the first two compatibility-test APKs were incorrectly CI debug-signed. Build 3 establishes the permanent private release-signing identity. Build 1 must be uninstalled once because its temporary signing key was not preserved; Build 2 was never installed on the target Fire TV. Future builds must use the exact Build 3 release keystore so they can update in place.\n'
+          build_info.write_text(bi, encoding='utf-8')
+
+          readme = root / 'README.md'
+          rm = readme.read_text(encoding='utf-8')
+          rm = rm.replace('# Source — DisneyNOW Fire TV Web Wrapper v0.1 Build 2', '# Source — DisneyNOW Fire TV Web Wrapper v0.1 Build 3', 1)
+          marker = 'This is an Android/Fire TV WebView wrapper intended to use the normal DisneyNOW website on a Fire TV Stick.\n'
+          insert = marker + '\n## Build 3 signing correction\n\nBuild 3 preserves the Build 2 cursor, 75% zoom, and performance corrections unchanged. Its artifact correction is establishing the permanent private release-signing identity required for future in-place updates. Build 1 used an unrecoverable CI debug key and must be uninstalled once. Build 2 was not installed on the target Fire TV.\n'
+          if marker not in rm:
+              raise SystemExit('README marker not found')
+          rm = rm.replace(marker, insert, 1)
+          rm = rm.replace(
+              'Build 1 and Build 2 compatibility-test APKs use CI debug signing. A GitHub-hosted runner can generate a different debug signing key between builds, so Android may require Build 1 to be uninstalled before Build 2 installs. A stable private release-signing key must be established before a final update-compatible DONE release.',
+              'Build 1 and Build 2 compatibility-test APKs used CI debug signing. Build 3 establishes the permanent private release-signing identity. The Build 3 keystore is intentionally not committed to the public repository. Every later APK for this package must be signed with that same key.', 1)
+          readme.write_text(rm, encoding='utf-8')
+
+          audit = root / 'tools/static_audit.py'
+          a = audit.read_text(encoding='utf-8')
+          replacements = [
+              ('STATIC-AUDIT-v0.1-Build2.txt', 'STATIC-AUDIT-v0.1-Build3.txt'),
+              ('EXPECTED_BUILD = "2"', 'EXPECTED_BUILD = "3"'),
+              ('EXPECTED_VERSION_CODE = "2"', 'EXPECTED_VERSION_CODE = "3"'),
+              ('versionCode\\s+2\\b', 'versionCode\\s+3\\b'),
+              ("buildConfigField 'int', 'APP_BUILD', '2'", "buildConfigField 'int', 'APP_BUILD', '3'"),
+              ('BuildConfig.APP_BUILD == 2', 'BuildConfig.APP_BUILD == 3'),
+              ('"Build: 2" in build_info', '"Build: 3" in build_info'),
+              ('Build 2 self-test report filename', 'Build 3 self-test report filename'),
+              ('SafeSelfTest-v0.1-Build2.txt', 'SafeSelfTest-v0.1-Build3.txt'),
+              ('Version: 0.1 Build 2', 'Version: 0.1 Build 3'),
+          ]
+          for old, new in replacements:
+              if old not in a:
+                  raise SystemExit(f'static audit pattern not found: {old!r}')
+              a = a.replace(old, new, 1)
+          audit.write_text(a, encoding='utf-8')
+
+          print('Build 3 source metadata patch applied successfully.')
+          PY
+          grep -q 'versionCode 3' "$PROJECT_DIR/app/build.gradle"
+          grep -q "BuildConfig.APP_BUILD == 3" "$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
+          grep -q 'SafeSelfTest-v0.1-Build3.txt' "$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
 
       - name: Set up Java 17
         uses: actions/setup-java@v6
@@ -74,7 +153,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          APK='_build3/DisneyNOWFireTV/Source/app/build/outputs/apk/release/app-release-unsigned.apk'
+          APK="$PROJECT_DIR/app/build/outputs/apk/release/app-release-unsigned.apk"
           AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
           BADGING="$($AAPT dump badging "$APK" | head -n 1)"
           echo "$BADGING"
@@ -82,15 +161,20 @@ jobs:
           echo "$BADGING" | grep -q "versionCode='3'"
           echo "$BADGING" | grep -q "versionName='0.1'"
 
-      - name: Stage unsigned Build 3 signing input
+      - name: Stage unsigned Build 3 signing input and exact source
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p _unsigned
-          cp _build3/DisneyNOWFireTV/Source/app/build/outputs/apk/release/app-release-unsigned.apk _unsigned/DisneyNOW-Fire-TV-v0.1-Build3-UNSIGNED.apk
-          cp _build3/DisneyNOWFireTV/Source/build/reports/STATIC-AUDIT-v0.1-Build3.txt _unsigned/
-          cp _build3/DisneyNOWFireTV/Source/build/reports/lint-results-debug.txt _unsigned/LINT-v0.1-Build3.txt
-          cp /tmp/build3-source.zip _unsigned/DisneyNOW-Fire-TV-v0.1-Build3-Source.zip
+          mkdir -p _unsigned _source_package/DisneyNOWFireTV
+          cp "$PROJECT_DIR/app/build/outputs/apk/release/app-release-unsigned.apk" _unsigned/DisneyNOW-Fire-TV-v0.1-Build3-UNSIGNED.apk
+          cp "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build3.txt" _unsigned/
+          cp "$PROJECT_DIR/build/reports/lint-results-debug.txt" _unsigned/LINT-v0.1-Build3.txt
+          cp -a "$PROJECT_DIR" _source_package/DisneyNOWFireTV/Source
+          rm -rf _source_package/DisneyNOWFireTV/Source/.gradle \
+                 _source_package/DisneyNOWFireTV/Source/app/build \
+                 _source_package/DisneyNOWFireTV/Source/build
+          cp MASTER_RULES.md _source_package/MASTER_RULES.md
+          (cd _source_package && zip -qr ../_unsigned/DisneyNOW-Fire-TV-v0.1-Build3-Source.zip .)
           sha256sum _unsigned/* > _unsigned/SHA256SUMS-UNSIGNED.txt
 
       - name: Upload unsigned Build 3 signing input
