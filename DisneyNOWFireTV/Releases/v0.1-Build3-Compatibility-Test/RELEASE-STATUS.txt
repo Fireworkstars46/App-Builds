@@ -1,0 +1,5 @@
+DisneyNOW Fire TV Web Wrapper
+Version 0.1 Build 3
+Status: NOT DONE - COMPATIBILITY TEST
+Signing: permanent release signing identity established for Build 3 and future in-place updates.
+Physical Fire TV playback/cursor/zoom verification remains required before DONE.
