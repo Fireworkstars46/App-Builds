@@ -1,0 +1,101 @@
+DisneyNOW Fire TV Web Wrapper - STATIC / RELEASE AUDIT
+Version: 0.1 Build 6
+MASTER_RULES SHA-256: b6ce9bf510ecd9e5807d7da697bff2b3761a5ff8dfe424aeaa97c2051649086d
+
+1. PASS - Required source exists: app/build.gradle | /home/runner/work/App-Builds/App-Builds/_build6/DisneyNOWFireTV/Source/app/build.gradle
+2. PASS - Required source exists: app/src/main/AndroidManifest.xml | /home/runner/work/App-Builds/App-Builds/_build6/DisneyNOWFireTV/Source/app/src/main/AndroidManifest.xml
+3. PASS - Required source exists: app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java | /home/runner/work/App-Builds/App-Builds/_build6/DisneyNOWFireTV/Source/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java
+4. PASS - Required source exists: BUILD_INFO.md | /home/runner/work/App-Builds/App-Builds/_build6/DisneyNOWFireTV/Source/BUILD_INFO.md
+5. PASS - Required source exists: README.md | /home/runner/work/App-Builds/App-Builds/_build6/DisneyNOWFireTV/Source/README.md
+6. PASS - Package ID / namespace preserved | com.fireworkstars46.disneynowfiretv
+7. PASS - Version name preserved | 0.1
+8. PASS - Version code incremented | 6
+9. PASS - Build number incremented | 6
+10. PASS - Minimum SDK 22 preserved | Android 5.1 / Fire OS 5-era floor
+11. PASS - Target SDK 35 preserved | targetSdk 35
+12. PASS - Java 17 compile target | source/target compatibility
+13. PASS - Least privilege: INTERNET is the only permission | permissions=['android.permission.INTERNET']
+14. PASS - Cleartext HTTP disabled | usesCleartextTraffic=false
+15. PASS - Application hardware acceleration enabled | hardwareAccelerated=true
+16. PASS - Launcher activity explicitly exported | exported=true
+17. PASS - Fire TV leanback launcher category | ['android.intent.category.LAUNCHER', 'android.intent.category.LEANBACK_LAUNCHER']
+18. PASS - Standard launcher category | ['android.intent.category.LAUNCHER', 'android.intent.category.LEANBACK_LAUNCHER']
+19. PASS - AndroidManifest XML parses | well-formed XML
+20. PASS - JavaScript enabled through production WebView settings | setJavaScriptEnabled(true)
+21. PASS - DOM storage enabled | setDomStorageEnabled(true)
+22. PASS - Media playback user gesture relaxed for TV playback | setMediaPlaybackRequiresUserGesture(false)
+23. PASS - File access disabled | setAllowFileAccess(false)
+24. PASS - Content access disabled | setAllowContentAccess(false)
+25. PASS - Mixed content prohibited | MIXED_CONTENT_NEVER_ALLOW
+26. PASS - Third-party cookies explicitly enabled for provider auth | setAcceptThirdPartyCookies(webView, true)
+27. PASS - Fullscreen video production callback | onShowCustomView
+28. PASS - Fullscreen exit production callback | onHideCustomView
+29. PASS - Fire TV Menu key app controls | KEYCODE_MENU
+30. PASS - Activity pre-WebView key dispatch override | public boolean dispatchKeyEvent(KeyEvent event)
+31. PASS - Cursor keys consumed before WebView | Consume both DOWN and UP before WebView
+32. PASS - Cursor dispatch directional helper | isCursorDirectionKey
+33. PASS - Cursor dispatch Select/Enter helper | isCursorNavigationKey
+34. PASS - Native cursor overlay exists | private final class CursorView extends View
+35. PASS - D-pad cursor movement fallback path | moveCursor(keyCode
+36. PASS - Smooth cursor direction start | startCursorDirection
+37. PASS - Smooth cursor direction stop | stopCursorDirection
+38. PASS - Smooth cursor 60Hz loop | CURSOR_FRAME_INTERVAL_MS = 16L
+39. PASS - Smooth cursor acceleration | CURSOR_MAX_PIXELS_PER_FRAME = 10f
+40. PASS - Precision 2-pixel nudge | CURSOR_TAP_NUDGE_PIXELS = 2f
+41. PASS - Center/Enter cursor click production path | performCursorClick()
+42. PASS - Cursor click uses WebView touch dispatch | webView.dispatchTouchEvent(down)
+43. PASS - Cursor hides during fullscreen | cursorView.setVisibility(View.GONE)
+44. PASS - Cursor preference persisted | KEY_CURSOR_ENABLED
+45. PASS - Build 2 migration enables cursor | .putBoolean(KEY_CURSOR_ENABLED, true)
+46. PASS - Build 2 migration disables legacy focus default | .putBoolean(KEY_TV_FOCUS, false)
+47. PASS - Page Zoom setting exists | KEY_PAGE_ZOOM
+48. PASS - Page Zoom default is 75 percent | DEFAULT_PAGE_ZOOM = 75
+49. PASS - Page Zoom minimum is 0 | MIN_PAGE_ZOOM = 0
+50. PASS - Page Zoom maximum is 500 | MAX_PAGE_ZOOM = 500
+51. PASS - Page Zoom direct numeric entry | TYPE_CLASS_NUMBER
+52. PASS - Page Zoom custom slider | slider.setMax(MAX_PAGE_ZOOM)
+53. PASS - Page Zoom one-percent controls | minus.setText("-1")
+54. PASS - Page Zoom reset 100 control | reset.setText("Reset 100%")
+55. PASS - Page Zoom applies to WebView production path | webView.setInitialScale(percent)
+56. PASS - Page Zoom menu is exposed | showPageZoomDialog
+57. PASS - WebView native compositor layer mode | webView.setLayerType(View.LAYER_TYPE_NONE, null)
+58. PASS - Fullscreen keeps WebView attached | webView.setVisibility(View.VISIBLE)
+59. PASS - Fullscreen overlay brought to front | customViewContainer.bringToFront()
+60. PASS - Popup login route is one-shot | final boolean[] routed = new boolean[]{false}
+61. PASS - Cookie flush after navigation | CookieManager.getInstance().flush()
+62. PASS - Default D-pad path avoids DOM focus scanning | if (customView == null && isCursorEnabled())
+63. PASS - Legacy focus fallback retained | moveWebFocus(boolean forward)
+64. PASS - Settings persistence uses synchronous verification path | .commit()
+65. PASS - Safe Self-Test present | runSafeSelfTest
+66. PASS - Settings persistence self-test write/reload/compare | Settings persistence write -> reload/read -> compare -> delete
+67. PASS - Cursor movement self-test through production method | Native cursor production movement path
+68. PASS - Pre-WebView dispatch regression self-test | Activity pre-WebView D-pad dispatch interception
+69. PASS - Page Zoom boundary/persistence self-test | Page Zoom 0-500 production boundary + persistence write -> reload/read -> compare -> restore
+70. PASS - Fullscreen compositor self-test | Fullscreen overlay compositor production path
+71. PASS - Hardware acceleration runtime self-test | Hardware-accelerated WebView runtime
+72. PASS - Data persistence self-test write/reload/compare | Project data write -> reload/read -> compare -> delete
+73. PASS - Widevine runtime diagnostic | MediaDrm.isCryptoSchemeSupported(WIDEVINE_UUID)
+74. PASS - No WebView remote debugging | setWebContentsDebuggingEnabled(false)
+75. PASS - App-local web-data clear path | clearAppWebData
+76. PASS - Bounded log rotation | MAX_FILES = 5
+77. PASS - Log size bound | MAX_BYTES = 1024L * 1024L
+78. PASS - Forbidden/high-risk capability absent: android.permission.READ_CONTACTS | android.permission.READ_CONTACTS
+79. PASS - Forbidden/high-risk capability absent: android.permission.READ_SMS | android.permission.READ_SMS
+80. PASS - Forbidden/high-risk capability absent: android.permission.RECORD_AUDIO | android.permission.RECORD_AUDIO
+81. PASS - Forbidden/high-risk capability absent: android.permission.CAMERA | android.permission.CAMERA
+82. PASS - Forbidden/high-risk capability absent: android.permission.ACCESS_FINE_LOCATION | android.permission.ACCESS_FINE_LOCATION
+83. PASS - Forbidden/high-risk capability absent: android.permission.MANAGE_EXTERNAL_STORAGE | android.permission.MANAGE_EXTERNAL_STORAGE
+84. PASS - Forbidden/high-risk capability absent: setWebContentsDebuggingEnabled(true) | setWebContentsDebuggingEnabled(true)
+85. PASS - Forbidden/high-risk capability absent: onReceivedSslError | onReceivedSslError
+86. PASS - Navigation logging remains host-only | No full page URL in normal navigation log
+87. PASS - Diagnostics declare no credential/token collection | privacy statement present
+88. PASS - Build 6 playback/login/zoom changes documented | Build 6 targeted compatibility changes
+89. PASS - Build info matches Version + Build | BUILD_INFO.md
+90. PASS - Build 6 self-test report filename | current build report path
+91. PASS - MainActivity brace balance | open=248 close=248
+92. PASS - MainActivity parenthesis count sanity | open=1191 close=1191
+
+STATIC TOTAL: PASS=92 FAIL=0
+RESULT: PASS
+
+Runtime Fire TV ad/protected-video rendering, real provider sign-in stability, DRM license negotiation, custom Page Zoom appearance, and physical remote behavior are not claimed by this static audit.

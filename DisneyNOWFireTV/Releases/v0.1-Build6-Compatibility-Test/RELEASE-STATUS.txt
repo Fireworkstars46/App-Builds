@@ -1,0 +1,15 @@
+DisneyNOW Fire TV Web Wrapper
+Version 0.1 Build 6
+Status: NOT DONE - COMPATIBILITY TEST
+Build 6 preserves Build 5's physically confirmed cursor routing and smooth movement behavior.
+Page Zoom: fully custom 0-500 whole-number range with direct numeric entry, 0-500 slider, -1/+1 controls, Reset 100%, immediate apply/persistence, and existing saved zoom preserved. Zoom 0 uses WebView automatic scale rather than making the page invisible.
+Video compatibility correction: removes the forced offscreen WebView hardware layer while retaining app/window hardware acceleration, keeps the WebView alive behind fullscreen custom video, and keeps the fullscreen video container frontmost/focused. This targets the reported Fire TV ad-audio/black-video symptom but requires physical retest.
+Login/navigation correction: flushes cookies after completed navigation and routes popup/login URLs through a one-shot path to prevent duplicate popup routing/destruction. Real provider login stability requires physical retest.
+Package ID: com.fireworkstars46.disneynowfiretv
+Android versionCode: 6
+Signing: exact permanent Build 3/4/5 release identity; SHA-256 certificate fingerprint 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838.
+Signing backup gate: PASS - verified private GitHub recovery backup plus independent Dropbox backup; real recovery test passed.
+CI build/static/lint/unit/package checks: PASS. Static audit: 92 PASS / 0 FAIL. Lint: 0 errors / 9 warnings (non-blocking).
+Publication verification: exact signed APK SHA-256, APK ZIP integrity, APK v2/v3 signatures, permanent signer fingerprint, package ID, versionCode 6, versionName 0.1, source ZIP integrity, static-audit result, and lint summary are fail-closed checks.
+Physical Fire TV Build 6 checks still required: ad video picture/audio, protected-program playback, provider login/redirect stability, custom zoom appearance/control behavior, and regression check of the Build 5 cursor behavior.
+Permanent GitHub archive: signed APK, source ZIP, static audit, lint reports, build metadata, release status, and checksums are archived together for Build 6.
