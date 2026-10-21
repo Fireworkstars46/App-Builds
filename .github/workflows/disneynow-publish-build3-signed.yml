@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'DisneyNOWFireTV/Build3/Publish/DisneyNOW-Fire-TV-v0.1-Build3-Permanent-Signed.apk.b64'
+      - 'DisneyNOWFireTV/Build3/Publish/part*.txt'
 
 permissions:
   contents: write
@@ -22,11 +22,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          INPUT='DisneyNOWFireTV/Build3/Publish/DisneyNOW-Fire-TV-v0.1-Build3-Permanent-Signed.apk.b64'
           OUTDIR='DisneyNOWFireTV/Releases/v0.1-Build3-Compatibility-Test'
           APK="$OUTDIR/DisneyNOW-Fire-TV-v0.1-Build3-Permanent-Signed.apk"
           mkdir -p "$OUTDIR"
-          base64 -d "$INPUT" > "$APK"
+          cat DisneyNOWFireTV/Build3/Publish/part*.txt > /tmp/build3-signed.b64
+          base64 -d /tmp/build3-signed.b64 > "$APK"
           echo '2c12f365290b7f9c13478dae4c39c7309b70619bda2322f3d538868609347746  '"$APK" | sha256sum -c -
           unzip -t "$APK" >/dev/null
           printf '%s  %s\n' '2c12f365290b7f9c13478dae4c39c7309b70619bda2322f3d538868609347746' 'DisneyNOW-Fire-TV-v0.1-Build3-Permanent-Signed.apk' > "$OUTDIR/SHA256SUMS.txt"
