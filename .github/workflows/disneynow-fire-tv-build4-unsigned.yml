@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'DisneyNOWFireTV/Build4/apply.py'
+      - 'DisneyNOWFireTV/Build4/reconstruct_build3.py'
       - '.github/workflows/disneynow-fire-tv-build4-unsigned.yml'
   workflow_dispatch:
 
@@ -15,8 +16,6 @@ jobs:
   build4-unsigned:
     runs-on: ubuntu-latest
     env:
-      BUILD3_SOURCE_PARTS: DisneyNOWFireTV/Build3/SourceParts/part*.txt
-      BUILD3_SOURCE_ZIP: /tmp/DisneyNOW-Fire-TV-v0.1-Build3-Source.zip
       BUILD4_SOURCE_ZIP: /tmp/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip
       PROJECT_DIR: _build4/DisneyNOWFireTV/Source
       STAGE_DIR: _stage_build4
@@ -25,23 +24,20 @@ jobs:
       - name: Check out App-Builds
         uses: actions/checkout@v7
 
-      - name: Reconstruct and verify Build 4 source from verified Build 3 source parts
+      - name: Reconstruct verified Build 3 source chain and apply Build 4 correction
         shell: bash
         run: |
           set -euo pipefail
-          cat $BUILD3_SOURCE_PARTS > /tmp/build3-source.b64
-          base64 -d /tmp/build3-source.b64 > "$BUILD3_SOURCE_ZIP"
-          BUILD3_SOURCE_SHA="$(sha256sum "$BUILD3_SOURCE_ZIP" | awk '{print $1}')"
-          echo "Reconstructed Build 3 source ZIP SHA-256: $BUILD3_SOURCE_SHA"
-          unzip -t "$BUILD3_SOURCE_ZIP" >/dev/null
           rm -rf _build4 "$STAGE_DIR"
-          mkdir -p _build4 "$STAGE_DIR"
-          unzip -q "$BUILD3_SOURCE_ZIP" -d _build4
-          cp MASTER_RULES.md _build4/MASTER_RULES.md
+          mkdir -p _build4/DisneyNOWFireTV "$STAGE_DIR"
+          python3 DisneyNOWFireTV/SourceSeed/reconstruct.py --output "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build2/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build4/reconstruct_build3.py --source "$PROJECT_DIR"
           python3 DisneyNOWFireTV/Build4/apply.py --source "$PROJECT_DIR"
           grep -q 'versionCode 4' "$PROJECT_DIR/app/build.gradle"
           grep -q 'BuildConfig.APP_BUILD == 4' "$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
           grep -q 'public boolean dispatchKeyEvent(KeyEvent event)' "$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
+          cp MASTER_RULES.md _build4/MASTER_RULES.md
           (cd _build4 && zip -X -qr "$BUILD4_SOURCE_ZIP" MASTER_RULES.md DisneyNOWFireTV/Source)
           test -s "$BUILD4_SOURCE_ZIP"
           unzip -t "$BUILD4_SOURCE_ZIP" >/dev/null
@@ -109,7 +105,6 @@ jobs:
           cp "$PROJECT_DIR/build/reports/lint-results-debug.html" "$STAGE_DIR/LINT-v0.1-Build4.html"
           MASTER_SHA="$(sha256sum MASTER_RULES.md | awk '{print $1}')"
           SOURCE_SHA="$(sha256sum "$BUILD4_SOURCE_ZIP" | awk '{print $1}')"
-          BUILD3_SOURCE_SHA="$(sha256sum "$BUILD3_SOURCE_ZIP" | awk '{print $1}')"
           UNSIGNED_SHA="$(sha256sum "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build4-UNSIGNED.apk" | awk '{print $1}')"
           cat > "$STAGE_DIR/BUILD-METADATA-UNSIGNED.txt" <<META
           Project: DisneyNOW Fire TV Web Wrapper
@@ -119,9 +114,9 @@ jobs:
           Package ID: com.fireworkstars46.disneynowfiretv
           Source commit: $GITHUB_SHA
           MASTER_RULES SHA-256: $MASTER_SHA
-          Reconstructed Build 3 source ZIP SHA-256: $BUILD3_SOURCE_SHA
           Source ZIP SHA-256: $SOURCE_SHA
           Unsigned APK SHA-256: $UNSIGNED_SHA
+          Source reconstruction: Build 1 SourceSeed -> verified Build 2 correction -> Build 3 signing-baseline metadata -> Build 4 cursor-input correction.
           Build environment: GitHub Actions ubuntu-latest, Java 17, Gradle 8.7, Android SDK 35 / build-tools 35.0.0
           Signing status: UNSIGNED; must be signed outside public CI with the preserved Build 3 permanent private release key.
           META
