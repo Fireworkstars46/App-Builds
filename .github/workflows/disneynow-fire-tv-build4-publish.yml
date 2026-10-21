@@ -2,19 +2,21 @@ name: DisneyNOW Fire TV Build 4 - Publish verified signed APK
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - '.github/workflows/disneynow-fire-tv-build4-publish.yml'
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
 
 jobs:
   publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.issue.title == 'Trigger DisneyNOW Build 4 publication'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Download exact signed Build 4 staging APK
         shell: bash
@@ -22,7 +24,7 @@ jobs:
           set -euo pipefail
           out='DisneyNOWFireTV/Releases/v0.1-Build4-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build4-Permanent-Signed.apk'
           mkdir -p "$(dirname "$out")"
-          curl --fail --location --retry 2 --output "$out" 'https://uc582916d4267a09bc4501b1f300.dl.dropboxusercontent.com/cd/0/get/DKbXMltJvjKiama16eZHmzwcLG07HiGd84zTxwdU6FqPIt2hY7gDjJ8yv4-z0TiB3OBdg6avRTgx-tzTLeeun9_IhE6tZncLhGIDXL4r7eP5ev5BFwqdwp0ShHQ8lCCwDODIHEBrYkptzXcMzpV9L55mSPWv1gkG7VaVbvUpJ1u83A/file?c_luid=f3fd60e5'
+          curl --fail --location --retry 2 --output "$out" 'https://uc63c0ec6cd3261c8eec7fd8ea91.dl.dropboxusercontent.com/cd/0/get/DKZH5f6ckvzUBKzi0OU8UTagCq8rzkBDlDgPDBtf5g_-8nog-w4zha574qrFH9ThidOgJBUrfrIguj3668id2ZczcWS0gvDVGqg1eVH7dFxrjnOpH_8VNvcrzcjqtaicGxHRyyf0froqvhTq7a1z3scu2GrUnuUIr7zgS7JeNbwoDw/file?c_luid=f3fd60e5'
           echo '5239e930ffc7b4e08816372c16e7f793f14eb09b7b5a1421555b38ea37cddbc3  '"$out" | sha256sum -c -
           unzip -t "$out"
 
@@ -61,5 +63,5 @@ jobs:
             echo 'Release APK already published identically.'
           else
             git commit -m 'Publish verified DisneyNOW Fire TV v0.1 Build 4 APK'
-            git push
+            git push origin HEAD:main
           fi
