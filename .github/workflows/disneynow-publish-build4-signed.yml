@@ -114,3 +114,5 @@ jobs:
           fi
           git commit -m 'Archive DisneyNOW Fire TV v0.1 Build 4 permanent-signed compatibility test'
           git push origin HEAD:main
+
+# Retry publication after verifying the public APK was missing from the release archive.
