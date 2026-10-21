@@ -49,8 +49,9 @@ def main() -> None:
 
     parts_dir = Path(__file__).resolve().parent / 'patch_parts'
     parts = sorted(parts_dir.glob('part*.b64'))
-    if [p.name for p in parts] != ['part00.b64']:
-        raise SystemExit('Build 8 patch payload must contain exactly part00.b64')
+    expected_names = [f'part{i:02d}.b64' for i in range(6)]
+    if [p.name for p in parts] != expected_names:
+        raise SystemExit('Build 8 patch payload must contain exactly part00.b64 through part05.b64')
     encoded = ''.join(p.read_text(encoding='ascii') for p in parts)
     try:
         payload = base64.b64decode(encoded, validate=True)
