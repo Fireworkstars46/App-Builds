@@ -24,8 +24,8 @@ jobs:
           set -euo pipefail
           out='DisneyNOWFireTV/Releases/v0.1-Build4-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build4-Permanent-Signed.apk'
           mkdir -p "$(dirname "$out")"
-          curl --fail --location --retry 2 --output "$out" 'https://uc63c0ec6cd3261c8eec7fd8ea91.dl.dropboxusercontent.com/cd/0/get/DKZH5f6ckvzUBKzi0OU8UTagCq8rzkBDlDgPDBtf5g_-8nog-w4zha574qrFH9ThidOgJBUrfrIguj3668id2ZczcWS0gvDVGqg1eVH7dFxrjnOpH_8VNvcrzcjqtaicGxHRyyf0froqvhTq7a1z3scu2GrUnuUIr7zgS7JeNbwoDw/file?c_luid=f3fd60e5'
-          echo '5239e930ffc7b4e08816372c16e7f793f14eb09b7b5a1421555b38ea37cddbc3  '"$out" | sha256sum -c -
+          curl --fail --location --retry 2 --output "$out" 'https://uc1a36167028bd2135a9a6454513.dl.dropboxusercontent.com/cd/0/get/DKbKGPEb35MZmeArlYgfTOqaYLjY0W5fxsCrWoAcknHJc9rc4fzT1t-RbxE6xQxpB70xkaz5FiIyqd0aXVRw1oxPT2pABzv2HoT_IRM0QGJ3Sv2BoCvLBy7aZl3YaE5ff3QwTwG8OLnSVukwDrmwd72pzAwTSqjm-daEDkKqPzy4Xg/file?c_luid=f3fd60e5'
+          echo 'd96d05ef24888b5542cc5bca4a1c4e1a6983a18f24f26345bb09fe85b2c773b6  '"$out" | sha256sum -c -
           unzip -t "$out"
 
       - name: Verify Android package, versionCode, and permanent signing identity
@@ -38,7 +38,8 @@ jobs:
           test -x "$APKSIGNER"
           test -x "$AAPT"
           "$APKSIGNER" verify --verbose --print-certs "$apk" | tee /tmp/apksigner.txt
-          grep -qi 'Signer #1 certificate SHA-256 digest: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838' /tmp/apksigner.txt
+          grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true' /tmp/apksigner.txt
+          grep -Eqi 'certificate SHA-256 digest: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838' /tmp/apksigner.txt
           "$AAPT" dump badging "$apk" | tee /tmp/badging.txt
           grep -q "package: name='com.fireworkstars46.disneynowfiretv'" /tmp/badging.txt
           grep -q "versionCode='4'" /tmp/badging.txt
