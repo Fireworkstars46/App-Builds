@@ -101,7 +101,13 @@ jobs:
         run: |
           set -euo pipefail
           APK="$PROJECT_DIR/app/build/outputs/apk/release/app-release-unsigned.apk"
+          ZIPALIGN="$ANDROID_HOME/build-tools/35.0.0/zipalign"
+          APKSIGNER_JAR="$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar"
           cp "$APK" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build5-UNSIGNED.apk"
+          "$ZIPALIGN" -f -p 4 "$APK" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build5-ALIGNED-UNSIGNED.apk"
+          "$ZIPALIGN" -c -p 4 "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build5-ALIGNED-UNSIGNED.apk"
+          test -s "$APKSIGNER_JAR"
+          cp "$APKSIGNER_JAR" "$STAGE_DIR/apksigner.jar"
           cp "$BUILD5_SOURCE_ZIP" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build5-Source.zip"
           cp "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build5.txt" "$STAGE_DIR/STATIC-AUDIT-v0.1-Build5.txt"
           cp "$PROJECT_DIR/build/reports/lint-results-debug.txt" "$STAGE_DIR/LINT-v0.1-Build5.txt"
@@ -109,6 +115,7 @@ jobs:
           MASTER_SHA="$(sha256sum MASTER_RULES.md | awk '{print $1}')"
           SOURCE_SHA="$(sha256sum "$BUILD5_SOURCE_ZIP" | awk '{print $1}')"
           UNSIGNED_SHA="$(sha256sum "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build5-UNSIGNED.apk" | awk '{print $1}')"
+          ALIGNED_SHA="$(sha256sum "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build5-ALIGNED-UNSIGNED.apk" | awk '{print $1}')"
           cat > "$STAGE_DIR/BUILD-METADATA-UNSIGNED.txt" <<META
           Project: DisneyNOW Fire TV Web Wrapper
           Version: 0.1
@@ -119,9 +126,10 @@ jobs:
           MASTER_RULES SHA-256: $MASTER_SHA
           Source ZIP SHA-256: $SOURCE_SHA
           Unsigned APK SHA-256: $UNSIGNED_SHA
+          Zipaligned unsigned APK SHA-256: $ALIGNED_SHA
           Source reconstruction: Build 1 SourceSeed -> Build 2 correction -> Build 3 baseline metadata -> Build 4 cursor interception -> Build 5 smooth cursor movement.
           Build environment: GitHub Actions ubuntu-latest, Java 17, Gradle 8.7, Android SDK 35 / build-tools 35.0.0
-          Signing status: UNSIGNED; must be signed privately with the preserved Build 3 permanent release key.
+          Signing status: UNSIGNED; the aligned input must be signed privately with the preserved Build 3 permanent release key.
           META
           (cd "$STAGE_DIR" && sha256sum * > SHA256SUMS-UNSIGNED.txt)
 
