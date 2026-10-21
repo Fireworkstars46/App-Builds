@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build4-unsigned:
@@ -121,6 +121,25 @@ jobs:
           Signing status: UNSIGNED; must be signed outside public CI with the preserved Build 3 permanent private release key.
           META
           (cd "$STAGE_DIR" && sha256sum * > SHA256SUMS-UNSIGNED.txt)
+
+      - name: Publish unsigned APK as temporary base64 transport parts
+        shell: bash
+        run: |
+          set -euo pipefail
+          TRANSPORT_DIR='DisneyNOWFireTV/Build4/UnsignedPublish'
+          rm -rf "$TRANSPORT_DIR"
+          mkdir -p "$TRANSPORT_DIR"
+          base64 -w 0 "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build4-UNSIGNED.apk" > /tmp/build4-unsigned.b64
+          split -b 4000 -d -a 3 --additional-suffix=.txt /tmp/build4-unsigned.b64 "$TRANSPORT_DIR/apk-part"
+          sha256sum "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build4-UNSIGNED.apk" > "$TRANSPORT_DIR/UNSIGNED-SHA256.txt"
+          printf '%s\n' 'Temporary transport only. These files contain the unsigned Build 4 APK encoded as base64 and may be deleted after permanent signing/publication succeeds.' > "$TRANSPORT_DIR/README.txt"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$TRANSPORT_DIR"
+          if ! git diff --cached --quiet; then
+            git commit -m 'Stage DisneyNOW Build 4 unsigned APK transport parts'
+            git push origin HEAD:main
+          fi
 
       - name: Upload unsigned Build 4 signing input
         uses: actions/upload-artifact@v4
