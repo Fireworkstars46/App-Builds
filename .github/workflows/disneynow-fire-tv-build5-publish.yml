@@ -1,0 +1,77 @@
+name: DisneyNOW Fire TV Build 5 - Publish verified signed APK
+
+on:
+  workflow_dispatch:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.issue.title == 'Trigger DisneyNOW Build 5 publication'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Download exact privately signed Build 5 APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          out='DisneyNOWFireTV/Releases/v0.1-Build5-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build5-Permanent-Signed.apk'
+          mkdir -p "$(dirname "$out")"
+          curl --fail --location --retry 2 --output "$out" 'https://uc91d02c704bfbf01f5d2e2c6223.dl.dropboxusercontent.com/cd/0/get/DKabl1A2n5rd2MgRcY1I-fnKZAks9uWP8zJm7AwBWbS18bt7WG8dqaHbVWwe1N1jn4L3bveSdmcnaPLj4Yy7OI0jSbnk6SFcNk2ZqT0w_LW41zp32C2zieiEF5a42Pxla4uRgjLQk-xo98XR252mJQctrlwdQp3D23zzw3_wLMP0pg/file?c_luid=f3fd60e5'
+          echo '6802e98b227cd989fd1497ef138301b633b2ba58194a7aa2b8c63b1c5755be03  '"$out" | sha256sum -c -
+          unzip -t "$out" >/dev/null
+
+      - name: Verify package, Build 5 identity, and permanent signer
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk='DisneyNOWFireTV/Releases/v0.1-Build5-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build5-Permanent-Signed.apk'
+          APKSIGNER="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          AAPT="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -type f -name aapt | sort -V | tail -1)"
+          test -x "$APKSIGNER" && test -x "$AAPT"
+          "$APKSIGNER" verify --verbose --print-certs "$apk" | tee /tmp/apksigner.txt
+          grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true' /tmp/apksigner.txt
+          grep -q 'Verified using v3 scheme (APK Signature Scheme v3): true' /tmp/apksigner.txt
+          grep -Eqi 'certificate SHA-256 digest: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838' /tmp/apksigner.txt
+          "$AAPT" dump badging "$apk" | tee /tmp/badging.txt
+          grep -q "package: name='com.fireworkstars46.disneynowfiretv'" /tmp/badging.txt
+          grep -q "versionCode='5'" /tmp/badging.txt
+          grep -q "versionName='0.1'" /tmp/badging.txt
+
+      - name: Write release verification metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build5-Compatibility-Test'
+          apk="$dir/DisneyNOW-Fire-TV-v0.1-Build5-Permanent-Signed.apk"
+          sha256sum "$apk" > "$dir/SHA256SUMS.txt"
+          cat > "$dir/RELEASE-STATUS.txt" <<'TXT'
+          DisneyNOW Fire TV Web Wrapper
+          Version 0.1 Build 5
+          Status: NOT DONE - COMPATIBILITY TEST
+          Build 5 preserves the Build 4 pre-WebView cursor interception and changes cursor movement to a 2-pixel tap nudge plus an approximately 60 Hz held-direction loop with acceleration, immediate stop on release, normalized diagonal movement, and smaller edge-scroll increments.
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Android versionCode: 5
+          Signing: exact permanent Build 3/Build 4 release identity; SHA-256 certificate fingerprint 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838.
+          Signing backup gate: PASS - verified private GitHub recovery backup plus independent Dropbox backup; real recovery test previously passed.
+          Build/static/lint/unit/package checks: PASS before signing. Static audit: 81 PASS / 0 FAIL. Lint: 0 errors / 7 warnings.
+          Publication verification: exact APK SHA-256, ZIP integrity, APK v2/v3 signature verification, permanent signer fingerprint, package ID, versionCode 5, and versionName 0.1 are fail-closed checks.
+          Physical Fire TV smooth-cursor feel and protected playback: NOT TESTED for Build 5.
+          TXT
+
+      - name: Commit verified Build 5 release archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add DisneyNOWFireTV/Releases/v0.1-Build5-Compatibility-Test/
+          git commit -m 'Publish verified DisneyNOW Fire TV v0.1 Build 5 APK'
+          git push origin HEAD:main
