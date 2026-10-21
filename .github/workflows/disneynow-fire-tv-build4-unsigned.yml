@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'DisneyNOWFireTV/Build4/SourceParts/**'
+      - 'DisneyNOWFireTV/Build4/apply.py'
       - '.github/workflows/disneynow-fire-tv-build4-unsigned.yml'
   workflow_dispatch:
 
@@ -15,9 +15,9 @@ jobs:
   build4-unsigned:
     runs-on: ubuntu-latest
     env:
-      SOURCE_ZIP: /tmp/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip
-      SOURCE_PARTS: DisneyNOWFireTV/Build4/SourceParts/part*.txt
-      SOURCE_ZIP_SHA256: b787dace60f4807de94bbe11bebe469baa32c75b6d5fe3d7cc34cd3eafe22538
+      BUILD3_SOURCE_ZIP: DisneyNOWFireTV/Build3/DisneyNOW-Fire-TV-v0.1-Build3-Source.zip
+      BUILD3_SOURCE_SHA256: ac5b01e1ed50e280ebfb37357bda19bcef2f1f2501b9f2f69f08f096e9be0485
+      BUILD4_SOURCE_ZIP: /tmp/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip
       PROJECT_DIR: _build4/DisneyNOWFireTV/Source
       STAGE_DIR: _stage_build4
 
@@ -25,21 +25,21 @@ jobs:
       - name: Check out App-Builds
         uses: actions/checkout@v7
 
-      - name: Verify and unpack exact Build 4 source package
+      - name: Reconstruct and verify Build 4 source from exact Build 3 source
         shell: bash
         run: |
           set -euo pipefail
-          cat $SOURCE_PARTS > /tmp/build4-source.b64
-          base64 -d /tmp/build4-source.b64 > "$SOURCE_ZIP"
-          echo "$SOURCE_ZIP_SHA256  $SOURCE_ZIP" | sha256sum -c -
+          echo "$BUILD3_SOURCE_SHA256  $BUILD3_SOURCE_ZIP" | sha256sum -c -
           rm -rf _build4 "$STAGE_DIR"
           mkdir -p _build4 "$STAGE_DIR"
-          unzip -q "$SOURCE_ZIP" -d _build4
-          test -s "$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
-          test -s "$PROJECT_DIR/tools/static_audit.py"
+          unzip -q "$BUILD3_SOURCE_ZIP" -d _build4
+          cp MASTER_RULES.md _build4/MASTER_RULES.md
+          python3 DisneyNOWFireTV/Build4/apply.py --source "$PROJECT_DIR"
           grep -q 'versionCode 4' "$PROJECT_DIR/app/build.gradle"
           grep -q 'BuildConfig.APP_BUILD == 4' "$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
-          test "$(sha256sum MASTER_RULES.md | awk '{print $1}')" = "$(sha256sum _build4/MASTER_RULES.md | awk '{print $1}')"
+          grep -q 'public boolean dispatchKeyEvent(KeyEvent event)' "$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
+          (cd _build4 && zip -X -qr "$BUILD4_SOURCE_ZIP" MASTER_RULES.md DisneyNOWFireTV/Source)
+          test -s "$BUILD4_SOURCE_ZIP"
 
       - name: Set up Java 17
         uses: actions/setup-java@v6
@@ -98,11 +98,12 @@ jobs:
           set -euo pipefail
           APK="$PROJECT_DIR/app/build/outputs/apk/release/app-release-unsigned.apk"
           cp "$APK" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build4-UNSIGNED.apk"
-          cp "$SOURCE_ZIP" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip"
+          cp "$BUILD4_SOURCE_ZIP" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip"
           cp "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build4.txt" "$STAGE_DIR/STATIC-AUDIT-v0.1-Build4.txt"
           cp "$PROJECT_DIR/build/reports/lint-results-debug.txt" "$STAGE_DIR/LINT-v0.1-Build4.txt"
           cp "$PROJECT_DIR/build/reports/lint-results-debug.html" "$STAGE_DIR/LINT-v0.1-Build4.html"
           MASTER_SHA="$(sha256sum MASTER_RULES.md | awk '{print $1}')"
+          SOURCE_SHA="$(sha256sum "$BUILD4_SOURCE_ZIP" | awk '{print $1}')"
           UNSIGNED_SHA="$(sha256sum "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build4-UNSIGNED.apk" | awk '{print $1}')"
           cat > "$STAGE_DIR/BUILD-METADATA-UNSIGNED.txt" <<META
           Project: DisneyNOW Fire TV Web Wrapper
@@ -112,7 +113,7 @@ jobs:
           Package ID: com.fireworkstars46.disneynowfiretv
           Source commit: $GITHUB_SHA
           MASTER_RULES SHA-256: $MASTER_SHA
-          Source ZIP SHA-256: $SOURCE_ZIP_SHA256
+          Source ZIP SHA-256: $SOURCE_SHA
           Unsigned APK SHA-256: $UNSIGNED_SHA
           Build environment: GitHub Actions ubuntu-latest, Java 17, Gradle 8.7, Android SDK 35 / build-tools 35.0.0
           Signing status: UNSIGNED; must be signed outside public CI with the preserved Build 3 permanent private release key.
