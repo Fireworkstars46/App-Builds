@@ -1,0 +1,148 @@
+name: Build DisneyNOW Fire TV Build 6 unsigned release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'DisneyNOWFireTV/Build6/apply.py'
+      - 'DisneyNOWFireTV/Build6/patch_parts/**'
+      - '.github/workflows/disneynow-fire-tv-build6-unsigned.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build6-unsigned:
+    runs-on: ubuntu-latest
+    env:
+      BUILD6_SOURCE_ZIP: /tmp/DisneyNOW-Fire-TV-v0.1-Build6-Source.zip
+      PROJECT_DIR: _build6/DisneyNOWFireTV/Source
+      STAGE_DIR: _stage_build6
+
+    steps:
+      - name: Check out App-Builds
+        uses: actions/checkout@v7
+
+      - name: Reconstruct verified Build 5 chain and apply Build 6 compatibility correction
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _build6 "$STAGE_DIR"
+          mkdir -p _build6/DisneyNOWFireTV "$STAGE_DIR"
+          python3 DisneyNOWFireTV/SourceSeed/reconstruct.py --output "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build2/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build4/reconstruct_build3.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build4/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build5/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build6/apply.py --source "$PROJECT_DIR"
+          MAIN="$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
+          grep -q 'versionCode 6' "$PROJECT_DIR/app/build.gradle"
+          grep -q "buildConfigField 'int', 'APP_BUILD', '6'" "$PROJECT_DIR/app/build.gradle"
+          grep -q 'MIN_PAGE_ZOOM = 0' "$MAIN"
+          grep -q 'MAX_PAGE_ZOOM = 500' "$MAIN"
+          grep -q 'View.LAYER_TYPE_NONE' "$MAIN"
+          grep -q 'customViewContainer.bringToFront()' "$MAIN"
+          grep -q 'if (routed\[0\]) return true' "$MAIN"
+          grep -q 'CURSOR_FRAME_INTERVAL_MS = 16L' "$MAIN"
+          grep -q 'CURSOR_TAP_NUDGE_PIXELS = 2f' "$MAIN"
+          cp MASTER_RULES.md _build6/MASTER_RULES.md
+          (cd _build6 && zip -X -qr "$BUILD6_SOURCE_ZIP" MASTER_RULES.md DisneyNOWFireTV/Source)
+          test -s "$BUILD6_SOURCE_ZIP"
+          unzip -t "$BUILD6_SOURCE_ZIP" >/dev/null
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
+          log-accepted-android-sdk-licenses: 'false'
+
+      - name: Install Android platform and build tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+
+      - name: Set up Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Run Build 6 static/release audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PROJECT_DIR/tools/static_audit.py"
+          grep -q 'STATIC TOTAL: PASS=.* FAIL=0' "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build6.txt"
+          grep -q 'RESULT: PASS' "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build6.txt"
+
+      - name: Compile, lint, unit-test, and produce unsigned release APK
+        shell: bash
+        working-directory: _build6/DisneyNOWFireTV/Source
+        run: |
+          set -euo pipefail
+          gradle --no-daemon clean lintDebug testDebugUnitTest assembleRelease
+
+      - name: Verify unsigned APK identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$PROJECT_DIR/app/build/outputs/apk/release/app-release-unsigned.apk"
+          test -s "$APK"
+          AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          BADGING="$($AAPT dump badging "$APK" | head -n 1)"
+          echo "$BADGING"
+          echo "$BADGING" | grep -q "name='com.fireworkstars46.disneynowfiretv'"
+          echo "$BADGING" | grep -q "versionCode='6'"
+          echo "$BADGING" | grep -q "versionName='0.1'"
+
+      - name: Stage unsigned Build 6 signing input and reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$PROJECT_DIR/app/build/outputs/apk/release/app-release-unsigned.apk"
+          ZIPALIGN="$ANDROID_HOME/build-tools/35.0.0/zipalign"
+          APKSIGNER_JAR="$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar"
+          cp "$APK" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build6-UNSIGNED.apk"
+          "$ZIPALIGN" -f -p 4 "$APK" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build6-ALIGNED-UNSIGNED.apk"
+          "$ZIPALIGN" -c -p 4 "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build6-ALIGNED-UNSIGNED.apk"
+          test -s "$APKSIGNER_JAR"
+          cp "$APKSIGNER_JAR" "$STAGE_DIR/apksigner.jar"
+          cp "$BUILD6_SOURCE_ZIP" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build6-Source.zip"
+          cp "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build6.txt" "$STAGE_DIR/STATIC-AUDIT-v0.1-Build6.txt"
+          cp "$PROJECT_DIR/build/reports/lint-results-debug.txt" "$STAGE_DIR/LINT-v0.1-Build6.txt"
+          cp "$PROJECT_DIR/build/reports/lint-results-debug.html" "$STAGE_DIR/LINT-v0.1-Build6.html"
+          MASTER_SHA="$(sha256sum MASTER_RULES.md | awk '{print $1}')"
+          SOURCE_SHA="$(sha256sum "$BUILD6_SOURCE_ZIP" | awk '{print $1}')"
+          UNSIGNED_SHA="$(sha256sum "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build6-UNSIGNED.apk" | awk '{print $1}')"
+          ALIGNED_SHA="$(sha256sum "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build6-ALIGNED-UNSIGNED.apk" | awk '{print $1}')"
+          cat > "$STAGE_DIR/BUILD-METADATA-UNSIGNED.txt" <<META
+          Project: DisneyNOW Fire TV Web Wrapper
+          Version: 0.1
+          Build: 6
+          Android versionCode: 6
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Source commit: $GITHUB_SHA
+          MASTER_RULES SHA-256: $MASTER_SHA
+          Source ZIP SHA-256: $SOURCE_SHA
+          Unsigned APK SHA-256: $UNSIGNED_SHA
+          Zipaligned unsigned APK SHA-256: $ALIGNED_SHA
+          Source reconstruction: Build 1 SourceSeed -> Build 2 correction -> Build 3 baseline metadata -> Build 4 cursor interception -> Build 5 smooth cursor movement -> Build 6 custom zoom/video compositor/login-routing correction.
+          Build environment: GitHub Actions ubuntu-latest, Java 17, Gradle 8.7, Android SDK 35 / build-tools 35.0.0
+          Signing status: UNSIGNED; the aligned input must be signed privately with the preserved Build 3 permanent release key.
+          META
+          (cd "$STAGE_DIR" && sha256sum * > SHA256SUMS-UNSIGNED.txt)
+
+      - name: Upload unsigned Build 6 signing input
+        uses: actions/upload-artifact@v4
+        with:
+          name: DisneyNOW-Fire-TV-v0.1-Build6-UNSIGNED
+          path: _stage_build6/
+          if-no-files-found: error
+          retention-days: 90
