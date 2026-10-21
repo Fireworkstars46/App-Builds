@@ -1,0 +1,116 @@
+name: Publish DisneyNOW Fire TV Build 4 signed APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'DisneyNOWFireTV/Build4/Publish/apk-part*.txt'
+      - '.github/workflows/disneynow-publish-build4-signed.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-signed-apk:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_DIR: _build4/DisneyNOWFireTV/Source
+      OUTDIR: DisneyNOWFireTV/Releases/v0.1-Build4-Compatibility-Test
+      APK_NAME: DisneyNOW-Fire-TV-v0.1-Build4-Permanent-Signed.apk
+      APK_SHA256: d96d05ef24888b5542cc5bca4a1c4e1a6983a18f24f26345bb09fe85b2c773b6
+      EXPECTED_CERT_SHA256: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct Build 4 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _build4
+          mkdir -p _build4/DisneyNOWFireTV
+          python3 DisneyNOWFireTV/SourceSeed/reconstruct.py --output "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build2/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build4/reconstruct_build3.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build4/apply.py --source "$PROJECT_DIR"
+          grep -q 'versionCode 4' "$PROJECT_DIR/app/build.gradle"
+          grep -q 'public boolean dispatchKeyEvent(KeyEvent event)' "$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
+          cp MASTER_RULES.md _build4/MASTER_RULES.md
+          (cd _build4 && zip -X -qr /tmp/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip MASTER_RULES.md DisneyNOWFireTV/Source)
+          unzip -t /tmp/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip >/dev/null
+          python3 "$PROJECT_DIR/tools/static_audit.py"
+          grep -q 'STATIC TOTAL: PASS=.* FAIL=0' "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build4.txt"
+          grep -q 'RESULT: PASS' "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build4.txt"
+
+      - name: Set up Android SDK signing verifier
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
+          log-accepted-android-sdk-licenses: 'false'
+
+      - name: Install Android build tools 35.0.0
+        shell: bash
+        run: sdkmanager 'build-tools;35.0.0'
+
+      - name: Reconstruct and verify exact signed APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$OUTDIR"
+          APK="$OUTDIR/$APK_NAME"
+          cat DisneyNOWFireTV/Build4/Publish/apk-part*.txt > /tmp/build4-signed.b64
+          base64 -d /tmp/build4-signed.b64 > "$APK"
+          echo "$APK_SHA256  $APK" | sha256sum -c -
+          unzip -t "$APK" >/dev/null
+          VERIFY="$($ANDROID_HOME/build-tools/35.0.0/apksigner verify --verbose --print-certs "$APK")"
+          printf '%s\n' "$VERIFY"
+          printf '%s\n' "$VERIFY" | grep -q 'Verified using v1 scheme (JAR signing): true'
+          printf '%s\n' "$VERIFY" | grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true'
+          printf '%s\n' "$VERIFY" | grep -q 'Verified using v3 scheme (APK Signature Scheme v3): true'
+          printf '%s\n' "$VERIFY" | grep -qi "Signer #1 certificate SHA-256 digest: $EXPECTED_CERT_SHA256"
+
+      - name: Stage permanent Build 4 archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp /tmp/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip "$OUTDIR/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip"
+          cp "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build4.txt" "$OUTDIR/STATIC-AUDIT-v0.1-Build4.txt"
+          cat > "$OUTDIR/RELEASE-STATUS.txt" <<'EOF'
+          DisneyNOW Fire TV Web Wrapper
+          Version 0.1 Build 4
+          Status: NOT DONE - COMPATIBILITY TEST
+          Build 4 corrective change: when Cursor is enabled, Activity-level dispatch intercepts D-pad directions and Select/Enter before WebView focus navigation can consume them. Cursor OFF preserves normal WebView navigation.
+          Signing: same permanent release signing identity established by Build 3, preserving in-place update compatibility.
+          Remaining physical checks: Fire TV/iPhone remote cursor movement, click targeting, page smoothness/zoom, fullscreen behavior, DisneyNOW provider sign-in, protected video playback/audio.
+          EOF
+          cat > "$OUTDIR/BUILD-METADATA.txt" <<META
+          Project: DisneyNOW Fire TV Web Wrapper
+          Version: 0.1
+          Build: 4
+          Android versionCode: 4
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Signed APK SHA-256: $APK_SHA256
+          Signing certificate SHA-256: $EXPECTED_CERT_SHA256
+          Source commit: $GITHUB_SHA
+          Source reconstruction: Build 1 SourceSeed -> verified Build 2 correction -> Build 3 signing-baseline metadata -> Build 4 cursor-input correction.
+          Status: NOT DONE - COMPATIBILITY TEST
+          META
+          (cd "$OUTDIR" && sha256sum "$APK_NAME" DisneyNOW-Fire-TV-v0.1-Build4-Source.zip STATIC-AUDIT-v0.1-Build4.txt BUILD-METADATA.txt RELEASE-STATUS.txt > SHA256SUMS.txt)
+
+      - name: Commit permanent public Build 4 archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$OUTDIR/"
+          if git diff --cached --quiet; then
+            echo 'Archive already matches; nothing to commit.'
+            exit 0
+          fi
+          git commit -m 'Archive DisneyNOW Fire TV v0.1 Build 4 permanent-signed compatibility test'
+          git push origin HEAD:main
