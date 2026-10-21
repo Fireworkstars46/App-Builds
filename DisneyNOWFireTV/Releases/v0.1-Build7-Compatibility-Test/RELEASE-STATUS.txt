@@ -1,0 +1,16 @@
+DisneyNOW Fire TV Web Wrapper
+Version 0.1 Build 7
+Status: NOT DONE - COMPATIBILITY TEST
+Build 7 corrects the physically reported Build 6 laggy cursor, ineffective reload-based zoom, and unchanged black-video-with-audio path.
+Cursor: compact 48dp translated cursor surface with vsync-timed elapsed-time motion; preserves pre-WebView D-pad interception and acceleration behavior.
+Page Zoom: fully custom 0-500 whole-number range; live injected document CSS; changing zoom does not reload DisneyNOW.
+Video experiment: fullscreen custom media keeps the WebView attached but invisible with a transparent media container to reduce composition conflicts.
+Playback fallback: menu action "Open Current Page in Silk (Video Fallback)" hands the current DisneyNOW page to Amazon Silk if embedded WebView video remains black.
+Package ID: com.fireworkstars46.disneynowfiretv
+Android versionCode: 7
+Signing: exact permanent Build 3/4/5/6 release identity; SHA-256 certificate fingerprint 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838.
+Signing backup gate: PASS - verified private GitHub recovery backup plus independent Dropbox backup; real recovery test previously passed.
+CI build/static/lint/unit/package checks: PASS. Static audit: 103 PASS / 0 FAIL. Lint: 0 errors / 9 warnings.
+Publication verification: exact APK SHA-256, APK ZIP integrity, APK v2/v3 signatures, permanent signer fingerprint, package ID, versionCode 7, versionName 0.1, source ZIP integrity, static audit, and lint summary are fail-closed checks.
+Physical Fire TV checks still required: cursor responsiveness/lag, live custom Page Zoom, provider login/redirect stability, ad video picture/audio, protected-program playback, and Amazon Silk fallback launch/playback.
+Permanent GitHub archive: signed APK, source ZIP, static audit, lint reports, signer verification, build metadata, release status, and checksums are archived together for Build 7.

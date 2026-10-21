@@ -1,0 +1,20 @@
+Verifies
+Verified using v1 scheme (JAR signing): true
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): true
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v3.2 scheme (APK Signature Scheme v3.2): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+V3.0 Signer: certificate DN: CN=DisneyNOW Fire TV Personal Release, OU=Fireworkstars46 App Builds, O=Fireworkstars46, L=Norfolk, ST=Virginia, C=US
+V3.0 Signer: certificate SHA-256 digest: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838
+V3.0 Signer: certificate SHA-1 digest: 74baffa01f52bb7c9b302afb83f7c8f4b0e1f2f3
+V3.0 Signer: certificate MD5 digest: 047b7fd6ee06758985f3e76842d8f160
+V3.0 Signer: key algorithm: RSA
+V3.0 Signer: key size (bits): 4096
+V3.0 Signer: public key SHA-256 digest: 22f5b425a6d3dba3c921bc1a1131a63b3955e6258be909cf9b993f05849fe366
+V3.0 Signer: public key SHA-1 digest: b42d751668b39b16c785baf6e56f7519712b24ac
+V3.0 Signer: public key MD5 digest: 221c37a241d727493401ce7d189152e3
+WARNING: META-INF/com/android/build/gradle/app-metadata.properties not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.
+WARNING: META-INF/version-control-info.textproto not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.

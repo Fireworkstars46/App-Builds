@@ -1,0 +1,17 @@
+Project: DisneyNOW Fire TV Web Wrapper
+Version: 0.1
+Build: 7
+Android versionCode: 7
+Package ID: com.fireworkstars46.disneynowfiretv
+Source commit: 63b9a2bd76870411ff2cc424a114103663bcf5df
+MASTER_RULES SHA-256: b6ce9bf510ecd9e5807d7da697bff2b3761a5ff8dfe424aeaa97c2051649086d
+Source ZIP SHA-256: b8cf5e4ab60763b27f0c01f186d669eb63223bf67ecad13e74cb10002a82105e
+Unsigned APK SHA-256: 2f63f6b671a7c5fd759aba3fa5e2a5d44b77328f969faea8b3a447f08a0a131e
+Zipaligned unsigned APK SHA-256: 2f63f6b671a7c5fd759aba3fa5e2a5d44b77328f969faea8b3a447f08a0a131e
+Source reconstruction: Build 1 SourceSeed -> Build 2 correction -> Build 3 baseline metadata -> Build 4 cursor interception -> Build 5 smooth cursor -> Build 6 zoom/video/login correction -> Build 7 compact cursor/live CSS zoom/fullscreen compositor experiment/Silk fallback.
+Build environment: GitHub Actions ubuntu-latest, Java 17, Gradle 8.7, Android SDK 35 / build-tools 35.0.0
+Signing status: UNSIGNED; the aligned input must be signed privately with the preserved Build 3 permanent release key.
+Signed APK SHA-256: 60d4a6f0e2c01c8e5986fc3942d463ff8289348bf0c9db00aae139ff169aeb93
+Permanent signer certificate SHA-256: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838
+Publication package verification: com.fireworkstars46.disneynowfiretv / versionCode 7 / versionName 0.1
+Publication status: NOT DONE - COMPATIBILITY TEST pending physical Fire TV testing.
