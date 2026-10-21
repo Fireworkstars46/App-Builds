@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'DisneyNOWFireTV/Build4/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip'
+      - 'DisneyNOWFireTV/Build4/SourceParts/**'
       - '.github/workflows/disneynow-fire-tv-build4-unsigned.yml'
   workflow_dispatch:
 
@@ -15,7 +15,8 @@ jobs:
   build4-unsigned:
     runs-on: ubuntu-latest
     env:
-      SOURCE_ZIP: DisneyNOWFireTV/Build4/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip
+      SOURCE_ZIP: /tmp/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip
+      SOURCE_PARTS: DisneyNOWFireTV/Build4/SourceParts/part*.txt
       SOURCE_ZIP_SHA256: b787dace60f4807de94bbe11bebe469baa32c75b6d5fe3d7cc34cd3eafe22538
       PROJECT_DIR: _build4/DisneyNOWFireTV/Source
       STAGE_DIR: _stage_build4
@@ -28,6 +29,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          cat $SOURCE_PARTS > /tmp/build4-source.b64
+          base64 -d /tmp/build4-source.b64 > "$SOURCE_ZIP"
           echo "$SOURCE_ZIP_SHA256  $SOURCE_ZIP" | sha256sum -c -
           rm -rf _build4 "$STAGE_DIR"
           mkdir -p _build4 "$STAGE_DIR"
