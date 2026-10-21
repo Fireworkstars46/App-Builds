@@ -1,0 +1,11 @@
+DisneyNOW Fire TV Web Wrapper
+Version 0.1 Build 5
+Status: NOT DONE - COMPATIBILITY TEST
+Build 5 preserves the Build 4 pre-WebView cursor interception and changes cursor movement to a 2-pixel tap nudge plus an approximately 60 Hz held-direction loop with acceleration, immediate stop on release, normalized diagonal movement, and smaller edge-scroll increments.
+Package ID: com.fireworkstars46.disneynowfiretv
+Android versionCode: 5
+Signing: exact permanent Build 3/Build 4 release identity; SHA-256 certificate fingerprint 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838.
+Signing backup gate: PASS - verified private GitHub recovery backup plus independent Dropbox backup; real recovery test previously passed.
+Build/static/lint/unit/package checks: PASS before signing. Static audit: 81 PASS / 0 FAIL. Lint: 0 errors / 7 warnings.
+Publication verification: exact APK SHA-256, ZIP integrity, APK v2/v3 signature verification, permanent signer fingerprint, package ID, versionCode 5, and versionName 0.1 are fail-closed checks.
+Physical Fire TV smooth-cursor feel and protected playback: NOT TESTED for Build 5.
