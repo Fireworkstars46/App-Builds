@@ -1,0 +1,104 @@
+name: DisneyNOW Fire TV Build 7 - Publish verified signed APK
+
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.issue.title == 'Trigger DisneyNOW Build 7 publication'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Download exact signed Build 7 APK and CI evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build7-Compatibility-Test'
+          mkdir -p "$dir" /tmp/build7-evidence
+          curl --fail --location --retry 2 --output "$dir/DisneyNOW-Fire-TV-v0.1-Build7-Permanent-Signed.apk" 'https://uc28bacfb2456c20c4d7e6649c57.dl.dropboxusercontent.com/cd/0/get/DKaMlvJ2NXGVkyg0Tjl6CSiRClhPuSx4YikL8EQm-zm4G1gnYcOHQb2IPjgKf0Qq2K4b3xhaC1no9zvNndusR8r89hWbJpD_74rHgXLeqlHmTfwC6BjgkHuwLKn1ljr1iKDTdq7TeaH0srZgytFC8_M1zBUnyeqb6DLzLJZl_2ouQg/file?c_luid=f3fd60e5'
+          curl --fail --location --retry 2 --output /tmp/build7-evidence.zip 'https://uc85699116ef8d657c67ccd7dd99.dl.dropboxusercontent.com/cd/0/get/DKbGeClRe9_l62fH3z4FHZ0FIvTt-AzY-iqIE1jDIa2zbd3e7D3ZvUULFBonU04Yfoyt67-QQcNG8PMgnT__xOqt7CXxTPKOvQ0b7Q4pbhztXmhyHZW7hs97IBG7UwMoy9Xc9LN3iLM8I6_4CbI21kRztjGurwBg2KZhGsTvRzOnmg/file?c_luid=f3fd60e5'
+          echo '60d4a6f0e2c01c8e5986fc3942d463ff8289348bf0c9db00aae139ff169aeb93  '"$dir/DisneyNOW-Fire-TV-v0.1-Build7-Permanent-Signed.apk" | sha256sum -c -
+          echo '12886144416a82cd4ea194dc43d0b83da0bde6ba9635f4e81784c4f09f6419c9  /tmp/build7-evidence.zip' | sha256sum -c -
+          unzip -t "$dir/DisneyNOW-Fire-TV-v0.1-Build7-Permanent-Signed.apk" >/dev/null
+          unzip -t /tmp/build7-evidence.zip >/dev/null
+          unzip -q /tmp/build7-evidence.zip -d /tmp/build7-evidence
+          cp /tmp/build7-evidence/DisneyNOW-Fire-TV-v0.1-Build7-Source.zip "$dir/"
+          cp /tmp/build7-evidence/STATIC-AUDIT-v0.1-Build7.txt "$dir/"
+          cp /tmp/build7-evidence/LINT-v0.1-Build7.txt "$dir/"
+          cp /tmp/build7-evidence/LINT-v0.1-Build7.html "$dir/"
+          cp /tmp/build7-evidence/BUILD-METADATA-UNSIGNED.txt "$dir/BUILD-METADATA.txt"
+          echo 'b8cf5e4ab60763b27f0c01f186d669eb63223bf67ecad13e74cb10002a82105e  '"$dir/DisneyNOW-Fire-TV-v0.1-Build7-Source.zip" | sha256sum -c -
+          unzip -t "$dir/DisneyNOW-Fire-TV-v0.1-Build7-Source.zip" >/dev/null
+          grep -q 'STATIC TOTAL: PASS=103 FAIL=0' "$dir/STATIC-AUDIT-v0.1-Build7.txt"
+          grep -q 'RESULT: PASS' "$dir/STATIC-AUDIT-v0.1-Build7.txt"
+          test "$(grep -c 'Error:' "$dir/LINT-v0.1-Build7.txt" || true)" -eq 0
+          test "$(grep -c 'Warning:' "$dir/LINT-v0.1-Build7.txt" || true)" -eq 9
+
+      - name: Verify package, Build 7 identity, and permanent signer
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build7-Compatibility-Test'
+          apk="$dir/DisneyNOW-Fire-TV-v0.1-Build7-Permanent-Signed.apk"
+          APKSIGNER="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          AAPT="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -type f -name aapt | sort -V | tail -1)"
+          test -x "$APKSIGNER" && test -x "$AAPT"
+          "$APKSIGNER" verify --verbose --print-certs "$apk" | tee "$dir/APKSIGNER-VERIFY-v0.1-Build7.txt"
+          grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true' "$dir/APKSIGNER-VERIFY-v0.1-Build7.txt"
+          grep -q 'Verified using v3 scheme (APK Signature Scheme v3): true' "$dir/APKSIGNER-VERIFY-v0.1-Build7.txt"
+          grep -Eqi 'certificate SHA-256 digest: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838' "$dir/APKSIGNER-VERIFY-v0.1-Build7.txt"
+          "$AAPT" dump badging "$apk" | tee /tmp/build7-badging.txt
+          grep -q "package: name='com.fireworkstars46.disneynowfiretv'" /tmp/build7-badging.txt
+          grep -q "versionCode='7'" /tmp/build7-badging.txt
+          grep -q "versionName='0.1'" /tmp/build7-badging.txt
+
+      - name: Write permanent Build 7 release evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build7-Compatibility-Test'
+          cat >> "$dir/BUILD-METADATA.txt" <<'TXT'
+          Signed APK SHA-256: 60d4a6f0e2c01c8e5986fc3942d463ff8289348bf0c9db00aae139ff169aeb93
+          Permanent signer certificate SHA-256: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838
+          Publication package verification: com.fireworkstars46.disneynowfiretv / versionCode 7 / versionName 0.1
+          Publication status: NOT DONE - COMPATIBILITY TEST pending physical Fire TV testing.
+          TXT
+          cat > "$dir/RELEASE-STATUS.txt" <<'TXT'
+          DisneyNOW Fire TV Web Wrapper
+          Version 0.1 Build 7
+          Status: NOT DONE - COMPATIBILITY TEST
+          Build 7 corrects the physically reported Build 6 laggy cursor, ineffective reload-based zoom, and unchanged black-video-with-audio path.
+          Cursor: compact 48dp translated cursor surface with vsync-timed elapsed-time motion; preserves pre-WebView D-pad interception and acceleration behavior.
+          Page Zoom: fully custom 0-500 whole-number range; live injected document CSS; changing zoom does not reload DisneyNOW.
+          Video experiment: fullscreen custom media keeps the WebView attached but invisible with a transparent media container to reduce composition conflicts.
+          Playback fallback: menu action "Open Current Page in Silk (Video Fallback)" hands the current DisneyNOW page to Amazon Silk if embedded WebView video remains black.
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Android versionCode: 7
+          Signing: exact permanent Build 3/4/5/6 release identity; SHA-256 certificate fingerprint 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838.
+          Signing backup gate: PASS - verified private GitHub recovery backup plus independent Dropbox backup; real recovery test previously passed.
+          CI build/static/lint/unit/package checks: PASS. Static audit: 103 PASS / 0 FAIL. Lint: 0 errors / 9 warnings.
+          Publication verification: exact APK SHA-256, APK ZIP integrity, APK v2/v3 signatures, permanent signer fingerprint, package ID, versionCode 7, versionName 0.1, source ZIP integrity, static audit, and lint summary are fail-closed checks.
+          Physical Fire TV checks still required: cursor responsiveness/lag, live custom Page Zoom, provider login/redirect stability, ad video picture/audio, protected-program playback, and Amazon Silk fallback launch/playback.
+          Permanent GitHub archive: signed APK, source ZIP, static audit, lint reports, signer verification, build metadata, release status, and checksums are archived together for Build 7.
+          TXT
+          (cd "$dir" && sha256sum DisneyNOW-Fire-TV-v0.1-Build7-Permanent-Signed.apk DisneyNOW-Fire-TV-v0.1-Build7-Source.zip STATIC-AUDIT-v0.1-Build7.txt LINT-v0.1-Build7.txt LINT-v0.1-Build7.html APKSIGNER-VERIFY-v0.1-Build7.txt BUILD-METADATA.txt RELEASE-STATUS.txt > SHA256SUMS.txt)
+
+      - name: Commit verified Build 7 release archive and remove incomplete staging parts
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf DisneyNOWFireTV/Build7/publish_signed_parts
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A DisneyNOWFireTV/Build7/publish_signed_parts DisneyNOWFireTV/Releases/v0.1-Build7-Compatibility-Test/
+          git commit -m 'Publish verified DisneyNOW Fire TV v0.1 Build 7 APK'
+          git push origin HEAD:main
