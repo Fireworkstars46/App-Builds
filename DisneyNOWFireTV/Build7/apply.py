@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import argparse, hashlib, io, zipfile
+import argparse, base64, hashlib, io, zipfile
 
 BASE6 = {
     'app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java': 'aea6a4445e6ecf4c380d1544dd5ffc130d0564b647695c97d8248a360c9e109e',
@@ -47,10 +47,16 @@ def main() -> None:
     root = Path(args.source).resolve()
     verify(root, BASE6, 'Build 6 baseline')
 
-    patch_path = Path(__file__).resolve().parent / 'build7-changed-files.zip'
-    if not patch_path.is_file():
-        raise SystemExit('Build 7 patch ZIP is missing')
-    payload = patch_path.read_bytes()
+    parts_dir = Path(__file__).resolve().parent / 'patch_parts'
+    parts = sorted(parts_dir.glob('part*.b64'))
+    expected_names = [f'part{i:02d}.b64' for i in range(5)]
+    if [p.name for p in parts] != expected_names:
+        raise SystemExit('Build 7 patch payload must contain exactly part00.b64 through part04.b64')
+    encoded = ''.join(p.read_text(encoding='ascii') for p in parts)
+    try:
+        payload = base64.b64decode(encoded, validate=True)
+    except Exception as exc:
+        raise SystemExit(f'Build 7 patch base64 decode failed: {exc}')
     if sha_bytes(payload) != PATCH_ZIP_SHA256:
         raise SystemExit('Build 7 patch ZIP SHA-256 mismatch')
 
