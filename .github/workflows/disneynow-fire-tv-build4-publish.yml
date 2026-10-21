@@ -1,0 +1,65 @@
+name: DisneyNOW Fire TV Build 4 - Publish reconstructed signed APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/disneynow-fire-tv-build4-publish.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reconstruct Build 4 signed APK from repository parts
+        shell: bash
+        run: |
+          set -euo pipefail
+          out='DisneyNOWFireTV/Releases/v0.1-Build4-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build4-Permanent-Signed.apk'
+          mkdir -p "$(dirname "$out")"
+          cat DisneyNOWFireTV/Build4/Publish/apk-part*.txt | tr -d '\r\n' | base64 --decode > "$out"
+          test -s "$out"
+          unzip -t "$out"
+          sha256sum "$out"
+
+      - name: Verify Android package, versionCode, and permanent signing identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk='DisneyNOWFireTV/Releases/v0.1-Build4-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build4-Permanent-Signed.apk'
+          APKSIGNER="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          AAPT="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -type f -name aapt | sort -V | tail -1)"
+          test -x "$APKSIGNER"
+          test -x "$AAPT"
+          "$APKSIGNER" verify --verbose --print-certs "$apk" | tee /tmp/apksigner.txt
+          grep -qi 'Signer #1 certificate SHA-256 digest: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838' /tmp/apksigner.txt
+          "$AAPT" dump badging "$apk" | tee /tmp/badging.txt
+          grep -q "package: name='com.fireworkstars46.disneynowfiretv'" /tmp/badging.txt
+          grep -q "versionCode='4'" /tmp/badging.txt
+
+      - name: Record published APK checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk='DisneyNOWFireTV/Releases/v0.1-Build4-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build4-Permanent-Signed.apk'
+          sha256sum "$apk" > DisneyNOWFireTV/Releases/v0.1-Build4-Compatibility-Test/SHA256SUMS.txt
+
+      - name: Commit verified APK to release archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add DisneyNOWFireTV/Releases/v0.1-Build4-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build4-Permanent-Signed.apk \
+                  DisneyNOWFireTV/Releases/v0.1-Build4-Compatibility-Test/SHA256SUMS.txt
+          if git diff --cached --quiet; then
+            echo 'Release APK already published identically.'
+          else
+            git commit -m 'Publish verified DisneyNOW Fire TV v0.1 Build 4 APK'
+            git push
+          fi
