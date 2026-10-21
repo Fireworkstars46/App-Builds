@@ -1,0 +1,124 @@
+name: Build DisneyNOW Fire TV Build 4 unsigned release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'DisneyNOWFireTV/Build4/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip'
+      - '.github/workflows/disneynow-fire-tv-build4-unsigned.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build4-unsigned:
+    runs-on: ubuntu-latest
+    env:
+      SOURCE_ZIP: DisneyNOWFireTV/Build4/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip
+      SOURCE_ZIP_SHA256: b787dace60f4807de94bbe11bebe469baa32c75b6d5fe3d7cc34cd3eafe22538
+      PROJECT_DIR: _build4/DisneyNOWFireTV/Source
+      STAGE_DIR: _stage_build4
+
+    steps:
+      - name: Check out App-Builds
+        uses: actions/checkout@v7
+
+      - name: Verify and unpack exact Build 4 source package
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "$SOURCE_ZIP_SHA256  $SOURCE_ZIP" | sha256sum -c -
+          rm -rf _build4 "$STAGE_DIR"
+          mkdir -p _build4 "$STAGE_DIR"
+          unzip -q "$SOURCE_ZIP" -d _build4
+          test -s "$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
+          test -s "$PROJECT_DIR/tools/static_audit.py"
+          grep -q 'versionCode 4' "$PROJECT_DIR/app/build.gradle"
+          grep -q 'BuildConfig.APP_BUILD == 4' "$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
+          test "$(sha256sum MASTER_RULES.md | awk '{print $1}')" = "$(sha256sum _build4/MASTER_RULES.md | awk '{print $1}')"
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
+          log-accepted-android-sdk-licenses: 'false'
+
+      - name: Install Android platform and build tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+
+      - name: Set up Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Run Build 4 static/release audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PROJECT_DIR/tools/static_audit.py"
+          grep -q 'STATIC TOTAL: PASS=.* FAIL=0' "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build4.txt"
+          grep -q 'RESULT: PASS' "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build4.txt"
+
+      - name: Compile, lint, unit-test, and produce unsigned release APK
+        shell: bash
+        working-directory: _build4/DisneyNOWFireTV/Source
+        run: |
+          set -euo pipefail
+          gradle --no-daemon clean lintDebug testDebugUnitTest assembleRelease
+
+      - name: Verify unsigned APK identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$PROJECT_DIR/app/build/outputs/apk/release/app-release-unsigned.apk"
+          test -s "$APK"
+          AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          BADGING="$($AAPT dump badging "$APK" | head -n 1)"
+          echo "$BADGING"
+          echo "$BADGING" | grep -q "name='com.fireworkstars46.disneynowfiretv'"
+          echo "$BADGING" | grep -q "versionCode='4'"
+          echo "$BADGING" | grep -q "versionName='0.1'"
+
+      - name: Stage unsigned Build 4 signing input and reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$PROJECT_DIR/app/build/outputs/apk/release/app-release-unsigned.apk"
+          cp "$APK" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build4-UNSIGNED.apk"
+          cp "$SOURCE_ZIP" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip"
+          cp "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build4.txt" "$STAGE_DIR/STATIC-AUDIT-v0.1-Build4.txt"
+          cp "$PROJECT_DIR/build/reports/lint-results-debug.txt" "$STAGE_DIR/LINT-v0.1-Build4.txt"
+          cp "$PROJECT_DIR/build/reports/lint-results-debug.html" "$STAGE_DIR/LINT-v0.1-Build4.html"
+          MASTER_SHA="$(sha256sum MASTER_RULES.md | awk '{print $1}')"
+          UNSIGNED_SHA="$(sha256sum "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build4-UNSIGNED.apk" | awk '{print $1}')"
+          cat > "$STAGE_DIR/BUILD-METADATA-UNSIGNED.txt" <<META
+          Project: DisneyNOW Fire TV Web Wrapper
+          Version: 0.1
+          Build: 4
+          Android versionCode: 4
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Source commit: $GITHUB_SHA
+          MASTER_RULES SHA-256: $MASTER_SHA
+          Source ZIP SHA-256: $SOURCE_ZIP_SHA256
+          Unsigned APK SHA-256: $UNSIGNED_SHA
+          Build environment: GitHub Actions ubuntu-latest, Java 17, Gradle 8.7, Android SDK 35 / build-tools 35.0.0
+          Signing status: UNSIGNED; must be signed outside public CI with the preserved Build 3 permanent private release key.
+          META
+          (cd "$STAGE_DIR" && sha256sum * > SHA256SUMS-UNSIGNED.txt)
+
+      - name: Upload unsigned Build 4 signing input
+        uses: actions/upload-artifact@v4
+        with:
+          name: DisneyNOW-Fire-TV-v0.1-Build4-UNSIGNED
+          path: _stage_build4/
+          if-no-files-found: error
