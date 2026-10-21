@@ -10,7 +10,7 @@ BASE7 = {
     'tools/static_audit.py': 'e066ab1a99b72927b77d25ee879852c4f9dd99867f4f9c1563e6e84c0bf56b39',
 }
 
-BUILD8 = {
+STAGE8 = {
     'app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java': '0c2ce6daeb8a7cf0a1b5bdcf37fa160228b97a0051c3571ce19d88df29dbdd2e',
     'app/build.gradle': '7121fac1d053df10032211cf64f0a0c83bd1275fb39650bed15198411a47d2ae',
     'README.md': 'b22a13ffe5683412ced7823509e2c9cb042b825ab2d3d1832155e31d2c18252d',
@@ -18,7 +18,17 @@ BUILD8 = {
     'tools/static_audit.py': '8b22e32a955bd7d7706a5c22ec0da84efd2d2abe893c671f1dbbd7dacc8908e9',
 }
 
+BUILD8 = {
+    'app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java': '0c2ce6daeb8a7cf0a1b5bdcf37fa160228b97a0051c3571ce19d88df29dbdd2e',
+    'app/build.gradle': '7121fac1d053df10032211cf64f0a0c83bd1275fb39650bed15198411a47d2ae',
+    'README.md': 'b22a13ffe5683412ced7823509e2c9cb042b825ab2d3d1832155e31d2c18252d',
+    'BUILD_INFO.md': '6ff421712fa8d042fa498e92b27cff83af02de4e42d6edd4d560ef272d725b84',
+    'gradle.properties': '19054d8ae377b73924f5570a2092f90741d86c973c1ea19e71b0791ae1085cee',
+    'tools/static_audit.py': '312100d25519191a05c5a755a867dd2134710a1407062f74869dabf7a8889c48',
+}
+
 PATCH_ZIP_SHA256 = '4deb1686394d73ae6e3405094ffbf4b411db3db06d6c08e842a4837d9afd370c'
+GRADLE_PROPERTIES_TEXT = '# AndroidX is required by AndroidX Media3 used by Build 8\'s experimental native player.\nandroid.useAndroidX=true\n'
 
 
 def sha_bytes(data: bytes) -> str:
@@ -38,6 +48,40 @@ def verify(root: Path, expected: dict[str, str], label: str) -> None:
             failures.append(f'{rel}: expected {wanted}, got {got}')
     if failures:
         raise SystemExit(label + ' hash verification failed:\n' + '\n'.join(failures))
+
+
+def replace_once(text: str, old: str, new: str, label: str) -> str:
+    count = text.count(old)
+    if count != 1:
+        raise SystemExit(f'Build 8 AndroidX correction expected one {label} match, got {count}')
+    return text.replace(old, new, 1)
+
+
+def apply_androidx_correction(root: Path) -> None:
+    (root / 'gradle.properties').write_text(GRADLE_PROPERTIES_TEXT, encoding='utf-8', newline='\n')
+    audit_path = root / 'tools' / 'static_audit.py'
+    text = audit_path.read_text(encoding='utf-8')
+    text = replace_once(text,
+        "README = ROOT / 'README.md'\nREPORT = ROOT / 'build' / 'reports' / 'STATIC-AUDIT-v0.1-Build8.txt'",
+        "README = ROOT / 'README.md'\nGRADLE_PROPERTIES = ROOT / 'gradle.properties'\nREPORT = ROOT / 'build' / 'reports' / 'STATIC-AUDIT-v0.1-Build8.txt'",
+        'GRADLE_PROPERTIES declaration')
+    text = replace_once(text,
+        "for path in [APP_GRADLE, MANIFEST, MAIN, BUILD_INFO, README]:",
+        "for path in [APP_GRADLE, MANIFEST, MAIN, BUILD_INFO, README, GRADLE_PROPERTIES]:",
+        'required-file list')
+    text = replace_once(text,
+        "    gradle = manifest_text = main = build_info = readme = ''",
+        "    gradle = manifest_text = main = build_info = readme = gradle_properties = ''",
+        'failure defaults')
+    text = replace_once(text,
+        "    readme = README.read_text(encoding='utf-8')\n\n# Identity / build / dependency invariants.",
+        "    readme = README.read_text(encoding='utf-8')\n    gradle_properties = GRADLE_PROPERTIES.read_text(encoding='utf-8')\n\n# Identity / build / dependency invariants.",
+        'gradle.properties read')
+    text = replace_once(text,
+        "add('Media3 version pinned to 1.8.1', 'def media3_version = \"1.8.1\"' in gradle, 'last compatible line before minSdk 23 migration')\nfor dep in ['media3-exoplayer', 'media3-exoplayer-dash', 'media3-exoplayer-hls', 'media3-ui']:",
+        "add('Media3 version pinned to 1.8.1', 'def media3_version = \"1.8.1\"' in gradle, 'last compatible line before minSdk 23 migration')\nadd('AndroidX mode enabled for Media3', 'android.useAndroidX=true' in gradle_properties, 'required by AndroidX Media3 dependencies')\nfor dep in ['media3-exoplayer', 'media3-exoplayer-dash', 'media3-exoplayer-hls', 'media3-ui']:",
+        'AndroidX audit check')
+    audit_path.write_text(text, encoding='utf-8', newline='\n')
 
 
 def main() -> None:
@@ -60,14 +104,14 @@ def main() -> None:
     if sha_bytes(payload) != PATCH_ZIP_SHA256:
         raise SystemExit('Build 8 patch ZIP SHA-256 mismatch')
 
-    expected_paths = set(BUILD8)
+    expected_paths = set(STAGE8)
     with zipfile.ZipFile(io.BytesIO(payload), 'r') as zf:
         names = set(zf.namelist())
         if names != expected_paths:
             raise SystemExit(f'Build 8 patch ZIP contains unexpected/missing entries: {sorted(names ^ expected_paths)}')
         for rel in sorted(expected_paths):
             data = zf.read(rel)
-            if sha_bytes(data) != BUILD8[rel]:
+            if sha_bytes(data) != STAGE8[rel]:
                 raise SystemExit(f'Build 8 payload entry hash mismatch: {rel}')
             out = (root / rel).resolve()
             if root not in out.parents:
@@ -75,6 +119,8 @@ def main() -> None:
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_bytes(data)
 
+    verify(root, STAGE8, 'Build 8 staged result')
+    apply_androidx_correction(root)
     verify(root, BUILD8, 'Build 8 result')
     print('Build 8 hybrid-TV-shell/native-navigation/whole-page-zoom/Media3 patch applied and verified.')
 
