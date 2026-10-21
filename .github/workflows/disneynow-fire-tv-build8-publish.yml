@@ -1,0 +1,140 @@
+name: DisneyNOW Fire TV Build 8 - Publish verified signed APK
+
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.issue.title == 'Trigger DisneyNOW Build 8 publication'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Download and verify exact signed Build 8 artifact bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build8-Compatibility-Test'
+          test ! -e "$dir"
+          mkdir -p "$dir" /tmp/build8-signed
+          curl --fail --location --retry 2 --output /tmp/build8-signed.zip 'https://sdmntprbrazilsouth.oaiusercontent.com/files/00000000-d460-820e-ba33-d3b56f50d74a/raw?se=2026-10-21T15%3A30%3A38Z&sp=r&sv=2026-02-06&sr=b&scid=f413d816-d966-56b9-b9fa-11d7ec0643a3&skoid=bbd22fc4-f881-4ea4-b2f3-c12033cf6a8b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-21T13%3A12%3A33Z&ske=2026-10-22T13%3A12%3A33Z&sks=b&skv=2026-02-06&sig=/valMTUCLsDQY7S9Z8unL7zp62uG4twmU31GkOWghns%3D'
+          echo '6116c4689e44cdbffec4efac86d2908b2ededb76ae7a9f754d5baef627210601  /tmp/build8-signed.zip' | sha256sum -c -
+          unzip -t /tmp/build8-signed.zip >/dev/null
+          unzip -q /tmp/build8-signed.zip -d /tmp/build8-signed
+          cp /tmp/build8-signed/DisneyNOW-Fire-TV-v0.1-Build8-Permanent-Signed.apk "$dir/"
+          cp /tmp/build8-signed/DisneyNOW-Fire-TV-v0.1-Build8-Source.zip "$dir/"
+          cp /tmp/build8-signed/STATIC-AUDIT-v0.1-Build8.txt "$dir/"
+          cp /tmp/build8-signed/LINT-v0.1-Build8.txt "$dir/"
+          cp /tmp/build8-signed/LINT-v0.1-Build8.html "$dir/"
+          cp /tmp/build8-signed/VERIFY-v0.1-Build8.txt "$dir/PRIVATE-SIGNING-VERIFY-v0.1-Build8.txt"
+          cp /tmp/build8-signed/BADGING-v0.1-Build8.txt "$dir/PRIVATE-BADGING-v0.1-Build8.txt"
+          apk="$dir/DisneyNOW-Fire-TV-v0.1-Build8-Permanent-Signed.apk"
+          echo 'f7a96f2e36406b86dbb734e186c93e431acd95d61e6b2b060333387bfb89dd81  '"$apk" | sha256sum -c -
+          echo '2c26c771b9d44500795f250910ff57cd6f2e506795ad2d9ef3c0650c4a9d5b8b  '"$dir/DisneyNOW-Fire-TV-v0.1-Build8-Source.zip" | sha256sum -c -
+          echo '0a018e71ba34a5af4ac3d6ece9b847376f0f88dfb6b5a8dec96b5446fcc7be11  '"$dir/STATIC-AUDIT-v0.1-Build8.txt" | sha256sum -c -
+          echo '8b814438ff9d0c44f51d3387680bdcf7217757b42fe89c95d11ba364fc8ce09f  '"$dir/LINT-v0.1-Build8.txt" | sha256sum -c -
+          echo '2a66d40a39700fe8cd7a530cef685c6cdce2b154e4096bdb0b51332e38ab1b5a  '"$dir/LINT-v0.1-Build8.html" | sha256sum -c -
+          unzip -t "$apk" >/dev/null
+          unzip -t "$dir/DisneyNOW-Fire-TV-v0.1-Build8-Source.zip" >/dev/null
+          grep -q 'STATIC TOTAL: PASS=157 FAIL=0' "$dir/STATIC-AUDIT-v0.1-Build8.txt"
+          grep -q 'RESULT: PASS' "$dir/STATIC-AUDIT-v0.1-Build8.txt"
+          grep -q '^0 errors, 13 warnings$' "$dir/LINT-v0.1-Build8.txt"
+
+      - name: Verify package, Build 8 identity, and permanent signer
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build8-Compatibility-Test'
+          apk="$dir/DisneyNOW-Fire-TV-v0.1-Build8-Permanent-Signed.apk"
+          APKSIGNER="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          AAPT="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -type f -name aapt | sort -V | tail -1)"
+          test -x "$APKSIGNER" && test -x "$AAPT"
+          "$APKSIGNER" verify --verbose --print-certs "$apk" | tee "$dir/APKSIGNER-VERIFY-v0.1-Build8.txt"
+          grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true' "$dir/APKSIGNER-VERIFY-v0.1-Build8.txt"
+          grep -q 'Verified using v3 scheme (APK Signature Scheme v3): true' "$dir/APKSIGNER-VERIFY-v0.1-Build8.txt"
+          grep -Eqi 'certificate SHA-256 digest: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838' "$dir/APKSIGNER-VERIFY-v0.1-Build8.txt"
+          "$AAPT" dump badging "$apk" | tee "$dir/BADGING-v0.1-Build8.txt"
+          grep -q "package: name='com.fireworkstars46.disneynowfiretv'" "$dir/BADGING-v0.1-Build8.txt"
+          grep -q "versionCode='8'" "$dir/BADGING-v0.1-Build8.txt"
+          grep -q "versionName='0.1'" "$dir/BADGING-v0.1-Build8.txt"
+
+      - name: Write permanent Build 8 release evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build8-Compatibility-Test'
+          cat > "$dir/BUILD-METADATA.txt" <<'TXT'
+          Project: DisneyNOW Fire TV Hybrid TV Shell
+          Version: 0.1
+          Build: 8
+          Android versionCode: 8
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Public unsigned CI run: 39624401435
+          Public unsigned CI artifact ID: 12355084960
+          Public unsigned artifact digest: sha256:888cd1f74cbfe1801cf9e984489bac0b721b352019a67b79b3aeff6bd2b17a29
+          Private permanent-signing CI run: 39625196002
+          Private signed artifact ID: 12355983732
+          Private signed artifact digest: sha256:6116c4689e44cdbffec4efac86d2908b2ededb76ae7a9f754d5baef627210601
+          Signed APK SHA-256: f7a96f2e36406b86dbb734e186c93e431acd95d61e6b2b060333387bfb89dd81
+          Source ZIP SHA-256: 2c26c771b9d44500795f250910ff57cd6f2e506795ad2d9ef3c0650c4a9d5b8b
+          Static audit SHA-256: 0a018e71ba34a5af4ac3d6ece9b847376f0f88dfb6b5a8dec96b5446fcc7be11
+          Lint text SHA-256: 8b814438ff9d0c44f51d3387680bdcf7217757b42fe89c95d11ba364fc8ce09f
+          Lint HTML SHA-256: 2a66d40a39700fe8cd7a530cef685c6cdce2b154e4096bdb0b51332e38ab1b5a
+          Permanent signer certificate SHA-256: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838
+          CI static/release audit: 157 PASS / 0 FAIL
+          Lint: 0 errors / 13 warnings
+          Signing backup gate: PASS - durable primary and independent secondary backups plus prior real recovery verification.
+          Publication status: NOT DONE - COMPATIBILITY TEST pending physical Fire TV testing.
+          TXT
+          cat > "$dir/RELEASE-STATUS.txt" <<'TXT'
+          DisneyNOW Fire TV Hybrid TV Shell
+          Version 0.1 Build 8
+          Status: NOT DONE - COMPATIBILITY TEST
+
+          Build 8 is the architectural response to physically reported Build 7 failures: persistent lag, DisneyNOW playback error, and document-only CSS zoom that did not affect the whole page.
+
+          Navigation: low-overhead Native TV Navigation is the migrated default. Fire TV D-pad input passes through to WebView/native focus instead of continuously driving the compatibility mouse cursor. Cursor Navigation and Legacy JS Focus Navigation remain available compatibility modes.
+          Performance Mode: migrated ON for Build 8; suppresses page animations/transitions and smooth scrolling where the page permits it.
+          Page Zoom: fully custom 0-500 whole-number range. Nonzero values use WebView-level zoomBy scaling with no DisneyNOW page reload and no document-only CSS zoom. 0 percent hides the WebView while the native menu remains available for recovery.
+          Experimental Native Player: AndroidX Media3 1.8.1 HLS/DASH player path. It observes legitimate media-manifest and probable DRM-license requests made by the authenticated DisneyNOW session, keeps candidate URLs/headers/cookies in memory only, and can try the detected stream in Media3. If a probable DRM license endpoint was legitimately observed, Media3 is configured for Android Widevine using that observed endpoint and request headers.
+          Security/rights boundary: no Disney proprietary source code or credentials are copied; no DRM keys are extracted; no DRM is bypassed; no entitlement, token, or license response is fabricated.
+          Fallback: Open Current Page in Silk (Video Fallback) remains available.
+
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Android versionCode: 8
+          Signing: exact permanent Build 3-7 update identity; certificate SHA-256 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838.
+          Signing backup gate: PASS.
+          CI verification: PASS. Static/release audit 157 PASS / 0 FAIL; lint 0 errors / 13 warnings; package/version and APK v2/v3 signer checks passed.
+          Physical Fire TV checks still required: native TV navigation responsiveness/lag, whole-page zoom appearance, provider login/redirect stability, media-stream detection, ad/program playback, Widevine negotiation when applicable, and Silk fallback.
+          TXT
+          (cd "$dir" && sha256sum \
+            DisneyNOW-Fire-TV-v0.1-Build8-Permanent-Signed.apk \
+            DisneyNOW-Fire-TV-v0.1-Build8-Source.zip \
+            STATIC-AUDIT-v0.1-Build8.txt \
+            LINT-v0.1-Build8.txt \
+            LINT-v0.1-Build8.html \
+            APKSIGNER-VERIFY-v0.1-Build8.txt \
+            BADGING-v0.1-Build8.txt \
+            PRIVATE-SIGNING-VERIFY-v0.1-Build8.txt \
+            PRIVATE-BADGING-v0.1-Build8.txt \
+            BUILD-METADATA.txt \
+            RELEASE-STATUS.txt > SHA256SUMS.txt)
+
+      - name: Commit verified Build 8 release archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build8-Compatibility-Test'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dir/"
+          git commit -m 'Publish verified DisneyNOW Fire TV v0.1 Build 8 APK'
+          git push origin HEAD:main
