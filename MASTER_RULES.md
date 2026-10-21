@@ -55,6 +55,24 @@ Project-specific requirements add to these rules and override only the specific 
 - Upgrades should load older valid settings/data where practical rather than silently resetting them.
 - Project-owned cleanup/uninstall logic must never remove unrelated files, registry values, tasks, shortcuts, services, or data belonging to another project.
 
+### Signing and update-critical identity hard gate (all platforms)
+- Apply this hard gate whenever future installs/updates/distribution depend on an update-critical identity or credential, including a private signing key, certificate/private-key pair, keystore, developer/distribution credential, package/bundle/application ID, installer/package identity, update key, or equivalent platform-specific signing/update resource.
+- Before the first installable/distributable release intended to establish a long-lived update identity:
+  - choose the permanent signing/update identity intentionally rather than relying on a generated debug, temporary, CI-only, or fallback identity;
+  - record the expected non-secret public identity needed for later verification, such as certificate/signing fingerprint, Team ID, package/bundle/application ID, package family/installer identity, or equivalent platform identifier;
+  - create at least two durable recovery copies of all private signing material that must be retained to preserve that identity;
+  - keep those recovery copies in user-controlled durable storage outside ChatGPT conversation attachments, `/mnt/data`, temporary build/container directories, CI workspaces, expiring CI artifacts, or other ephemeral storage;
+  - keep at least one recovery copy separate from the primary working copy so one lost/corrupt device or workspace does not destroy the only usable credential;
+  - perform a real recovery test from a backup copy and verify that the recovered credential produces the exact expected public fingerprint/identity; merely proving that the original working key still functions is not a recovery test;
+  - do not release, distribute, install, or call the release DONE/permanent-baseline until the durable-backup and recovery-test gate has passed.
+- GitHub Actions secrets, CI secret stores, credential managers, or platform-hosted signing services may be used for automated signing, but they do not count as the only recovery backup unless the platform explicitly guarantees durable export/recovery of the same update identity and that recovery has been verified.
+- Public repositories may store safe public verification metadata such as fingerprints, certificate/public-key information, Team IDs, package/bundle/application IDs, and expected installer/update identities, but must never store private signing keys, keystore passwords, private certificates, recovery passwords, tokens, or equivalent secrets.
+- For every later signed/package-identity-sensitive release, verify the expected package/bundle/application/installer identity, Version + Build/versionCode or equivalent, and expected signer/certificate/public identity before publication.
+- Release/build automation must fail closed when the expected established signer/update identity is unavailable, missing, or mismatched. Never silently generate or substitute a new debug, temporary, CI-generated, self-signed, or fallback key for an established app/update identity.
+- If the required signing/update credential, expected fingerprint/identity, or recovery copy is missing, inaccessible, uncertain, corrupted, or cannot be verified, STOP the release and report the project/build as NOT DONE/pending rather than guessing or creating an incompatible artifact.
+- If a long-lived signing/update credential is lost after users have installed a release, explicitly report that normal in-place update compatibility is broken for that installed identity. Do not pretend a newly generated credential can update it. Establish a new baseline only with explicit approval and clearly warn about any uninstall/reinstall, data-loss, trust, store/distribution, or migration consequences.
+- Preserve safe public recovery metadata in the project/release archive so future builds can verify the intended identity without exposing the private credential.
+
 ## 4. Safety and least privilege
 - Prefer per-user, least-permission, reversible methods.
 - Avoid unnecessary administrator/root access, services, scheduled tasks, firewall changes, registry changes, hooks/injection, debugger attachment, process manipulation, broad system scanning, drivers, or unrelated file/input/clipboard access.
@@ -229,6 +247,7 @@ Before release, perform applicable static/release checks and report real PASS/FA
 - tray/menu/control callbacks;
 - window creation and state restoration;
 - version/build/signing/update behavior;
+- when signing/update identity applies, durable signing-credential backup status, recovery-test evidence, expected public signer/fingerprint/identity, and fail-closed release-gate configuration;
 - package/bundle/installer identity;
 - import/export format handling;
 - conflicts with other project resources;
@@ -366,6 +385,9 @@ Static checks do not replace runtime/Safe Self-Test verification for behavior th
 - When crash dumps are part of a project, keep dumps bounded/separate and test dump creation only with safe isolated methods when possible.
 - Explorer/taskbar forced termination is disruptive and may be a justified SKIPPED test if there is no safe equivalent.
 - Preserve Windows startup/autostart behavior and registration compatibility when applicable.
+- For Windows projects that use code signing, package signing, MSIX/AppX identity, installer certificates, signed update manifests, or another retained signing/update credential, apply the Section 3 signing/update-critical identity hard gate before the first release that depends on that identity.
+- Preserve the expected Windows installer/package/application identity and, when signing is used, the expected public certificate fingerprint/subject or other non-secret signer identifier so later releases can verify update compatibility.
+- Do not force code signing onto an intentionally unsigned Windows project merely to satisfy this rule; the hard gate applies to signing/update credentials that the project actually depends on.
 
 ## 20. Android rules
 - When requested and tool availability allows, deliver a ready APK rather than only source/build instructions.
@@ -373,7 +395,10 @@ Static checks do not replace runtime/Safe Self-Test verification for behavior th
 - Increment versionCode for each installable update and preserve the chosen versionName scheme.
 - Use unique project resources and launcher identity/icon.
 - Preserve existing app data/update compatibility where platform rules permit.
-- Keep/backup signing-key information safely; never expose private keys in chat, logs, repositories, or diagnostics.
+- Before the first intended long-lived installable release, establish the permanent Android release keystore/signing identity and pass the Section 3 durable-backup + recovery-test hard gate.
+- Keep/backup signing-key information safely; never expose private keys or keystore passwords in chat, logs, public repositories, diagnostics, or release metadata.
+- Record the expected Android signing-certificate SHA-256 fingerprint as safe public project/release metadata and require future release workflows to verify it before publishing.
+- Never silently fall back to a debug key, newly generated CI key, temporary key, or replacement keystore for an established Android package identity; if the established signer cannot be recovered and verified, STOP the release.
 - Do not change package ID casually because it creates a separate app identity/install.
 - Request only permissions actually required by the app’s features.
 - Unless the project says otherwise, target the user’s intended Galaxy S22/current supported Android environment.
@@ -384,7 +409,10 @@ Static checks do not replace runtime/Safe Self-Test verification for behavior th
 - Preserve sideload/update behavior when that is part of the project.
 - Keep platform/version compatibility explicit, especially for older supported iPhones/iOS versions.
 - Preserve the project’s established signing/re-signing workflow where possible.
-- Do not expose signing secrets/private keys/profiles unnecessarily in logs or repositories.
+- For iOS/Apple-platform projects whose update/distribution identity depends on signing material controlled by the project/user, apply the Section 3 durable-backup + recovery-test hard gate to the signing certificate/private key and other non-regenerable update-critical credentials before release.
+- Preserve and record safe public identity metadata such as bundle ID, Team ID, certificate/public signing identity, and the intended provisioning/distribution strategy where applicable.
+- Do not expose signing secrets/private keys/private certificates/provisioning secrets unnecessarily in chat, logs, public repositories, diagnostics, or release metadata.
+- If Apple or another platform provider intentionally manages signing so the private key is not exportable to the project, document that provider-managed model and verify the provider/account recovery path rather than pretending a local private-key backup exists.
 - When older iOS support is an established requirement, do not silently adopt APIs/deployment targets that break that support.
 
 ## 22. Release artifacts
@@ -406,6 +434,7 @@ A project/build is DONE only when all applicable requirements are satisfied:
 - there are no known broken controls, tray actions, window behaviors, persistence paths, Exit/Close behaviors, project-specific required features, or regression blockers;
 - any SKIPPED/NOT TESTED items are clearly listed, justified, and limited to genuinely disruptive/unsafe/environment-dependent/unautomatable actions;
 - update compatibility and existing working behavior have been preserved unless an intentional change was requested;
+- when the release depends on retained signing/update-critical credentials, the Section 3 durable-backup + real recovery-test hard gate has passed and the expected public identity/fingerprint has been verified;
 - applicable release artifacts correspond to the tested build;
 - permanent archive requirements in Section 27 are satisfied for releases to which the archive rule applies.
 
@@ -435,6 +464,7 @@ When reporting a build/audit/release result, clearly state applicable evidence r
 - runtime/log findings when real runtime evidence was supplied;
 - permanent GitHub archive status when Section 27 applies;
 - hashes/checksums when they are part of the release evidence;
+- when applicable, signing/update identity verification status, expected public fingerprint/identity, durable backup status, recovery-test result, and whether the release gate is PASS/FAIL/pending without exposing any private credential;
 - final DONE/NOT DONE/pending status and remaining blockers.
 
 Additional reporting rules:
