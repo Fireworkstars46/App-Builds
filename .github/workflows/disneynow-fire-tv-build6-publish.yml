@@ -1,0 +1,103 @@
+name: DisneyNOW Fire TV Build 6 - Publish verified signed APK
+
+on:
+  workflow_dispatch:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.issue.title == 'Trigger DisneyNOW Build 6 publication'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Download exact signed Build 6 APK and CI evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build6-Compatibility-Test'
+          apk="$dir/DisneyNOW-Fire-TV-v0.1-Build6-Permanent-Signed.apk"
+          mkdir -p "$dir" /tmp/build6-evidence
+          curl --fail --location --retry 2 --output "$apk" 'https://uc115f9cbb5fb4f402f935d818ae.dl.dropboxusercontent.com/cd/0/get/DKZZSqQi6F6_AqrnY_pvfenZ_U0hcCTYAylOwVWSk4ftVTwayku1NksGed4Fm3reJ_E1P8CNvICr0V2YoZLQ2MJoXuCML1VBoe0MqfKSPTcRL2L-WlkCKrZXZUg4Bo3NExCTaUjvVLCdAltzZc-01HyeOq5R6TombebfNXXPt3WD4g/file?c_luid=f3fd60e5'
+          echo '39a4cd997d126e3cbb2f2650e529725a07ff0583da0fde9fadc761639979551c  '"$apk" | sha256sum -c -
+          unzip -t "$apk" >/dev/null
+          curl --fail --location --retry 2 --output /tmp/build6-evidence.zip 'https://uc508a03d6c5f7d34cfb1a2a7c78.dl.dropboxusercontent.com/cd/0/get/DKYaWNRkDF9c_AmO5huCjZV8YOpr5wCJ6S7MvGjbI027YFn004PhkZFF75_j41iMwd4AQJKP4kvi8bCRAKhdVmSW9qB2CfA1pC4Mayc5Hbbd-G2a0kWV2hM3_NsubX3t0GkMPWu6RUFVg_SYqSuZIjF63-JPSzggGIyVv_EkZPP0vg/file?c_luid=f3fd60e5'
+          echo '3b7351bbc18b1d30fb499991a7495ad01efe8274d4850dd1521d0f16bc2d41b1  /tmp/build6-evidence.zip' | sha256sum -c -
+          unzip -q /tmp/build6-evidence.zip -d /tmp/build6-evidence
+          cp /tmp/build6-evidence/DisneyNOW-Fire-TV-v0.1-Build6-Source.zip "$dir/"
+          cp /tmp/build6-evidence/STATIC-AUDIT-v0.1-Build6.txt "$dir/"
+          cp /tmp/build6-evidence/LINT-v0.1-Build6.txt "$dir/"
+          cp /tmp/build6-evidence/LINT-v0.1-Build6.html "$dir/"
+          cp /tmp/build6-evidence/BUILD-METADATA-UNSIGNED.txt "$dir/BUILD-METADATA.txt"
+          unzip -t "$dir/DisneyNOW-Fire-TV-v0.1-Build6-Source.zip" >/dev/null
+          grep -q 'STATIC TOTAL: PASS=92 FAIL=0' "$dir/STATIC-AUDIT-v0.1-Build6.txt"
+          grep -q 'RESULT: PASS' "$dir/STATIC-AUDIT-v0.1-Build6.txt"
+          grep -q '0 errors, 9 warnings' "$dir/LINT-v0.1-Build6.txt"
+
+      - name: Verify package, Build 6 identity, and permanent signer
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk='DisneyNOWFireTV/Releases/v0.1-Build6-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build6-Permanent-Signed.apk'
+          APKSIGNER="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          AAPT="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools" -type f -name aapt | sort -V | tail -1)"
+          test -x "$APKSIGNER" && test -x "$AAPT"
+          "$APKSIGNER" verify --verbose --print-certs "$apk" | tee /tmp/apksigner.txt
+          grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true' /tmp/apksigner.txt
+          grep -q 'Verified using v3 scheme (APK Signature Scheme v3): true' /tmp/apksigner.txt
+          grep -Eqi 'certificate SHA-256 digest: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838' /tmp/apksigner.txt
+          "$AAPT" dump badging "$apk" | tee /tmp/badging.txt
+          grep -q "package: name='com.fireworkstars46.disneynowfiretv'" /tmp/badging.txt
+          grep -q "versionCode='6'" /tmp/badging.txt
+          grep -q "versionName='0.1'" /tmp/badging.txt
+
+      - name: Write permanent release evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build6-Compatibility-Test'
+          cat > "$dir/RELEASE-STATUS.txt" <<'TXT'
+          DisneyNOW Fire TV Web Wrapper
+          Version 0.1 Build 6
+          Status: NOT DONE - COMPATIBILITY TEST
+          Build 6 preserves Build 5's physically confirmed cursor routing and smooth movement behavior.
+          Page Zoom: fully custom 0-500 whole-number range with direct numeric entry, 0-500 slider, -1/+1 controls, Reset 100%, immediate apply/persistence, and existing saved zoom preserved. Zoom 0 uses WebView automatic scale rather than making the page invisible.
+          Video compatibility correction: removes the forced offscreen WebView hardware layer while retaining app/window hardware acceleration, keeps the WebView alive behind fullscreen custom video, and keeps the fullscreen video container frontmost/focused. This targets the reported Fire TV ad-audio/black-video symptom but requires physical retest.
+          Login/navigation correction: flushes cookies after completed navigation and routes popup/login URLs through a one-shot path to prevent duplicate popup routing/destruction. Real provider login stability requires physical retest.
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Android versionCode: 6
+          Signing: exact permanent Build 3/4/5 release identity; SHA-256 certificate fingerprint 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838.
+          Signing backup gate: PASS - verified private GitHub recovery backup plus independent Dropbox backup; real recovery test passed.
+          CI build/static/lint/unit/package checks: PASS. Static audit: 92 PASS / 0 FAIL. Lint: 0 errors / 9 warnings (non-blocking).
+          Publication verification: exact signed APK SHA-256, APK ZIP integrity, APK v2/v3 signatures, permanent signer fingerprint, package ID, versionCode 6, versionName 0.1, source ZIP integrity, static-audit result, and lint summary are fail-closed checks.
+          Physical Fire TV Build 6 checks still required: ad video picture/audio, protected-program playback, provider login/redirect stability, custom zoom appearance/control behavior, and regression check of the Build 5 cursor behavior.
+          Permanent GitHub archive: signed APK, source ZIP, static audit, lint reports, build metadata, release status, and checksums are archived together for Build 6.
+          TXT
+          (
+            cd "$dir"
+            sha256sum \
+              DisneyNOW-Fire-TV-v0.1-Build6-Permanent-Signed.apk \
+              DisneyNOW-Fire-TV-v0.1-Build6-Source.zip \
+              STATIC-AUDIT-v0.1-Build6.txt \
+              LINT-v0.1-Build6.txt \
+              LINT-v0.1-Build6.html \
+              BUILD-METADATA.txt \
+              RELEASE-STATUS.txt > SHA256SUMS.txt
+          )
+
+      - name: Commit verified Build 6 release archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add DisneyNOWFireTV/Releases/v0.1-Build6-Compatibility-Test/
+          git commit -m 'Publish verified DisneyNOW Fire TV v0.1 Build 6 APK and evidence'
+          git push origin HEAD:main
