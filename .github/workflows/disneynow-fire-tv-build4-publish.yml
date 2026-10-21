@@ -22,7 +22,7 @@ jobs:
           set -euo pipefail
           out='DisneyNOWFireTV/Releases/v0.1-Build4-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build4-Permanent-Signed.apk'
           mkdir -p "$(dirname "$out")"
-          cat DisneyNOWFireTV/Build4/Publish/apk-part*.txt | tr -d '\r\n' | base64 --decode > "$out"
+          cat DisneyNOWFireTV/Build4/Publish2/apk-part*.txt | tr -d '\r\n' | base64 --decode > "$out"
           test -s "$out"
           unzip -t "$out"
           sha256sum "$out"
