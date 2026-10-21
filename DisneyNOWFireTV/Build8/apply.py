@@ -19,7 +19,7 @@ STAGE8 = {
 }
 
 BUILD8 = {
-    'app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java': '0c2ce6daeb8a7cf0a1b5bdcf37fa160228b97a0051c3571ce19d88df29dbdd2e',
+    'app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java': 'e63e0e7281456aa8e6e5304e264b445649567422491643946764e7182995d36f',
     'app/build.gradle': '7121fac1d053df10032211cf64f0a0c83bd1275fb39650bed15198411a47d2ae',
     'README.md': 'b22a13ffe5683412ced7823509e2c9cb042b825ab2d3d1832155e31d2c18252d',
     'BUILD_INFO.md': '6ff421712fa8d042fa498e92b27cff83af02de4e42d6edd4d560ef272d725b84',
@@ -84,6 +84,20 @@ def apply_androidx_correction(root: Path) -> None:
     audit_path.write_text(text, encoding='utf-8', newline='\n')
 
 
+def apply_media3_opt_in(root: Path) -> None:
+    main_path = root / 'app' / 'src' / 'main' / 'java' / 'com' / 'fireworkstars46' / 'disneynowfiretv' / 'MainActivity.java'
+    text = main_path.read_text(encoding='utf-8')
+    text = replace_once(text,
+        'import androidx.media3.common.Player;\n',
+        'import androidx.media3.common.Player;\nimport androidx.media3.common.util.UnstableApi;\n',
+        'Media3 UnstableApi import')
+    text = replace_once(text,
+        'public final class MainActivity extends Activity {',
+        '@UnstableApi\npublic final class MainActivity extends Activity {',
+        'Media3 UnstableApi class annotation')
+    main_path.write_text(text, encoding='utf-8', newline='\n')
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--source', required=True)
@@ -121,6 +135,7 @@ def main() -> None:
 
     verify(root, STAGE8, 'Build 8 staged result')
     apply_androidx_correction(root)
+    apply_media3_opt_in(root)
     verify(root, BUILD8, 'Build 8 result')
     print('Build 8 hybrid-TV-shell/native-navigation/whole-page-zoom/Media3 patch applied and verified.')
 
