@@ -1,0 +1,5 @@
+DisneyNOW Fire TV Web Wrapper
+Version 0.1 Build 4
+Status: NOT DONE - COMPATIBILITY TEST
+Build 4 fixes the Build 3 cursor regression by intercepting D-pad/Select at the Activity dispatch layer before WebView native focus navigation can consume those events when Cursor is enabled. Cursor OFF preserves normal WebView navigation. Physical Fire TV cursor/click and protected playback verification remain required.
+Signing: same permanent release signing identity as Build 3 for in-place updates.
