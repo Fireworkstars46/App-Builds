@@ -1,0 +1,1 @@
+Build 4 direct binary publication repair staging. The final release APK is verified before publication; this folder contains only temporary publication metadata, not signing secrets.
