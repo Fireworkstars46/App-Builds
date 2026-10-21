@@ -1,4 +1,4 @@
-name: DisneyNOW Fire TV Build 4 - Publish reconstructed signed APK
+name: DisneyNOW Fire TV Build 4 - Publish verified signed APK
 
 on:
   workflow_dispatch:
@@ -16,16 +16,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Reconstruct Build 4 signed APK from repository parts
+      - name: Download exact signed Build 4 staging APK
         shell: bash
         run: |
           set -euo pipefail
           out='DisneyNOWFireTV/Releases/v0.1-Build4-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build4-Permanent-Signed.apk'
           mkdir -p "$(dirname "$out")"
-          cat DisneyNOWFireTV/Build4/Publish2/apk-part*.txt | tr -d '\r\n' | base64 --decode > "$out"
-          test -s "$out"
+          curl --fail --location --retry 2 --output "$out" 'https://uc582916d4267a09bc4501b1f300.dl.dropboxusercontent.com/cd/0/get/DKbXMltJvjKiama16eZHmzwcLG07HiGd84zTxwdU6FqPIt2hY7gDjJ8yv4-z0TiB3OBdg6avRTgx-tzTLeeun9_IhE6tZncLhGIDXL4r7eP5ev5BFwqdwp0ShHQ8lCCwDODIHEBrYkptzXcMzpV9L55mSPWv1gkG7VaVbvUpJ1u83A/file?c_luid=f3fd60e5'
+          echo '5239e930ffc7b4e08816372c16e7f793f14eb09b7b5a1421555b38ea37cddbc3  '"$out" | sha256sum -c -
           unzip -t "$out"
-          sha256sum "$out"
 
       - name: Verify Android package, versionCode, and permanent signing identity
         shell: bash
@@ -41,6 +40,7 @@ jobs:
           "$AAPT" dump badging "$apk" | tee /tmp/badging.txt
           grep -q "package: name='com.fireworkstars46.disneynowfiretv'" /tmp/badging.txt
           grep -q "versionCode='4'" /tmp/badging.txt
+          grep -q "versionName='0.1'" /tmp/badging.txt
 
       - name: Record published APK checksum
         shell: bash
