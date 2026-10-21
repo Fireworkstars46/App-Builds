@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'DisneyNOWFireTV/Build3/Publish/part*.txt'
+      - 'DisneyNOWFireTV/Build3/Publish/**'
 
 permissions:
   contents: write
@@ -22,13 +22,27 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          PUB='DisneyNOWFireTV/Build3/Publish'
           OUTDIR='DisneyNOWFireTV/Releases/v0.1-Build3-Compatibility-Test'
           APK="$OUTDIR/DisneyNOW-Fire-TV-v0.1-Build3-Permanent-Signed.apk"
           mkdir -p "$OUTDIR"
-          cat DisneyNOWFireTV/Build3/Publish/part*.txt > /tmp/build3-signed.b64
-          base64 -d /tmp/build3-signed.b64 > "$APK"
+
+          # The first 27,000 APK bytes are represented as exact base64 text parts.
+          cat "$PUB"/part00.txt "$PUB"/part01.txt "$PUB"/part02.txt "$PUB"/part03.txt "$PUB"/part04.txt "$PUB"/part05.txt > /tmp/build3-prefix.b64
+          base64 -d /tmp/build3-prefix.b64 > "$APK"
+
+          # Append the remaining exact binary regions. Long zero-padding regions are
+          # recreated explicitly so the private signing key never enters the repository.
+          cat "$PUB"/rem00.bin >> "$APK"
+          head -c 423 /dev/zero >> "$APK"
+          cat "$PUB"/rem01.bin "$PUB"/rem02.bin "$PUB"/rem03.bin "$PUB"/rem04.bin "$PUB"/rem05.bin >> "$APK"
+          head -c 2698 /dev/zero >> "$APK"
+          cat "$PUB"/rem06.bin >> "$APK"
+
+          test "$(stat -c%s "$APK")" = '37625'
           echo '2c12f365290b7f9c13478dae4c39c7309b70619bda2322f3d538868609347746  '"$APK" | sha256sum -c -
           unzip -t "$APK" >/dev/null
+
           printf '%s  %s\n' '2c12f365290b7f9c13478dae4c39c7309b70619bda2322f3d538868609347746' 'DisneyNOW-Fire-TV-v0.1-Build3-Permanent-Signed.apk' > "$OUTDIR/SHA256SUMS.txt"
           cat > "$OUTDIR/RELEASE-STATUS.txt" <<'EOF'
           DisneyNOW Fire TV Web Wrapper
