@@ -1,0 +1,33 @@
+name: DisneyNOW temporary apksigner helper
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/disneynow-fire-tv-apksigner-helper.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export-apksigner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: android-actions/setup-android@v4
+      - name: Install Android build tools 35.0.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'build-tools;35.0.0'
+          test -s "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar"
+          mkdir -p _helper
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" _helper/apksigner.jar
+      - name: Upload temporary helper
+        uses: actions/upload-artifact@v4
+        with:
+          name: DisneyNOW-apksigner-helper
+          path: _helper/apksigner.jar
+          if-no-files-found: error
