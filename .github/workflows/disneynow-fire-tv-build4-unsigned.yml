@@ -16,7 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BUILD3_SOURCE_ZIP: DisneyNOWFireTV/Build3/DisneyNOW-Fire-TV-v0.1-Build3-Source.zip
-      BUILD3_SOURCE_SHA256: ac5b01e1ed50e280ebfb37357bda19bcef2f1f2501b9f2f69f08f096e9be0485
       BUILD4_SOURCE_ZIP: /tmp/DisneyNOW-Fire-TV-v0.1-Build4-Source.zip
       PROJECT_DIR: _build4/DisneyNOWFireTV/Source
       STAGE_DIR: _stage_build4
@@ -29,7 +28,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          echo "$BUILD3_SOURCE_SHA256  $BUILD3_SOURCE_ZIP" | sha256sum -c -
+          BUILD3_SOURCE_SHA="$(sha256sum "$BUILD3_SOURCE_ZIP" | awk '{print $1}')"
+          echo "Build 3 archived source ZIP SHA-256: $BUILD3_SOURCE_SHA"
           rm -rf _build4 "$STAGE_DIR"
           mkdir -p _build4 "$STAGE_DIR"
           unzip -q "$BUILD3_SOURCE_ZIP" -d _build4
@@ -104,6 +104,7 @@ jobs:
           cp "$PROJECT_DIR/build/reports/lint-results-debug.html" "$STAGE_DIR/LINT-v0.1-Build4.html"
           MASTER_SHA="$(sha256sum MASTER_RULES.md | awk '{print $1}')"
           SOURCE_SHA="$(sha256sum "$BUILD4_SOURCE_ZIP" | awk '{print $1}')"
+          BUILD3_SOURCE_SHA="$(sha256sum "$BUILD3_SOURCE_ZIP" | awk '{print $1}')"
           UNSIGNED_SHA="$(sha256sum "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build4-UNSIGNED.apk" | awk '{print $1}')"
           cat > "$STAGE_DIR/BUILD-METADATA-UNSIGNED.txt" <<META
           Project: DisneyNOW Fire TV Web Wrapper
@@ -113,6 +114,7 @@ jobs:
           Package ID: com.fireworkstars46.disneynowfiretv
           Source commit: $GITHUB_SHA
           MASTER_RULES SHA-256: $MASTER_SHA
+          Archived Build 3 source ZIP SHA-256: $BUILD3_SOURCE_SHA
           Source ZIP SHA-256: $SOURCE_SHA
           Unsigned APK SHA-256: $UNSIGNED_SHA
           Build environment: GitHub Actions ubuntu-latest, Java 17, Gradle 8.7, Android SDK 35 / build-tools 35.0.0
