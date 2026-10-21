@@ -42,6 +42,7 @@ jobs:
           GRADLE="$PROJECT_DIR/app/build.gradle"
           grep -q 'versionCode 8' "$GRADLE"
           grep -q "buildConfigField 'int', 'APP_BUILD', '8'" "$GRADLE"
+          grep -q 'android.useAndroidX=true' "$PROJECT_DIR/gradle.properties"
           grep -q 'KEY_NATIVE_TV_NAV' "$MAIN"
           grep -q 'applyWholePageZoom' "$MAIN"
           grep -q 'webView.zoomBy' "$MAIN"
@@ -85,7 +86,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 "$PROJECT_DIR/tools/static_audit.py"
-          grep -q 'STATIC TOTAL: PASS=155 FAIL=0' "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build8.txt"
+          grep -q 'STATIC TOTAL: PASS=157 FAIL=0' "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build8.txt"
           grep -q 'RESULT: PASS' "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build8.txt"
 
       - name: Compile, lint, unit-test, and produce unsigned release APK
