@@ -1,0 +1,21 @@
+Project: DisneyNOW Fire TV Hybrid TV Shell
+Version: 0.1
+Build: 8
+Android versionCode: 8
+Package ID: com.fireworkstars46.disneynowfiretv
+Public unsigned CI run: 39624401435
+Public unsigned CI artifact ID: 12355084960
+Public unsigned artifact digest: sha256:888cd1f74cbfe1801cf9e984489bac0b721b352019a67b79b3aeff6bd2b17a29
+Private permanent-signing CI run: 39625196002
+Private signed artifact ID: 12355983732
+Private signed artifact digest: sha256:6116c4689e44cdbffec4efac86d2908b2ededb76ae7a9f754d5baef627210601
+Signed APK SHA-256: f7a96f2e36406b86dbb734e186c93e431acd95d61e6b2b060333387bfb89dd81
+Source ZIP SHA-256: 2c26c771b9d44500795f250910ff57cd6f2e506795ad2d9ef3c0650c4a9d5b8b
+Static audit SHA-256: 0a018e71ba34a5af4ac3d6ece9b847376f0f88dfb6b5a8dec96b5446fcc7be11
+Lint text SHA-256: 8b814438ff9d0c44f51d3387680bdcf7217757b42fe89c95d11ba364fc8ce09f
+Lint HTML SHA-256: 2a66d40a39700fe8cd7a530cef685c6cdce2b154e4096bdb0b51332e38ab1b5a
+Permanent signer certificate SHA-256: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838
+CI static/release audit: 157 PASS / 0 FAIL
+Lint: 0 errors / 13 warnings
+Signing backup gate: PASS - durable primary and independent secondary backups plus prior real recovery verification.
+Publication status: NOT DONE - COMPATIBILITY TEST pending physical Fire TV testing.

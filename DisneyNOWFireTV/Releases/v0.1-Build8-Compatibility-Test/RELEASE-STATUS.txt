@@ -1,0 +1,19 @@
+DisneyNOW Fire TV Hybrid TV Shell
+Version 0.1 Build 8
+Status: NOT DONE - COMPATIBILITY TEST
+
+Build 8 is the architectural response to physically reported Build 7 failures: persistent lag, DisneyNOW playback error, and document-only CSS zoom that did not affect the whole page.
+
+Navigation: low-overhead Native TV Navigation is the migrated default. Fire TV D-pad input passes through to WebView/native focus instead of continuously driving the compatibility mouse cursor. Cursor Navigation and Legacy JS Focus Navigation remain available compatibility modes.
+Performance Mode: migrated ON for Build 8; suppresses page animations/transitions and smooth scrolling where the page permits it.
+Page Zoom: fully custom 0-500 whole-number range. Nonzero values use WebView-level zoomBy scaling with no DisneyNOW page reload and no document-only CSS zoom. 0 percent hides the WebView while the native menu remains available for recovery.
+Experimental Native Player: AndroidX Media3 1.8.1 HLS/DASH player path. It observes legitimate media-manifest and probable DRM-license requests made by the authenticated DisneyNOW session, keeps candidate URLs/headers/cookies in memory only, and can try the detected stream in Media3. If a probable DRM license endpoint was legitimately observed, Media3 is configured for Android Widevine using that observed endpoint and request headers.
+Security/rights boundary: no Disney proprietary source code or credentials are copied; no DRM keys are extracted; no DRM is bypassed; no entitlement, token, or license response is fabricated.
+Fallback: Open Current Page in Silk (Video Fallback) remains available.
+
+Package ID: com.fireworkstars46.disneynowfiretv
+Android versionCode: 8
+Signing: exact permanent Build 3-7 update identity; certificate SHA-256 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838.
+Signing backup gate: PASS.
+CI verification: PASS. Static/release audit 157 PASS / 0 FAIL; lint 0 errors / 13 warnings; package/version and APK v2/v3 signer checks passed.
+Physical Fire TV checks still required: native TV navigation responsiveness/lag, whole-page zoom appearance, provider login/redirect stability, media-stream detection, ad/program playback, Widevine negotiation when applicable, and Silk fallback.

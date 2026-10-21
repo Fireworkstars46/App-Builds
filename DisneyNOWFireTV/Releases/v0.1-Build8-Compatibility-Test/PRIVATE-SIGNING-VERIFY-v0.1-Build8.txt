@@ -1,0 +1,11 @@
+DisneyNOW Fire TV v0.1 Build 8 private signing verification
+PASS - exact Build 8 unsigned artifact ZIP SHA-256 verified
+PASS - aligned unsigned APK SHA-256 verified
+PASS - source/static-audit/lint evidence SHA-256 verified
+PASS - static audit 157 PASS / 0 FAIL verified
+PASS - lint 0 errors / 13 warnings verified
+PASS - apksigner v2/v3 verification passed
+PASS - established permanent signer fingerprint matched
+PASS - package com.fireworkstars46.disneynowfiretv verified
+PASS - versionCode 8 / versionName 0.1 verified
+Physical Fire TV behavior/playback: NOT TESTED
