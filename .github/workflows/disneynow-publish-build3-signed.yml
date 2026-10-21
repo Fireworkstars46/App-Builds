@@ -1,0 +1,53 @@
+name: Publish DisneyNOW Fire TV Build 3 signed APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'DisneyNOWFireTV/Build3/Publish/DisneyNOW-Fire-TV-v0.1-Build3-Permanent-Signed.apk.b64'
+
+permissions:
+  contents: write
+
+jobs:
+  publish-signed-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct and verify exact signed APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          INPUT='DisneyNOWFireTV/Build3/Publish/DisneyNOW-Fire-TV-v0.1-Build3-Permanent-Signed.apk.b64'
+          OUTDIR='DisneyNOWFireTV/Releases/v0.1-Build3-Compatibility-Test'
+          APK="$OUTDIR/DisneyNOW-Fire-TV-v0.1-Build3-Permanent-Signed.apk"
+          mkdir -p "$OUTDIR"
+          base64 -d "$INPUT" > "$APK"
+          echo '2c12f365290b7f9c13478dae4c39c7309b70619bda2322f3d538868609347746  '"$APK" | sha256sum -c -
+          unzip -t "$APK" >/dev/null
+          printf '%s  %s\n' '2c12f365290b7f9c13478dae4c39c7309b70619bda2322f3d538868609347746' 'DisneyNOW-Fire-TV-v0.1-Build3-Permanent-Signed.apk' > "$OUTDIR/SHA256SUMS.txt"
+          cat > "$OUTDIR/RELEASE-STATUS.txt" <<'EOF'
+          DisneyNOW Fire TV Web Wrapper
+          Version 0.1 Build 3
+          Status: NOT DONE - COMPATIBILITY TEST
+          Signing: permanent release signing identity established for Build 3 and future in-place updates.
+          Physical Fire TV playback/cursor/zoom verification remains required before DONE.
+          EOF
+
+      - name: Commit permanent public APK archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add DisneyNOWFireTV/Releases/v0.1-Build3-Compatibility-Test/
+          if git diff --cached --quiet; then
+            echo 'Archive already matches; nothing to commit.'
+            exit 0
+          fi
+          git commit -m 'Archive DisneyNOW Fire TV v0.1 Build 3 permanent-signed compatibility test'
+          git push origin HEAD:main
