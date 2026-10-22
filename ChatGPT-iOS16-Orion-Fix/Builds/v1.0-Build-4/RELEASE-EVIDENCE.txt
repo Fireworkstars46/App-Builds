@@ -1,0 +1,24 @@
+ChatGPT iOS 16 Orion Fix — RELEASE EVIDENCE
+Version 1.0 | Build 4
+
+Reason for Build 4:
+User requested a persistent diagnostics enable/disable control so the diagnostic UI does not block ChatGPT during normal use.
+
+Preservation:
+- Build 3 polyfill.js is byte-for-byte unchanged in Build 4.
+- URL.canParse, Object.groupBy, and Map.groupBy compatibility behavior is preserved.
+- Diagnostics remain privacy-limited and are now OFF by default.
+
+Static audit: 16 PASS / 0 FAIL.
+Safe Self-Test: 13 PASS / 0 FAIL / 4 NOT TESTED.
+
+Real-device blockers before DONE:
+- Install/update in Orion 1.4.4 on iOS 16.
+- Verify the extension popup can be opened and the toggle works on-device.
+- Verify OFF removes the DIAG bubble and remains OFF after reload; verify ON can be restored and remains ON after reload.
+- Verify ChatGPT sidebar and Send behavior on the live site.
+
+Signing/update identity:
+Not applicable. This artifact is a file-based WebExtension ZIP, not a signed native iOS app/IPA.
+
+Final project/build status at packaging: PENDING / NOT DONE pending user device verification and complete permanent binary archival.
