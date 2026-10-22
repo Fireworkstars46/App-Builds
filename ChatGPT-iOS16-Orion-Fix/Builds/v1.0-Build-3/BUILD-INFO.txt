@@ -1,0 +1,11 @@
+Project: ChatGPT iOS 16 URL.canParse Fix
+Version: 1.0
+Build: 3
+Purpose: Corrective compatibility build based on Build 2 diagnostics.
+
+Changes from Build 2:
+- Preserves the URL.canParse fallback.
+- Adds Object.groupBy fallback only when missing.
+- Adds Map.groupBy fallback only when missing.
+- Preserves the privacy-limited diagnostic panel and updates it to Build 3.
+- No cookies, storage, message text, typed text, request bodies, or clipboard contents are inspected.
