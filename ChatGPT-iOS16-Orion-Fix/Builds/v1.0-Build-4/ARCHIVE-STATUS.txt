@@ -1,7 +1,7 @@
 ChatGPT iOS 16 Orion Fix — Archive Status
 Version 1.0 | Build 4
 
-Source/text/audit artifacts: archived to GitHub and subject to retrieval verification.
-Exact binary ZIP: cannot be uploaded through the currently available GitHub connector because it has no arbitrary binary upload/Release-asset action. Therefore permanent archive remains INCOMPLETE unless/until the exact ZIP is uploaded through a supported binary/Release-asset path and its checksum is verified.
+Source/text/audit artifacts: pending GitHub archival verification at the time this file was packaged.
+Exact binary ZIP: cannot be uploaded through the currently available GitHub connector because it has no arbitrary binary upload action. Therefore permanent archive must remain INCOMPLETE unless/until the exact ZIP is uploaded through a supported binary/Release-asset path and its checksum is verified.
 
 Do not call archive COMPLETE or Build 4 DONE while the exact release ZIP is missing from permanent archive or real-device tests remain pending.
