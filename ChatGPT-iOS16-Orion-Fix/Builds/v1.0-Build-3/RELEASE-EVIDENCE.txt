@@ -1,0 +1,29 @@
+ChatGPT iOS 16 URL.canParse Fix — Release Evidence
+Version 1.0 | Build 3
+
+Reason for corrective build
+- User-provided Build 2 target diagnostic report showed Object.groupBy and Map.groupBy as the only missing features in the checked browser-feature set.
+- Build 2 captured 0 JavaScript errors/rejections during that report.
+- Build 3 therefore adds only those two missing grouping APIs and preserves existing behavior.
+
+Automated/static evidence
+- JavaScript syntax: PASS for polyfill.js and diagnostic.js.
+- manifest.json parse: PASS.
+- Manifest referenced-file existence: PASS.
+- Privacy-oriented diagnostic scan: PASS.
+- Compatibility self-test: 10/10 PASS for URL.canParse/Object.groupBy/Map.groupBy behavior and native-preservation checks.
+- Static/release audit: 12 PASS / 0 FAIL.
+- Safe Self-Test reported totals: 14 PASS / 0 FAIL / 4 SKIPPED-NOT TESTED.
+
+Target runtime status
+- Build 2 diagnostic execution/report return on target iOS 16 + Orion: PASS (user supplied report).
+- Build 3 installation on target iOS 16 + Orion: NOT TESTED yet.
+- Build 3 ChatGPT sidebar: NOT TESTED yet.
+- Build 3 ChatGPT Send: NOT TESTED yet.
+- Build 3 diagnostic copy path: NOT TESTED yet.
+
+Signing/update identity
+- This is a manually installed file-based browser extension ZIP; no retained signing identity/key is used by this artifact.
+
+Final status
+- NOT DONE pending live Build 3 target testing and permanent archive of the exact downloadable ZIP.
