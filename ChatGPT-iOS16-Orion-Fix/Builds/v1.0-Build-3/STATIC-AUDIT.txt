@@ -1,0 +1,21 @@
+ChatGPT iOS 16 URL.canParse Fix — Static/Release Audit
+Version 1.0 | Build 3
+
+PASS 1 - manifest.json parses as valid JSON.
+PASS 2 - Manifest identifies extension version 1.0.2 and loads polyfill.js before diagnostic.js at document_start.
+PASS 3 - Project name/origin scope from Build 2 is preserved.
+PASS 4 - Existing URL.canParse fallback behavior is preserved and remains conditional on native support being absent.
+PASS 5 - Object.groupBy fallback is conditional and does not overwrite a native implementation.
+PASS 6 - Map.groupBy fallback is conditional and does not overwrite a native implementation.
+PASS 7 - polyfill.js passes Node JavaScript syntax checking.
+PASS 8 - diagnostic.js passes Node JavaScript syntax checking.
+PASS 9 - Diagnostic remains privacy-limited: no direct access to document.cookie, localStorage, sessionStorage, input values, keyboard/paste event capture, clipboard reads, fetch, or XMLHttpRequest.
+PASS 10 - No extension permissions, host_permissions, background worker, native code, signing key, or external network endpoint was added.
+PASS 11 - Version/build strings in package documentation identify Version 1.0 Build 3; manifest extension version is 1.0.2.
+PASS 12 - Package contains every content-script file referenced by manifest.json.
+
+Static audit total: 12 PASS / 0 FAIL
+
+Important limitation:
+Static validation cannot prove ChatGPT's live page will resume working after these
+polyfills. That requires the user's actual Orion/iOS 16 runtime test.
