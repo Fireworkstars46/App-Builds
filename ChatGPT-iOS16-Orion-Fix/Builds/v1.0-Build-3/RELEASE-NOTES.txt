@@ -1,0 +1,17 @@
+ChatGPT iOS 16 URL.canParse Fix
+Version 1.0 | Build 3
+
+Reason for Build 3
+Build 2 diagnostics on the target iOS 16 / Orion environment reported two missing checked JavaScript features:
+- Object.groupBy
+- Map.groupBy
+No JavaScript errors/rejections were captured during that diagnostic run.
+
+Changes
+- Added standards-oriented Object.groupBy compatibility fallback.
+- Added standards-oriented Map.groupBy compatibility fallback.
+- Preserved the existing URL.canParse compatibility fallback.
+- Preserved the Build 2 privacy-limited diagnostic UI, updated to identify Build 3.
+
+Scope
+The new fallbacks are installed only when the browser does not already provide the corresponding native function.
