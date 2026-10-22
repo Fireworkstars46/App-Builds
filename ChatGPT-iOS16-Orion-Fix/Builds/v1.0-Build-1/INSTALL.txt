@@ -1,0 +1,29 @@
+ChatGPT iOS 16 URL.canParse Fix
+Version 1.0 | Build 1
+
+Purpose
+-------
+Adds only the missing URL.canParse() JavaScript function on ChatGPT/OpenAI sign-in pages.
+It does not read passwords, cookies, messages, clipboard contents, or other browsing data.
+
+Install in Orion on iPhone/iPad
+--------------------------------
+1. Save the ZIP to the Files app.
+2. In Orion, tap the three-dot (...) menu.
+3. Tap Settings and make sure Chrome Extensions is enabled.
+4. Go back, tap (...) > Extensions.
+5. Tap the + button.
+6. Choose the option to install a file-based extension and select this ZIP.
+7. Make sure "ChatGPT iOS 16 URL.canParse Fix" is enabled.
+8. Close the broken ChatGPT login tab completely.
+9. Open a fresh tab and go to https://chatgpt.com/ then try Log in again.
+
+If Orion rejects the ZIP or the same error still appears, do not clear your data again.
+Report the exact Orion error/message so the extension format can be adjusted.
+
+Testing status
+--------------
+PASS: manifest.json parses as valid JSON.
+PASS: polyfill.js passes JavaScript syntax checking.
+PASS: local behavior test confirms valid URLs return true and invalid URLs return false.
+SKIPPED / NOT TESTED: actual Orion 1.4.4 + iOS 16 runtime injection, because that environment is not available here.
