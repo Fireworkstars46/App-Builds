@@ -1,0 +1,41 @@
+ChatGPT iOS 16 URL.canParse Fix
+Version 1.0 | Build 3
+
+Purpose
+-------
+Build 3 is a corrective compatibility build based on the live Build 2 diagnostic
+report from the target iOS 16 / Orion environment. That report found two missing
+checked JavaScript features: Object.groupBy and Map.groupBy.
+
+Build 3 preserves the existing URL.canParse fallback and diagnostic panel, and
+adds fallbacks for Object.groupBy and Map.groupBy only when the browser does not
+already provide them.
+
+It does NOT inspect or record:
+- your ChatGPT message text
+- text you type into ChatGPT
+- passwords
+- cookies
+- localStorage/sessionStorage
+- request bodies
+- clipboard contents
+
+Install / test
+--------------
+1. Disable Build 1 and Build 2 in Orion so only Build 3 is active.
+2. Install this Build 3 ZIP using Orion (...) > Extensions > + > file-based extension.
+3. Make sure Build 3 is enabled.
+4. Reload chatgpt.com. Do not clear cookies/site data.
+5. Test the sidebar button.
+6. Type and send a harmless test message.
+7. If either still fails, tap DIAG > Copy Report and return the new Build 3 report.
+
+Expected Build 3 diagnostic change
+----------------------------------
+Object.groupBy and Map.groupBy should no longer appear in the "Missing checked
+browser features" list because Build 3 supplies them when native support is absent.
+
+Testing status
+--------------
+See STATIC-AUDIT.txt and SAFE-SELF-TEST.txt in this package.
+Actual Build 3 behavior on Orion/iOS 16 remains NOT TESTED until the user's live test.
