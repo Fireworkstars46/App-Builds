@@ -1,0 +1,9 @@
+ChatGPT iOS 16 URL.canParse Fix
+Version 1.0 | Build 2
+
+GitHub source/evidence archive: PARTIAL/INCOMPLETE
+Archived: manifest.json, polyfill.js, diagnostic.js, INSTALL.txt, RELEASE-EVIDENCE.txt
+Exact downloadable ZIP SHA-256:
+4954bef1379b8ea775b6dba11acc2894995d99bc35f63a363cefaccdc3e5f689  ChatGPT-iOS16-Orion-Fix-v1.0-Build2.zip
+
+The exact ZIP bytes are not archived in GitHub because the currently available GitHub connector can create UTF-8 text files but cannot upload this binary ZIP. Do not treat the release as fully archived/DONE until the exact ZIP is uploaded through a binary-capable GitHub path and the downloaded copy is hash-verified against the SHA-256 above.
