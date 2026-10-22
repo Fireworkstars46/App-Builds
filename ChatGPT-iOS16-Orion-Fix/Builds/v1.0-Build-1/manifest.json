@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT iOS 16 URL.canParse Fix",
+  "version": "1.0.0",
+  "description": "Adds a minimal URL.canParse compatibility fallback on ChatGPT/OpenAI sign-in pages for older WebKit such as iOS 16.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://auth.openai.com/*",
+        "https://auth0.openai.com/*",
+        "https://setup.auth.openai.com/*",
+        "https://frontend-apps-multi-region.workos.com/*",
+        "https://forwarder.workos.com/*"
+      ],
+      "js": ["polyfill.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ]
+}
