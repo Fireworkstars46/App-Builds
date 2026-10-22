@@ -1,0 +1,38 @@
+ChatGPT iOS 16 URL.canParse Fix
+Version 1.0 | Build 2
+
+Purpose
+-------
+Build 2 preserves the Build 1 URL.canParse compatibility fallback and adds a
+privacy-limited diagnostic panel so we can see which browser features are
+missing and which JavaScript errors occur when ChatGPT's Send/sidebar controls
+fail on Orion 1.4.4 / iOS 16.
+
+It does NOT inspect or record:
+- your ChatGPT message text
+- text you type into ChatGPT
+- passwords
+- cookies
+- localStorage/sessionStorage
+- request bodies
+- clipboard contents
+
+Install / test
+--------------
+1. Keep Build 1 available, but disable it in Orion so only one copy is active.
+2. Install this Build 2 ZIP using Orion (...) > Extensions > + > file-based extension.
+3. If Orion shows both builds, make sure only Build 2 is enabled.
+4. Reload chatgpt.com.
+5. A small "DIAG 0" button should appear at the bottom-right.
+6. Try the broken sidebar button and try sending a harmless test message.
+7. Tap DIAG.
+8. Tap "Copy Report" and paste the report back into the ChatGPT conversation on
+   another working device/browser, or select/copy the report text manually.
+
+If Build 2 causes a new problem, disable it and re-enable Build 1.
+Do not clear your ChatGPT cookies/site data just for this diagnostic test.
+
+Testing status
+--------------
+Actual Orion 1.4.4 + iOS 16 runtime behavior remains NOT TESTED here because
+that environment is not available in the build container.
