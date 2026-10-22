@@ -1,0 +1,63 @@
+ChatGPT iOS 16 URL.canParse Fix — Version 1.0 Build 2
+
+Reason for Build 2
+------------------
+Login succeeded after Build 1, but ChatGPT's Send and sidebar controls remained nonfunctional even with Build 1 disabled. Build 2 adds diagnostics to identify that separate compatibility failure instead of guessing additional polyfills.
+
+Changes from Build 1
+--------------------
+- Preserves Build 1 polyfill.js byte-for-byte unchanged.
+- Adds a small DIAG overlay.
+- Captures top-level JavaScript errors and unhandled Promise rejections.
+- Reports selected modern browser APIs missing from iOS 16.
+- Adds Copy Report, Clear Errors, and Close controls.
+- Does not intentionally inspect messages, typed text, cookies, local/session storage, request bodies, or clipboard contents.
+
+Static/release audit
+--------------------
+PASS 1 - manifest.json parses as valid JSON.
+PASS 2 - Manifest loads polyfill.js before diagnostic.js at document_start.
+PASS 3 - Build 1 polyfill.js preserved byte-for-byte.
+PASS 4 - polyfill.js passes Node JavaScript syntax checking.
+PASS 5 - diagnostic.js passes Node JavaScript syntax checking.
+PASS 6 - Privacy static scan found no direct access to document.cookie, localStorage, sessionStorage, keyboard/paste events, clipboard reads, fetch, or XMLHttpRequest.
+PASS 7 - Diagnostic remains scoped to the same ChatGPT/OpenAI origins used by Build 1.
+PASS 8 - No extension permissions, host_permissions, background worker, native code, signing key, or external network endpoint added.
+PASS 9 - Version/build strings are consistent with Version 1.0 Build 2; manifest extension version is 1.0.1.
+Total: 9 PASS / 0 FAIL.
+
+Safe Self-Test
+--------------
+PASS 1 - Build 1 URL.canParse polyfill source preserved byte-for-byte.
+PASS 2 - Manifest JSON load/parse succeeds.
+PASS 3 - polyfill.js syntax check succeeds.
+PASS 4 - diagnostic.js syntax check succeeds.
+PASS 5 - Privacy-oriented static scan passes.
+PASS 6 - Package contains all referenced content-script files.
+SKIPPED / NOT TESTED 1 - Actual Orion 1.4.4 + iOS 16 extension installation; environment unavailable here.
+SKIPPED / NOT TESTED 2 - Live ChatGPT Send/sidebar reproduction and error capture; requires user's device.
+SKIPPED / NOT TESTED 3 - Copy Report behavior in Orion/iOS clipboard UI; requires real iOS user gesture/WebKit clipboard environment.
+Totals: 6 PASS / 0 FAIL / 3 SKIPPED-NOT TESTED.
+
+Hashes
+------
+ZIP SHA-256:
+4954bef1379b8ea775b6dba11acc2894995d99bc35f63a363cefaccdc3e5f689  ChatGPT-iOS16-Orion-Fix-v1.0-Build2.zip
+
+Source/evidence SHA-256:
+d6af95f31d9b460e17b1a8f444115e85c18d9b5320ad75e7b753c8ab4b59ed35  BUILD-INFO.txt
+f5a374d015e986aac373d7628c57e000fab630c3320db36a00b7c151524bf96c  INSTALL.txt
+df8d6c105f654f9a3b83bc17674a852b36b6c448a8674030373c195d14062c27  RELEASE-NOTES.txt
+cd7e6bcf030afa5576b28240cb8fceed62922bc60bde629af466bd6248a7719a  SAFE-SELF-TEST.txt
+d4189cebd81a0ad187f568f0bad4e21e4c0765a5909db0ccbf648732ab798190  STATIC-AUDIT.txt
+c3582246990bb83f7c04be72300db1b94339c810c64fc64b426b85a6c9452423  diagnostic.js
+21596ca17c9b39bd3343b899f0fb11603bc33b3e3d8fb765a4f8185551962d93  manifest.json
+074a2409dbe1b328bada3da47d6215fa5258e3bd28eee923e5058b313d04d3a4  polyfill.js
+
+Signing/update identity
+-----------------------
+Not applicable: this is an unsigned file-based Orion extension ZIP, not an App Store/IPA or signed browser-store extension release.
+
+Status
+------
+NOT DONE pending the three live Orion/iOS checks and exact binary ZIP archival completion.
