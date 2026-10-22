@@ -1,0 +1,23 @@
+ChatGPT iOS 16 Orion Fix — STATIC / RELEASE AUDIT
+Version 1.0 | Build 4
+
+1. PASS - manifest.json parses as valid JSON.
+2. PASS - polyfill.js JavaScript syntax parses.
+3. PASS - diagnostic.js JavaScript syntax parses.
+4. PASS - settings-bridge.js JavaScript syntax parses.
+5. PASS - popup.js JavaScript syntax parses.
+6. PASS - Build 4 polyfill.js SHA-256 exactly matches Build 3 polyfill.js; compatibility logic preserved unchanged.
+7. PASS - Manifest version advanced from extension 1.0.2 to 1.0.3 for changed downloadable artifact.
+8. PASS - Persistent setting uses extension-owned storage.local and defaults OFF.
+9. PASS - Only added permission is storage; no tabs/history/cookies/network permissions added.
+10. PASS - Action popup is declared and popup.html/popup.js exist.
+11. PASS - MAIN-world compatibility/diagnostic script and isolated settings bridge are separated.
+12. PASS - Diagnostics OFF stops collection and removes on-page DIAG UI while compatibility polyfills remain active.
+13. PASS - Diagnostic privacy invariant preserved: no reading of ChatGPT message DOM, typed input, cookies, localStorage/sessionStorage contents, request bodies, or clipboard contents.
+14. PASS - No external network requests or remote code added by Build 4.
+15. PASS - Version + Build identifiers are consistent in release metadata and diagnostic UI.
+16. PASS - All manifest-referenced local files are present.
+
+Static totals: 16 PASS / 0 FAIL
+
+External capability check (not a runtime PASS): Orion's current WebExtension API coverage documentation reports iOS support for action popups and storage.local/storage.onChanged. Actual Orion 1.4.4 behavior on the user's iOS 16 device remains NOT TESTED until user verification.
