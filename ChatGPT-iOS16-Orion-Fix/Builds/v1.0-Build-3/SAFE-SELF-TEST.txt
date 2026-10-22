@@ -1,0 +1,36 @@
+ChatGPT iOS 16 URL.canParse Fix — Safe Self-Test
+Version 1.0 | Build 3
+
+PASS 1 - URL.canParse fallback installs when missing and accepts/rejects representative URLs.
+PASS 2 - Object.groupBy installs with non-enumerable/writable/configurable static-method descriptor.
+PASS 3 - Object.groupBy groups generic iterable input and supplies callback indexes correctly.
+PASS 4 - Object.groupBy safely groups the special "__proto__" property using a null-prototype result.
+PASS 5 - Object.groupBy supports Symbol property keys.
+PASS 6 - Map.groupBy installs with non-enumerable/writable/configurable static-method descriptor.
+PASS 7 - Map.groupBy preserves object-key identity.
+PASS 8 - Map.groupBy follows Map SameValueZero behavior for NaN grouping keys.
+PASS 9 - Object.groupBy and Map.groupBy reject non-callable callbacks with TypeError.
+PASS 10 - Existing/native URL.canParse, Object.groupBy, and Map.groupBy implementations are not overwritten.
+PASS 11 - Manifest JSON load/parse succeeds.
+PASS 12 - polyfill.js syntax check succeeds.
+PASS 13 - diagnostic.js syntax check succeeds.
+PASS 14 - Package contains all referenced content-script files.
+
+LIVE EVIDENCE FROM PREVIOUS BUILD:
+PASS - Build 2 diagnostic UI executed on the target device and produced a report supplied by the user.
+PASS - Build 2 target report identified Object.groupBy and Map.groupBy as the only missing features in its checked feature set.
+
+SKIPPED / NOT TESTED 1 - Actual Build 3 Orion/iOS 16 extension installation.
+Reason: the target iPhone/Orion runtime is not available in this build environment.
+
+SKIPPED / NOT TESTED 2 - Actual Build 3 ChatGPT sidebar functionality.
+Reason: requires the user's live ChatGPT page on the target iPhone.
+
+SKIPPED / NOT TESTED 3 - Actual Build 3 ChatGPT Send functionality.
+Reason: requires the user's live ChatGPT page on the target iPhone.
+
+SKIPPED / NOT TESTED 4 - Build 3 diagnostic Copy Report behavior in Orion/iOS.
+Reason: requires a real iOS user gesture/WebKit clipboard environment; Build 2 copy/report path did work well enough for the user to return its report, but Build 3 itself has not been run yet.
+
+Automated Build 3 totals: 14 PASS / 0 FAIL / 4 SKIPPED-NOT TESTED
+Status: NOT DONE pending live Build 3 Orion/iOS behavior and exact ZIP permanent archive completion.
