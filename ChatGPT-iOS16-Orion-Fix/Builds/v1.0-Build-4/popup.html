@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ChatGPT iOS 16 Fix</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 18px; min-width: 260px; line-height: 1.35; }
+    h1 { font-size: 18px; margin: 0 0 12px; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid rgba(127,127,127,.35); border-bottom: 1px solid rgba(127,127,127,.35); }
+    .label { font-size: 16px; font-weight: 600; }
+    .hint, #status { font-size: 13px; opacity: .8; margin-top: 10px; }
+    input[type="checkbox"] { width: 24px; height: 24px; }
+  </style>
+</head>
+<body>
+  <h1>ChatGPT iOS 16 Fix</h1>
+  <div class="row">
+    <label class="label" for="diagnostics">Diagnostics</label>
+    <input id="diagnostics" type="checkbox">
+  </div>
+  <div class="hint">OFF hides the DIAG bubble completely. Compatibility fixes stay enabled either way.</div>
+  <div id="status" role="status" aria-live="polite">Loading…</div>
+  <script src="popup.js"></script>
+</body>
+</html>
