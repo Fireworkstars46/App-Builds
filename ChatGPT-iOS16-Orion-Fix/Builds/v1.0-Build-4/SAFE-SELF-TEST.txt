@@ -1,0 +1,27 @@
+ChatGPT iOS 16 Orion Fix — SAFE SELF-TEST
+Version 1.0 | Build 4
+
+Automated isolated tests:
+1. PASS - URL.canParse valid/invalid/base behavior.
+2. PASS - Object.groupBy grouping and callback indexes.
+3. PASS - Object.groupBy handles __proto__ and Symbol keys safely.
+4. PASS - Map.groupBy preserves object key identity and NaN grouping.
+5. PASS - Existing native implementations are not overwritten.
+6. PASS - Diagnostics default OFF when no saved setting exists.
+7. PASS - Persisted Diagnostics ON is read and applied.
+8. PASS - Extension storage ON/OFF changes immediately synchronize to diagnostic state.
+9. PASS - In-panel Turn Diagnostics Off request writes OFF and disables immediately.
+10. PASS - Persistence uses write -> reload/read -> compare.
+11. PASS - Popup loads default OFF and reports OFF.
+12. PASS - Popup ON toggle writes the persistent setting and reports ON.
+13. PASS - Diagnostic UI mounts only when enabled and is removed when disabled.
+
+Totals: 13 PASS / 0 FAIL / 4 NOT TESTED
+
+NOT TESTED / requires the user's real device:
+- Orion iOS 16 file-based extension installation/update behavior.
+- Opening the extension action popup in Orion 1.4.4 on the iPhone 8 Plus.
+- Real on-device persistence/synchronization through Orion's implementation of storage.local.
+- ChatGPT sidebar/Send behavior with Build 4 on the live current ChatGPT site.
+
+Status: PENDING / NOT DONE until the real-device checks above are performed. No skipped item is counted as PASS.
