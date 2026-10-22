@@ -1,0 +1,7 @@
+Project: ChatGPT iOS 16 Orion Fix
+Version: 1.0
+Build: 4
+Extension version: 1.0.3
+Target: Orion on iOS 16 / iPhone 8 Plus use case
+Build reason: User-requested persistent Diagnostics ON/OFF control, default OFF, with no on-page diagnostic UI during normal use.
+Signing/update identity: Not applicable; this is a file-based WebExtension ZIP, not a signed native iOS application.
