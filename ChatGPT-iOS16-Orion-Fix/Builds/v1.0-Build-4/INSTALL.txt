@@ -1,0 +1,21 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 4
+
+Install:
+1. Disable older Builds 1-3 in Orion.
+2. Install the Build 4 ZIP as a file-based extension. Select the ZIP itself; do not extract it first.
+3. Leave Build 4 enabled.
+4. Reload chatgpt.com. Do not clear cookies/site data.
+
+Diagnostics setting:
+- Diagnostics default to OFF, so no DIAG bubble should cover the page.
+- Open this extension's popup from Orion's extension UI and toggle Diagnostics ON only when troubleshooting is needed.
+- Turning Diagnostics OFF hides/removes the DIAG bubble immediately while leaving all compatibility fixes active.
+- When Diagnostics is ON, the diagnostic panel also includes a Turn Diagnostics Off button.
+
+Compatibility fixes always active:
+- URL.canParse
+- Object.groupBy
+- Map.groupBy
+
+Privacy:
+Diagnostics never inspect message text, typed text, cookies, local/session storage contents, request bodies, or clipboard contents. The extension stores only its own boolean diagnosticsEnabled preference in extension-owned storage.
