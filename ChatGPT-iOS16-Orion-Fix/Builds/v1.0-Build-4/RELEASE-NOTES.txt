@@ -1,0 +1,12 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 4
+
+Change requested:
+- Add a setting to enable/disable diagnostics so the DIAG UI does not block ChatGPT during normal use.
+
+Changes:
+- Diagnostics now default OFF.
+- Added persistent Diagnostics ON/OFF setting in the extension action popup.
+- OFF removes the DIAG bubble/panel completely while preserving all compatibility polyfills.
+- Added Turn Diagnostics Off inside the diagnostic panel.
+- Setting changes propagate immediately to open matching pages through extension-owned storage and the settings bridge.
+- Preserved Build 3 compatibility fixes unchanged: URL.canParse, Object.groupBy, Map.groupBy.
