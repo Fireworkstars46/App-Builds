@@ -1,0 +1,9 @@
+ChatGPT iOS 16 URL.canParse Fix
+Version 1.0 | Build 3
+Permanent archive status: INCOMPLETE
+
+Text source, manifest, documentation, audits, self-test evidence, and checksum metadata are archived/being archived to Fireworkstars46/App-Builds under:
+ChatGPT-iOS16-Orion-Fix/Builds/v1.0-Build-3/
+
+The exact binary ZIP cannot be uploaded through the currently available GitHub connector because it supports UTF-8 content writes but not arbitrary binary release-asset upload.
+Do not treat the archive as complete until the exact ZIP bytes are stored and verified in the permanent GitHub archive.
