@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT iOS 16 URL.canParse Fix",
+  "version": "1.0.2",
+  "description": "Adds iOS 16 compatibility fallbacks for URL.canParse, Object.groupBy, and Map.groupBy, plus a privacy-limited diagnostic panel for ChatGPT/OpenAI pages.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://auth.openai.com/*",
+        "https://auth0.openai.com/*",
+        "https://setup.auth.openai.com/*",
+        "https://frontend-apps-multi-region.workos.com/*",
+        "https://forwarder.workos.com/*"
+      ],
+      "js": [
+        "polyfill.js",
+        "diagnostic.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ]
+}
