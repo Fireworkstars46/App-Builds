@@ -1,0 +1,184 @@
+(() => {
+  "use strict";
+
+  // Build 18: Safari/iOS 16 module compatibility bridge.
+  // The current ChatGPT bundle contains RegExp `v` literals that Safari 16 cannot parse.
+  // Intercept the deferred inline module bootstrap, transform only affected same-origin
+  // /cdn/assets/*.js modules, map them to Blob URLs, then replay the bootstrap.
+
+  if (location.origin !== "https://chatgpt.com") return;
+
+  const STATUS_KEY = "__chatgptIOS16ModuleCompatStatus";
+  const HELPER_KEY = "__chatgptIOS16RegExpV";
+  const MAX_ASSETS = 64;
+  const MAX_ASSET_BYTES = 4 * 1024 * 1024;
+  const FETCH_TIMEOUT_MS = 8000;
+  const COMPAT_ATTR = "data-chatgpt-ios16-module-compat";
+  let capturedEntry = null;
+  let observer = null;
+  let started = false;
+
+  const status = {
+    build: 18,
+    active: true,
+    regexpVNative: supportsVFlag(),
+    importMapSupported: supportsImportMaps(),
+    intercepted: false,
+    replayed: false,
+    modulePreloads: 0,
+    scannedAssets: 0,
+    transformedAssets: 0,
+    transformedRegexLiterals: 0,
+    failedAssets: 0,
+    skippedLargeAssets: 0,
+    fallbackReason: "",
+    transformedFiles: []
+  };
+
+  try {
+    Object.defineProperty(window, STATUS_KEY, {
+      configurable: true,
+      value: status
+    });
+  } catch (_) {
+    window[STATUS_KEY] = status;
+  }
+
+  if (status.regexpVNative) {
+    status.active = false;
+    status.fallbackReason = "native-regexp-v-supported";
+    return;
+  }
+
+  function supportsVFlag() {
+    try {
+      new RegExp("", "v");
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function supportsImportMaps() {
+    try {
+      return typeof HTMLScriptElement !== "undefined" &&
+        typeof HTMLScriptElement.supports === "function" &&
+        HTMLScriptElement.supports("importmap") === true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function regexpVCompat(pattern, flags) {
+    const rawFlags = String(flags || "");
+    let nextFlags = rawFlags.replace(/v/g, "");
+    if (nextFlags.indexOf("u") === -1) nextFlags += "u";
+    try {
+      return new RegExp(pattern, nextFlags);
+    } catch (_) {
+      // Last-resort parser compatibility: preserve flags that Safari 16 understands
+      // and return a non-matching expression rather than aborting the entire module graph.
+      // This path is only used for v-only set syntax that cannot be represented by u mode.
+      const safeFlags = nextFlags.replace(/[^dgimsuy]/g, "");
+      return new RegExp("(?!)", safeFlags);
+    }
+  }
+
+  if (typeof window[HELPER_KEY] !== "function") {
+    try {
+      Object.defineProperty(window, HELPER_KEY, {
+        configurable: true,
+        writable: true,
+        value: regexpVCompat
+      });
+    } catch (_) {
+      window[HELPER_KEY] = regexpVCompat;
+    }
+  }
+
+  function isIdentifierStart(ch) {
+    return /[A-Za-z_$]/.test(ch || "");
+  }
+
+  function isIdentifierPart(ch) {
+    return /[A-Za-z0-9_$]/.test(ch || "");
+  }
+
+  function isDigit(ch) {
+    return /[0-9]/.test(ch || "");
+  }
+
+  function regexAllowedAfterToken(token) {
+    if (!token) return true;
+    if (token.type === "punct") {
+      return /^(?:\(|\[|\{|,|;|:|=|!|\?|\+|-|\*|%|&|\||\^|~|<|>|=>)$/.test(token.value);
+    }
+    if (token.type === "keyword") {
+      return /^(?:return|throw|case|delete|void|typeof|instanceof|in|of|yield|await|else|do|new)$/.test(token.value);
+    }
+    return false;
+  }
+
+  function readQuoted(source, start, quote) {
+    let i = start + 1;
+    while (i < source.length) {
+      const ch = source[i++];
+      if (ch === "\\") {
+        i += 1;
+        continue;
+      }
+      if (ch === quote) return i;
+    }
+    return source.length;
+  }
+
+  function readTemplate(source, start) {
+    let i = start + 1;
+    while (i < source.length) {
+      const ch = source[i++];
+      if (ch === "\\") {
+        i += 1;
+        continue;
+      }
+      if (ch === "`") return i;
+      // We intentionally treat ${...} as opaque here. Regex literals inside template
+      // expressions are uncommon in the affected startup chunks; leaving them untouched
+      // is safer than corrupting template text.
+    }
+    return source.length;
+  }
+
+  function readNumber(source, start) {
+    let i = start;
+    while (i < source.length && /[0-9A-Fa-f_xXoObBeE.+-]/.test(source[i])) i += 1;
+    return i;
+  }
+
+  function parseRegexLiteral(source, start) {
+    let i = start + 1;
+    let inClass = false;
+    while (i < source.length) {
+      const ch = source[i++];
+      if (ch === "\\") {
+        i += 1;
+        continue;
+      }
+      if (ch === "[") {
+        inClass = true;
+        continue;
+      }
+      if (ch === "]") {
+        inClass = false;
+        continue;
+      }
+      if (ch === "/" && !inClass) {
+        const bodyEnd = i - 1;
+        let flagEnd = i;
+        while (flagEnd < source.length && /[A-Za-z]/.test(source[flagEnd])) flagEnd += 1;
+        return {
+          end: flagEnd,
+          body: source.slice(start + 1, bodyEnd),
+          flags: source.slice(i, flagEnd)
+        };
+      }
+      if (ch === "\n" ||
