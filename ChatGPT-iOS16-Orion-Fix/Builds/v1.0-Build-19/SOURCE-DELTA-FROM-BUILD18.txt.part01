@@ -1,0 +1,160 @@
+--- Build18/manifest.json
++++ Build19/manifest.json
+@@ -1,10 +1,11 @@
+ {
+   "manifest_version": 3,
+   "name": "ChatGPT iOS 16 URL.canParse Fix",
+-  "version": "1.0.17",
+-  "description": "Adds targeted iOS 16 compatibility shims for ChatGPT plus a Build 18 module bridge that rewrites RegExp v literals in affected public ChatGPT modules before Safari 16 parses them. Optional diagnostics default OFF.",
++  "version": "1.0.18",
++  "description": "Adds targeted iOS 16 compatibility shims plus a Build 19 CSP-compatible module bridge for ChatGPT. Removes the ChatGPT main-document CSP header with a narrow declarative rule, immediately installs a replacement script policy, then replays transformed RegExp-v modules. Optional diagnostics default OFF.",
+   "permissions": [
+-    "storage"
++    "storage",
++    "declarativeNetRequestWithHostAccess"
+   ],
+   "action": {
+     "default_title": "ChatGPT iOS 16 Fix",
+@@ -55,5 +56,17 @@
+       ],
+       "run_at": "document_start"
+     }
+-  ]
++  ],
++  "host_permissions": [
++    "https://chatgpt.com/*"
++  ],
++  "declarative_net_request": {
++    "rule_resources": [
++      {
++        "id": "chatgpt-csp-bridge",
++        "enabled": true,
++        "path": "rules.json"
++      }
++    ]
++  }
+ }
+--- Build18/rules.json
++++ Build19/rules.json
+@@ -0,0 +1,25 @@
++[
++  {
++    "id": 1,
++    "priority": 1,
++    "action": {
++      "type": "modifyHeaders",
++      "responseHeaders": [
++        {
++          "header": "Content-Security-Policy",
++          "operation": "remove"
++        },
++        {
++          "header": "Content-Security-Policy-Report-Only",
++          "operation": "remove"
++        }
++      ]
++    },
++    "condition": {
++      "urlFilter": "|https://chatgpt.com/",
++      "resourceTypes": [
++        "main_frame"
++      ]
++    }
++  }
++]
+--- Build18/module-compat.js
++++ Build19/module-compat.js
+@@ -1,7 +1,7 @@
+ (() => {
+   "use strict";
+ 
+-  // Build 18: Safari/iOS 16 module compatibility bridge.
++  // Build 19: Safari/iOS 16 CSP-compatible module compatibility bridge.
+   // The current ChatGPT bundle contains RegExp `v` literals that Safari 16 cannot parse.
+   // Intercept the deferred inline module bootstrap, transform only affected same-origin
+   // /cdn/assets/*.js modules, map them to Blob URLs, then replay the bootstrap.
+@@ -14,15 +14,20 @@
+   const MAX_ASSET_BYTES = 4 * 1024 * 1024;
+   const FETCH_TIMEOUT_MS = 8000;
+   const COMPAT_ATTR = "data-chatgpt-ios16-module-compat";
++  const CSP_ATTR = "data-chatgpt-ios16-csp-bridge";
++  const REPLACEMENT_CSP = "default-src 'self' https: data: blob:; script-src 'self' blob: 'unsafe-inline' 'wasm-unsafe-eval'; object-src 'none'; base-uri 'self'; connect-src 'self' https: wss:; img-src 'self' https: data: blob:; style-src 'self' https: 'unsafe-inline'; font-src 'self' https: data:; frame-src https:; worker-src 'self' blob:";
+   let capturedEntry = null;
+   let observer = null;
++  let cspObserver = null;
+   let started = false;
+ 
+   const status = {
+-    build: 18,
++    build: 19,
+     active: true,
+     regexpVNative: supportsVFlag(),
+     importMapSupported: supportsImportMaps(),
++    cspHeaderRuleExpected: true,
++    replacementCspInstalled: false,
+     intercepted: false,
+     replayed: false,
+     modulePreloads: 0,
+@@ -44,6 +49,40 @@
+     window[STATUS_KEY] = status;
+   }
+ 
++  function ensureReplacementCsp() {
++    try {
++      if (document.querySelector && document.querySelector("meta[" + CSP_ATTR + "='1']")) {
++        status.replacementCspInstalled = true;
++        return true;
++      }
++      const head = document.head;
++      if (!head || typeof document.createElement !== "function") return false;
++      const meta = document.createElement("meta");
++      meta.setAttribute("http-equiv", "Content-Security-Policy");
++      meta.setAttribute("content", REPLACEMENT_CSP);
++      meta.setAttribute(CSP_ATTR, "1");
++      head.insertBefore(meta, head.firstChild || null);
++      status.replacementCspInstalled = true;
++      return true;
++    } catch (_) {
++      return false;
++    }
++  }
++
++  function startCspObserver() {
++    if (ensureReplacementCsp()) return;
++    if (typeof MutationObserver !== "function") return;
++    cspObserver = new MutationObserver(() => {
++      if (!ensureReplacementCsp()) return;
++      try { cspObserver.disconnect(); } catch (_) {}
++      cspObserver = null;
++    });
++    try { cspObserver.observe(document, { childList: true, subtree: true }); }
++    catch (_) { cspObserver = null; }
++  }
++
++  startCspObserver();
++
+   if (status.regexpVNative) {
+     status.active = false;
+     status.fallbackReason = "native-regexp-v-supported";
+@@ -394,6 +433,7 @@
+       return;
+     }
+     observer = new MutationObserver((records) => {
++      ensureReplacementCsp();
+       for (const record of records) {
+         if (!record || !record.addedNodes) continue;
+         for (const node of record.addedNodes) inspectAddedNode(node);
+@@ -465,6 +505,7 @@
+ 
+   async function runBootstrap() {
+     if (started) return;
++    ensureReplacementCsp();
+     started = true;
+     if (observer) {
+       try { observer.disconnect(); } catch (_) {}
+@@ -499,10 +540,10 @@
+     try {
+       Object.defineProperty(window, "__chatgptIOS16ModuleCompatTestHooks", {
+         configurable: true,
+-        value: { transformRegExpVLiterals, rewriteModuleSpecifiers, regexpVCompat }
++        value: { transformRegExpVLiterals, rewriteModuleSpecifiers
