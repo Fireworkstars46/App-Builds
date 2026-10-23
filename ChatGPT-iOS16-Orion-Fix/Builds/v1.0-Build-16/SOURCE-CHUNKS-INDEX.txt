@@ -1,0 +1,17 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 16
+GitHub reconstruction index
+
+Build 16 exact changed/reconstruction sources are stored in numbered UTF-8 chunks because of connector text-size limits.
+Concatenate each file's parts in numeric order with NO separators, then verify the whole-file SHA-256 below.
+
+polyfill.js  SHA256=690e6d2e5bfb8d39320d1385b95ee54c493b2babd4d4c74a923ed69de2b40dfe  parts=2
+  polyfill.js.part01  SHA256=29ea821757391d444c12b4cd4b2b4d06c0912ec126a64e73b23cfd5dd2c75e6f  chars=5800
+  polyfill.js.part02  SHA256=12314836b107745bfe57791159328b9becd965a684f8b55aeaae1f71b45531f2  chars=5226
+
+SOURCE-DELTA-FROM-BUILD15.txt  SHA256=6e261e1bccb57f13bfe62ba73f44f63feb4c733a63f77fe4b2b51bcefe56ae03  parts=6
+  SOURCE-DELTA-FROM-BUILD15.txt.part01  SHA256=8bf9bf390d417867cb0abea91eac8fd89be191f16c66d49138305aded3855701  chars=5800
+  SOURCE-DELTA-FROM-BUILD15.txt.part02  SHA256=f1225bece7e0f74dc357acffe72cbc2b2f085816fb058aa8e983c7e6c078e8fb  chars=5800
+  SOURCE-DELTA-FROM-BUILD15.txt.part03  SHA256=36dc3dce8a426a62af29d952c3be3b273cf4a4b83e3161f151d599bfa714b9dd  chars=5800
+  SOURCE-DELTA-FROM-BUILD15.txt.part04  SHA256=f1410ac5c3bf51a58790601746bc792029de0616032a8837c77cd9e0d428eb7a  chars=5800
+  SOURCE-DELTA-FROM-BUILD15.txt.part05  SHA256=c84df4443159b26c3033a41a10e660e31ded6c8f53907d0d2d011ba23ae03a00  chars=5800
+  SOURCE-DELTA-FROM-BUILD15.txt.part06  SHA256=f342dc53a615b33eac56dd53890a3ade428bbd7379440732c09036b0d4fc038b  chars=1811
