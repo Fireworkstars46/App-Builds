@@ -1,0 +1,16 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 6
+
+Reason for Build 6:
+- Real-device feedback showed Build 5 diagnostics made the iPhone 8 Plus/iOS 16 page severely laggy/freezing, preventing report retrieval.
+- Build 6 is a corrective diagnostic redesign, not a speculative compatibility-polyfill change.
+
+Static audit: 25 PASS / 0 FAIL.
+Safe Self-Test: 12 PASS / 0 FAIL / 4 SKIPPED-NOT TESTED.
+Compatibility polyfill preserved byte-for-byte from Build 5: YES.
+Diagnostics default OFF: YES.
+Continuous DOM/resource/performance observers: REMOVED.
+On-page diagnostic UI: REMOVED.
+Saved popup-retrievable report: ADDED.
+
+Status: PENDING / NOT DONE until real Orion+iOS16 testing confirms the lightweight diagnostic does not reproduce the Build 5 lag and a report can be retrieved.
