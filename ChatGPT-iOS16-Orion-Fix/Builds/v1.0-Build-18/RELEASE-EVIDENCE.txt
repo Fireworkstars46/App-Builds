@@ -1,0 +1,13 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 18
+
+Release evidence generated locally before packaging:
+- Latest MASTER_RULES.md re-read before the build.
+- Build 17 ZIP used as the exact baseline.
+- Build 17 real-device log confirmed React still did not hydrate and the remaining missing-source references had narrowed to two.
+- Build 18 targets the parser-level RegExp-v path without adding a fake Navigation API.
+- No new extension permissions were added; storage remains the only permission.
+- Module bridge is same-origin/public-assets only and omits credentials on its compatibility fetches.
+- Diagnostics remain optional and default OFF.
+- Safe Self-Test and static audit results are recorded in their release files after final test.
+
+Status: PENDING / NOT DONE pending real-device Build 18 test.
