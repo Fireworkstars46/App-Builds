@@ -1,0 +1,100 @@
+ts.length) lines.push("  - none");
+          else hits.forEach((item) => {
+            const assets = Array.isArray(item.assets) ? item.assets : [];
+            lines.push("  - " + item.feature + " | confidence=" + (item.confidence || "heuristic") + " | asset hits=" + (item.assetHits || 0) + (assets.length ? " | " + assets.join(", ") : ""));
+          });
+          const noHits = Array.isArray(scan.noHits) ? scan.noHits : [];
+          lines.push("- APIs with no source-token hit: " + noHits.length);
+          if (!noHits.length) lines.push("  - none");
+          else noHits.forEach((name) => lines.push("  - " + name));
+        }
+
+        lines.push("");
+        lines.push("Asset API context classifier:");
+        const classifier = scan && scan.contextClassifier ? scan.contextClassifier : null;
+        if (!classifier) {
+          lines.push("- pending/not received yet");
+        } else {
+          lines.push("- note: " + (classifier.note || "none"));
+          const results = Array.isArray(classifier.results) ? classifier.results : [];
+          lines.push("- classified hit APIs: " + results.length);
+          function assetNames(list) {
+            return Array.isArray(list) && list.length ? list.join(", ") : "none";
+          }
+          results.forEach((item) => {
+            const direct = Array.isArray(item.directAssets) ? item.directAssets : [];
+            const guards = Array.isArray(item.guardAssets) ? item.guardAssets : [];
+            const optional = Array.isArray(item.optionalAssets) ? item.optionalAssets : [];
+            const fallback = Array.isArray(item.fallbackAssets) ? item.fallbackAssets : [];
+            const definitions = Array.isArray(item.definitionAssets) ? item.definitionAssets : [];
+            const rvCtor = Array.isArray(item.regexpVConstructorAssets) ? item.regexpVConstructorAssets : [];
+            const rvLiteral = Array.isArray(item.regexpVLiteralCandidateAssets) ? item.regexpVLiteralCandidateAssets : [];
+            const unclassified = Array.isArray(item.unclassifiedAssets) ? item.unclassifiedAssets : [];
+            lines.push("  - " + item.feature + " | confidence=" + (item.confidence || "heuristic") + " | token assets=" + (item.tokenAssets || 0));
+            lines.push("    direct-use assets=" + direct.length + " | " + assetNames(direct));
+            lines.push("    guard assets=" + guards.length + " | " + assetNames(guards));
+            lines.push("    optional-access assets=" + optional.length + " | " + assetNames(optional));
+            lines.push("    fallback-style assets=" + fallback.length + " | " + assetNames(fallback));
+            lines.push("    definition/polyfill assets=" + definitions.length + " | " + assetNames(definitions));
+            if (item.feature === "RegExp v flag") {
+              lines.push("    RegExp constructor-v assets=" + rvCtor.length + " | " + assetNames(rvCtor));
+              lines.push("    RegExp literal-v candidate assets=" + rvLiteral.length + " | " + assetNames(rvLiteral));
+            }
+            lines.push("    unclassified-token assets=" + unclassified.length + " | " + assetNames(unclassified));
+          });
+        }
+
+        const errs = Array.isArray(s.errors) ? s.errors : [];
+        lines.push("");
+        lines.push("Page-world errors/rejections (" + errs.length + "):");
+        if (!errs.length) lines.push("- None captured");
+        else errs.forEach((item) => lines.push("- " + item.time + " [" + item.kind + "] " + item.message + (item.source ? " | " + item.source : "")));
+      }
+
+      lines.push("");
+      lines.push("Privacy: no message text, typed text, cookies, local/session storage contents, request bodies, clipboard contents, placeholders, labels, or page text are collected.");
+      lines.push("Performance: no MutationObserver, PerformanceObserver, DOM polling, click tracking, or on-page diagnostic UI is used; resource timing is read once at the 8-second snapshot. Build 15 then scans and classifies the already-loaded same-origin public /cdn/assets/*.js files one at a time with short yields.");
+      return lines.join("\n");
+    }
+
+    function persist() {
+      storageSet({
+        [REPORT_KEY]: {
+          version: VERSION,
+          build: BUILD,
+          updated: new Date().toISOString(),
+          report: buildReport()
+        }
+      });
+    }
+
+    function onMainReport(event) {
+      let data = null;
+      try { data = JSON.parse(event && typeof event.detail === "string" ? event.detail : ""); } catch (_) {}
+      if (!data || data.build !== BUILD) return;
+      if (data.kind === "started") {
+        const buffered = data.payload && Number.isFinite(Number(data.payload.earlyBufferedErrorCount)) ? Number(data.payload.earlyBufferedErrorCount) : 0;
+        const featureCount = data.payload && Number.isFinite(Number(data.payload.earlyFeatureCount)) ? Number(data.payload.earlyFeatureCount) : 0;
+        addEvent("page-probe", "page-world probe started; early buffered errors=" + buffered + "; early feature probes=" + featureCount);
+      } else if (data.kind === "snapshot" && data.payload) {
+        state.snapshot = data.payload;
+        state.completed = true;
+        addEvent("snapshot", "8-second page-world snapshot saved; public asset scan started");
+        persist();
+      } else if (data.kind === "asset-scan" && data.payload) {
+        state.assetScan = data.payload;
+        const matched = Array.isArray(data.payload.hits) ? data.payload.hits.length : 0;
+        addEvent("asset-scan", "public JS asset scan/classifier saved; matched APIs=" + matched + "; scanned assets=" + (data.payload.fetchedAssets || 0));
+        persist();
+      }
+    }
+
+    document.addEventListener(REPORT_EVENT, onMainReport);
+    persist();
+
+    function resolveMainProbe(enabled) {
+      try { if (document.documentElement) document.documentElement.setAttribute(ENABLE_ATTR, enabled ? "1" : "0"); } catch (_) {}
+      try { document.dispatchEvent(new Event(RESOLVE_EVENT)); } catch (_) {}
+    }
+
+    resolveMa
