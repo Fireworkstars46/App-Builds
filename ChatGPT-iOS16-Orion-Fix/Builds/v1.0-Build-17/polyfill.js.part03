@@ -1,0 +1,115 @@
+orce === "boolean"
+        ? force
+        : !currentlyOpen;
+      if (openPopovers) {
+        if (shouldOpen) openPopovers.add(this);
+        else openPopovers.delete(this);
+      }
+      return shouldOpen;
+    });
+  }
+  // Build 17: second evidence-selected compatibility layer.
+  // Build 16 left four source-token matches on the real device. Navigation API
+  // was guarded/fallback-style, and RegExp-v literal syntax cannot be safely
+  // polyfilled at runtime. These two missing APIs are safe to emulate.
+
+  function hex2(code) {
+    return "\\x" + code.toString(16).padStart(2, "0");
+  }
+
+  function hex4(code) {
+    return "\\u" + code.toString(16).padStart(4, "0");
+  }
+
+  if (typeof RegExp !== "undefined" && typeof RegExp.escape !== "function") {
+    Object.defineProperty(RegExp, "escape", {
+      configurable: true,
+      writable: true,
+      value(string) {
+        if (typeof string !== "string") {
+          throw new TypeError("RegExp.escape requires a string");
+        }
+        let out = "";
+        for (let i = 0; i < string.length; i += 1) {
+          const code = string.charCodeAt(i);
+          const ch = string.charAt(i);
+
+          // Leading ASCII alphanumeric must not merge with a preceding escape.
+          if (i === 0 && ((code >= 0x30 && code <= 0x39) || (code >= 0x41 && code <= 0x5a) || (code >= 0x61 && code <= 0x7a))) {
+            out += hex2(code);
+            continue;
+          }
+
+          // RegExp syntax and slash delimiter are safe with a backslash escape.
+          if ("^$\\.*+?()[]{}|/".indexOf(ch) !== -1) {
+            out += "\\" + ch;
+            continue;
+          }
+
+          // Other ASCII punctuators are escaped with hex because backslash forms
+          // are not valid in every regexp grammar position.
+          if (",-=<>#&!%:;@~'`\"".indexOf(ch) !== -1) {
+            out += hex2(code);
+            continue;
+          }
+
+          switch (code) {
+            case 0x0c: out += "\\f"; continue;
+            case 0x0a: out += "\\n"; continue;
+            case 0x0d: out += "\\r"; continue;
+            case 0x09: out += "\\t"; continue;
+            case 0x0b: out += "\\v"; continue;
+            case 0x20: out += "\\x20"; continue;
+          }
+
+          // Escape lone surrogates and non-ASCII whitespace/line terminators.
+          const isHigh = code >= 0xd800 && code <= 0xdbff;
+          const isLow = code >= 0xdc00 && code <= 0xdfff;
+          if (isHigh) {
+            const next = i + 1 < string.length ? string.charCodeAt(i + 1) : -1;
+            if (next >= 0xdc00 && next <= 0xdfff) {
+              out += ch + string.charAt(i + 1);
+              i += 1;
+            } else {
+              out += hex4(code);
+            }
+            continue;
+          }
+          if (isLow) { out += hex4(code); continue; }
+
+          if (/\s/u.test(ch) && code > 0x7f) {
+            out += hex4(code);
+            continue;
+          }
+
+          out += ch;
+        }
+        return out;
+      }
+    });
+  }
+
+  if (typeof Document !== "undefined" && Document.prototype &&
+      typeof Document.prototype.startViewTransition !== "function") {
+    defineMethod(Document.prototype, "startViewTransition", function startViewTransition(callbackOrOptions) {
+      let update = null;
+      if (typeof callbackOrOptions === "function") {
+        update = callbackOrOptions;
+      } else if (callbackOrOptions && typeof callbackOrOptions === "object" &&
+                 typeof callbackOrOptions.update === "function") {
+        update = callbackOrOptions.update;
+      }
+
+      const updateCallbackDone = Promise.resolve().then(() => update ? update() : undefined);
+      const ready = updateCallbackDone.then(() => undefined);
+      const finished = updateCallbackDone.then(() => undefined);
+      return {
+        updateCallbackDone,
+        ready,
+        finished,
+        skipTransition() { return undefined; }
+      };
+    });
+  }
+
+})();
