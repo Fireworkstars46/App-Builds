@@ -1,0 +1,7 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 10
+Manifest extension version: 1.0.9
+
+Purpose: preserve the existing iOS 16 compatibility shims and add a diagnostic-only, pre-bootstrap browser feature matrix to investigate ChatGPT silently failing to hydrate on Orion/iOS 16.6.
+
+Release status: PENDING / NOT DONE until real-device testing.
