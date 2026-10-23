@@ -1,0 +1,9 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 17
+
+Changes from Build 16:
+- Preserves Build 16's evidence-selected fixes: URL.canParse, Object.groupBy, Map.groupBy, Set.union/intersection, ArrayBuffer.transfer, Uint8Array Base64 helpers, and Popover method fallbacks.
+- Adds RegExp.escape using spec-oriented escaping rules for leading alphanumerics, regexp syntax, punctuators, whitespace, and lone surrogates.
+- Adds a no-animation document.startViewTransition fallback that still runs the update callback and exposes updateCallbackDone, ready, finished, and skipTransition().
+- Does not spoof or fake the Navigation API.
+- Does not attempt unsafe runtime rewriting of RegExp-v literal syntax.
+- Optional lightweight diagnostics remain default OFF.
