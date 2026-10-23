@@ -1,0 +1,111 @@
+ack: [], definition: [],
+      regexpVConstructor: ["new\\s+RegExp\\([^\\n]{0,260},\\s*[\"']v[\"']\\s*\\)"],
+      regexpVLiteral: ["/(?:\\\\.|[^/\\n]){1,260}/[dgimsuy]*v[dgimsuvy]*"]
+    },
+    "RegExp.escape": {
+      direct: ["RegExp\\.escape\\s*\\("],
+      guard: ["typeof\\s+RegExp\\.escape", "[\"']escape[\"']\\s+in\\s+RegExp", "RegExp\\.escape\\s*[!=]==?\\s*(?:undefined|null)"],
+      optional: ["RegExp\\.escape\\?\\.\\s*\\(", "RegExp\\?\\.escape"],
+      fallback: ["RegExp\\.escape\\s*(?:\\|\\||\\?\\?)"],
+      definition: ["RegExp\\.escape\\s*=", "Object\\.defineProperty\\(RegExp[^)]{0,180}escape"]
+    },
+    "Set.prototype.intersection": {
+      direct: ["\\.intersection\\s*\\("],
+      guard: ["typeof\\s+[^;,]{0,120}\\.intersection", "[\"']intersection[\"']\\s+in\\s+[^,;)]{1,120}"],
+      optional: ["\\.intersection\\?\\.\\s*\\("],
+      fallback: ["intersection[^;]{0,100}(?:\\|\\||\\?\\?)"],
+      definition: ["Set\\.prototype\\.intersection\\s*=", "Object\\.defineProperty\\(Set\\.prototype[^)]{0,180}intersection"]
+    },
+    "Set.prototype.union": {
+      direct: ["\\.union\\s*\\("],
+      guard: ["typeof\\s+[^;,]{0,120}\\.union", "[\"']union[\"']\\s+in\\s+[^,;)]{1,120}"],
+      optional: ["\\.union\\?\\.\\s*\\("],
+      fallback: ["union[^;]{0,100}(?:\\|\\||\\?\\?)"],
+      definition: ["Set\\.prototype\\.union\\s*=", "Object\\.defineProperty\\(Set\\.prototype[^)]{0,180}union"]
+    },
+    "Uint8Array.fromBase64": {
+      direct: ["Uint8Array\\.fromBase64\\s*\\("],
+      guard: ["typeof\\s+Uint8Array\\.fromBase64", "[\"']fromBase64[\"']\\s+in\\s+Uint8Array"],
+      optional: ["Uint8Array\\.fromBase64\\?\\.\\s*\\(", "Uint8Array\\?\\.fromBase64"],
+      fallback: ["Uint8Array\\.fromBase64\\s*(?:\\|\\||\\?\\?)"],
+      definition: ["Uint8Array\\.fromBase64\\s*=", "Object\\.defineProperty\\(Uint8Array[^)]{0,180}fromBase64"]
+    },
+    "Uint8Array.prototype.toBase64": {
+      direct: ["\\.toBase64\\s*\\("],
+      guard: ["typeof\\s+[^;,]{0,120}\\.toBase64", "[\"']toBase64[\"']\\s+in\\s+[^,;)]{1,120}"],
+      optional: ["\\.toBase64\\?\\.\\s*\\("],
+      fallback: ["toBase64[^;]{0,100}(?:\\|\\||\\?\\?)"],
+      definition: ["Uint8Array\\.prototype\\.toBase64\\s*=", "Object\\.defineProperty\\(Uint8Array\\.prototype[^)]{0,180}toBase64"]
+    },
+    "document.startViewTransition": {
+      direct: ["document\\.startViewTransition\\s*\\(", "\\.startViewTransition\\s*\\("],
+      guard: ["typeof\\s+document\\.startViewTransition", "[\"']startViewTransition[\"']\\s+in\\s+document"],
+      optional: ["document\\.startViewTransition\\?\\.\\s*\\(", "document\\?\\.startViewTransition"],
+      fallback: ["startViewTransition[^;]{0,100}(?:\\|\\||\\?\\?)"],
+      definition: ["document\\.startViewTransition\\s*="]
+    }
+  };
+
+
+  let started = false;
+  let settingResolved = false;
+  let diagnosticsEnabled = false;
+  const errors = [];
+  let earlyFeatureMatrix = null;
+
+  function hasFunction(value) {
+    return typeof value === "function";
+  }
+
+  function regexpFlagSupported(flag) {
+    try {
+      new RegExp("", flag);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function normalizeFeatureMap(rawFeatures) {
+    const normalized = {};
+    for (const name of Object.keys(rawFeatures || {})) {
+      normalized[name] = rawFeatures[name] === true;
+    }
+    return normalized;
+  }
+
+  function buildFeatureMatrix(phase) {
+    const setProto = typeof Set !== "undefined" ? Set.prototype : null;
+    const arrayBufferProto = typeof ArrayBuffer !== "undefined" ? ArrayBuffer.prototype : null;
+    const uint8Proto = typeof Uint8Array !== "undefined" ? Uint8Array.prototype : null;
+    const iteratorProto = typeof Iterator !== "undefined" && Iterator && Iterator.prototype ? Iterator.prototype : null;
+    const intl = typeof Intl !== "undefined" ? Intl : null;
+    const readableStreamCtor = typeof ReadableStream !== "undefined" ? ReadableStream : null;
+    const abortSignalCtor = typeof AbortSignal !== "undefined" ? AbortSignal : null;
+    const cryptoObj = typeof crypto !== "undefined" ? crypto : null;
+
+    const rawFeatures = {
+        "Array.fromAsync": hasFunction(Array.fromAsync),
+        "Promise.withResolvers": hasFunction(Promise.withResolvers),
+        "Promise.try": hasFunction(Promise.try),
+        "Object.groupBy": hasFunction(Object.groupBy),
+        "Map.groupBy": hasFunction(Map.groupBy),
+        "RegExp.escape": typeof RegExp !== "undefined" && hasFunction(RegExp.escape),
+        "RegExp v flag": regexpFlagSupported("v"),
+        "Set.prototype.union": Boolean(setProto && hasFunction(setProto.union)),
+        "Set.prototype.intersection": Boolean(setProto && hasFunction(setProto.intersection)),
+        "Set.prototype.difference": Boolean(setProto && hasFunction(setProto.difference)),
+        "Set.prototype.symmetricDifference": Boolean(setProto && hasFunction(setProto.symmetricDifference)),
+        "Set.prototype.isSubsetOf": Boolean(setProto && hasFunction(setProto.isSubsetOf)),
+        "Set.prototype.isSupersetOf": Boolean(setProto && hasFunction(setProto.isSupersetOf)),
+        "Set.prototype.isDisjointFrom": Boolean(setProto && hasFunction(setProto.isDisjointFrom)),
+        "Iterator global": typeof Iterator !== "undefined",
+        "Iterator.prototype.map": Boolean(iteratorProto && hasFunction(iteratorProto.map)),
+        "Iterator.prototype.filter": Boolean(iteratorProto && hasFunction(iteratorProto.filter)),
+        "Iterator.prototype.take": Boolean(iteratorProto && hasFunction(iteratorProto.take)),
+        "Iterator.prototype.drop": Boolean(iteratorProto && hasFunction(iteratorProto.drop)),
+        "Iterator.prototype.flatMap": Boolean(iteratorProto && hasFunction(iteratorProto.flatMap)),
+        "Iterator.prototype.reduce": Boolean(iteratorProto && hasFunction(iteratorProto.reduce)),
+        "Iterator.prototype.toArray": Boolean(iteratorProto && hasFunction(iteratorProto.toArray)),
+        "URLPattern": typeof URLPattern === "function",
+        "Intl.DurationFormat":
