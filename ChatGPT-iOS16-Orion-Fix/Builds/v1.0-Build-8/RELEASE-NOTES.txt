@@ -1,0 +1,11 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 8
+
+Changes from Build 7:
+- Keeps URL.canParse, Object.groupBy, and Map.groupBy compatibility fixes unchanged.
+- Keeps the lightweight one-shot startup diagnostic architecture and popup report retrieval.
+- Fixes a diagnostic blind spot where an inline SCRIPT/MODULE error with no src URL could be ignored.
+- Adds lightweight CSP violation capture without collecting blocked script content or CSP samples.
+- Adds React container/listeners/handles/listening marker checks in addition to fiber/props/events markers.
+- Adds inline-module vs external-module script counts.
+- Still uses no MutationObserver, PerformanceObserver, DOM polling, click tracking, or on-page diagnostic UI.
