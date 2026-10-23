@@ -1,0 +1,9 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 11
+
+Changes from Build 10:
+- Added a popup button: Copy Missing Features Only.
+- The new action extracts the Early browser feature matrix summary and missing/unsupported feature list only.
+- It stops before the large full feature results section, making the result practical to copy on the iPhone 8 Plus.
+- Added an older-clipboard fallback that selects/copies only that compact subsection.
+- Build 10 feature probes, startup timing, hydration/resource snapshot, privacy limits, and compatibility polyfills are otherwise preserved.
+- Diagnostics remain default OFF.
