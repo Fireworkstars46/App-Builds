@@ -1,0 +1,12 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 19
+
+Corrective change from Build 18:
+- Build 18 still showed no React hydration and no Send button.
+- Build 19 addresses the likely CSP conflict that prevented the transformed module bridge from running.
+- Adds one static declarativeNetRequest rule for chatgpt.com main-frame responses only.
+- Removes the server CSP headers only for that main document, then installs a replacement CSP at document_start.
+- Replacement script policy allows only same-origin scripts, Blob modules, and inline compatibility bootstrap/import-map execution; object-src remains none and base-uri remains self.
+- Keeps all prior compatibility polyfills and RegExp-v module transformation.
+- Does not fake Navigation API.
+
+Status: PENDING / NOT DONE pending real-device hydration test.
