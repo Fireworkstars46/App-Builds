@@ -1,0 +1,13 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 15
+
+Release evidence generated locally before packaging:
+- Manifest MV3 and Version/Build identity checked.
+- Compatibility polyfill preserved byte-for-byte from Build 14.
+- Context classifier uses the same one-at-a-time public-asset fetch path as Build 14; no second asset-download pass.
+- Asset fetch remains same-origin /cdn/assets/*.js only, credentials omitted, bounded count/size/timeout, short yields.
+- No source snippets or source text are persisted into the report/storage.
+- Safe Self-Test: 37 PASS / 0 FAIL.
+- Static audit: 45 PASS / 0 FAIL.
+- Fresh-extracted package checksums and JavaScript syntax checks passed.
+
+Status: PENDING / NOT DONE pending real-device classifier log.
