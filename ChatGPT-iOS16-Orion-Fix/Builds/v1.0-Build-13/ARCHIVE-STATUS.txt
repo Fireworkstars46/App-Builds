@@ -1,0 +1,7 @@
+ChatGPT iOS 16 Orion Fix — Archive Status
+Version 1.0 | Build 13
+
+Source/text/audit artifacts are intended for the permanent GitHub project archive and are retrieval-verified where possible.
+The downloadable ZIP is verified locally by SHA-256 and fresh extraction.
+Exact binary ZIP permanent GitHub archival: INCOMPLETE unless separately byte-verified.
+Release status: PENDING / NOT DONE until real-device Build 13 testing.
