@@ -1,0 +1,173 @@
+(() => {
+  "use strict";
+
+  function defineMethod(target, name, value) {
+    if (!target || typeof target[name] === "function") return;
+    Object.defineProperty(target, name, {
+      configurable: true,
+      writable: true,
+      value
+    });
+  }
+
+  // Existing authentication/main-site compatibility shims.
+  if (typeof URL !== "undefined" && typeof URL.canParse !== "function") {
+    Object.defineProperty(URL, "canParse", {
+      configurable: true,
+      writable: true,
+      value(url, base) {
+        try {
+          if (arguments.length >= 2) {
+            new URL(url, base);
+          } else {
+            new URL(url);
+          }
+          return true;
+        } catch (_) {
+          return false;
+        }
+      }
+    });
+  }
+
+  if (typeof Object.groupBy !== "function") {
+    Object.defineProperty(Object, "groupBy", {
+      configurable: true,
+      writable: true,
+      value(items, callbackFn) {
+        if (items == null) {
+          throw new TypeError("Object.groupBy requires an iterable");
+        }
+        if (typeof callbackFn !== "function") {
+          throw new TypeError("Object.groupBy callback must be a function");
+        }
+
+        const groups = Object.create(null);
+        let index = 0;
+        for (const item of items) {
+          if (index >= Number.MAX_SAFE_INTEGER) {
+            throw new TypeError("Object.groupBy exceeded the maximum safe index");
+          }
+          const key = callbackFn(item, index);
+          if (Object.prototype.hasOwnProperty.call(groups, key)) {
+            groups[key].push(item);
+          } else {
+            groups[key] = [item];
+          }
+          index += 1;
+        }
+        return groups;
+      }
+    });
+  }
+
+  if (typeof Map.groupBy !== "function") {
+    Object.defineProperty(Map, "groupBy", {
+      configurable: true,
+      writable: true,
+      value(items, callbackFn) {
+        if (items == null) {
+          throw new TypeError("Map.groupBy requires an iterable");
+        }
+        if (typeof callbackFn !== "function") {
+          throw new TypeError("Map.groupBy callback must be a function");
+        }
+
+        const groups = new Map();
+        let index = 0;
+        for (const item of items) {
+          if (index >= Number.MAX_SAFE_INTEGER) {
+            throw new TypeError("Map.groupBy exceeded the maximum safe index");
+          }
+          const key = callbackFn(item, index);
+          const existing = groups.get(key);
+          if (existing) {
+            existing.push(item);
+          } else {
+            groups.set(key, [item]);
+          }
+          index += 1;
+        }
+        return groups;
+      }
+    });
+  }
+
+  // Build 16: targeted shims selected from the real-device Build 15 classifier.
+  // Guarded/fallback APIs are intentionally not patched here.
+
+  function requireSet(value) {
+    try {
+      Set.prototype.has.call(value, __setBrandSentinel);
+    } catch (_) {
+      throw new TypeError("Set method called on incompatible receiver");
+    }
+  }
+
+  const __setBrandSentinel = {};
+
+  function getSetRecord(other) {
+    if (other == null) throw new TypeError("Set-like value is required");
+    const obj = Object(other);
+    const size = Number(obj.size);
+    if (Number.isNaN(size)) throw new TypeError("Set-like size must be numeric");
+    const has = obj.has;
+    const keys = obj.keys;
+    if (typeof has !== "function" || typeof keys !== "function") {
+      throw new TypeError("Set-like value must provide has() and keys()");
+    }
+    return { obj, size, has, keys };
+  }
+
+  if (typeof Set !== "undefined") {
+    defineMethod(Set.prototype, "union", function union(other) {
+      requireSet(this);
+      const record = getSetRecord(other);
+      const result = new Set(this);
+      const iterator = record.keys.call(record.obj);
+      for (const value of iterator) result.add(value);
+      return result;
+    });
+
+    defineMethod(Set.prototype, "intersection", function intersection(other) {
+      requireSet(this);
+      const record = getSetRecord(other);
+      const result = new Set();
+      if (this.size <= record.size) {
+        for (const value of this) {
+          if (record.has.call(record.obj, value)) result.add(value);
+        }
+      } else {
+        const iterator = record.keys.call(record.obj);
+        for (const value of iterator) {
+          if (Set.prototype.has.call(this, value)) result.add(value);
+        }
+      }
+      return result;
+    });
+  }
+
+  function toIndex(value, fallback) {
+    if (value === undefined) return fallback;
+    let number = Number(value);
+    if (Number.isNaN(number) || number === 0) return 0;
+    if (!Number.isFinite(number)) throw new RangeError("Invalid ArrayBuffer length");
+    number = number < 0 ? Math.ceil(number) : Math.floor(number);
+    if (number < 0 || number > Number.MAX_SAFE_INTEGER) {
+      throw new RangeError("Invalid ArrayBuffer length");
+    }
+    return number;
+  }
+
+  function transferArrayBuffer(buffer, newByteLength) {
+    const oldLength = buffer.byteLength;
+    const targetLength = toIndex(newByteLength, oldLength);
+
+    if (typeof structuredClone === "function") {
+      try {
+        const moved = structuredClone(buffer, { transfer: [buffer] });
+        if (targetLength === oldLength) return moved;
+        const resized = new ArrayBuffer(targetLength);
+        new Uint8Array(resized).set(
+          new Uint8Array(moved, 0, Math.min(oldLength, targetLength))
+      
