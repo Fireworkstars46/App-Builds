@@ -1,0 +1,28 @@
+nosticsEnabled) {
+      start();
+    } else {
+      detachEarlyCapture();
+      errors.splice(0, errors.length);
+      earlyFeatureMatrix = null;
+      try { if (document.documentElement) document.documentElement.removeAttribute(ENABLE_ATTR); } catch (_) {}
+    }
+  }
+
+  // Attach immediately at document_start, before the isolated-world storage lookup can finish.
+  // If diagnostics are OFF, the isolated-world script resolves the setting to OFF,
+  // these listeners are removed, and the small in-memory buffer is cleared without persistence.
+  attachEarlyCapture();
+  document.addEventListener(RESOLVE_EVENT, resolveSetting, { once: true });
+
+  function checkResolvedAttribute() {
+    try {
+      if (!document.documentElement) return;
+      const value = document.documentElement.getAttribute(ENABLE_ATTR);
+      if (value === "1" || value === "0") resolveSetting();
+    } catch (_) {}
+  }
+
+  checkResolvedAttribute();
+  if (!document.documentElement) document.addEventListener("DOMContentLoaded", checkResolvedAttribute, { once: true });
+
+})();
