@@ -1,0 +1,75 @@
+PASS - Manifest V3
+PASS - Manifest version 1.0.18
+PASS - Manifest description identifies Build 19
+PASS - Permissions exactly storage + declarativeNetRequestWithHostAccess
+PASS - Host permission exactly chatgpt.com only
+PASS - No all_urls permission
+PASS - No tabs permission
+PASS - No cookies permission
+PASS - No history permission
+PASS - No clipboard permission
+PASS - No webRequest permission
+PASS - No background worker added
+PASS - DNR static ruleset configured
+PASS - Rules file has exactly one rule
+PASS - Rule action is modifyHeaders
+PASS - Rule URL anchored to chatgpt.com
+PASS - Rule resource type exactly main_frame
+PASS - Rule removes Content-Security-Policy
+PASS - Rule removes Content-Security-Policy-Report-Only
+PASS - Rule modifies no request headers
+PASS - Rule redirects nowhere
+PASS - Only two response header operations
+PASS - Polyfill remains first MAIN document_start script
+PASS - Module bridge MAIN document_start on chatgpt only
+PASS - Main probe MAIN document_start on chatgpt only
+PASS - Isolated diagnostic document_start on chatgpt only
+PASS - Module bridge status identifies Build 19
+PASS - Main probe identifies Build 19
+PASS - Isolated reporter identifies Build 19
+PASS - Popup identifies Build 19
+PASS - Diagnostics default OFF
+PASS - Replacement CSP helper exists
+PASS - Replacement CSP installs meta CSP
+PASS - Replacement CSP script-src same-origin
+PASS - Replacement CSP allows Blob modules
+PASS - Replacement CSP allows required inline bootstrap
+PASS - Replacement CSP keeps object-src none
+PASS - Replacement CSP keeps base-uri self
+PASS - Replacement CSP does not allow general unsafe-eval
+PASS - Replacement CSP allows only wasm eval token
+PASS - Replacement CSP installs before native-v early return
+PASS - CSP observer disconnects after install
+PASS - Module bridge still bounds assets to 64
+PASS - Module bridge still bounds asset bytes to 4 MiB
+PASS - Module bridge still has 8-second fetch timeout
+PASS - Module bridge fetches with credentials omitted
+PASS - Module bridge fetches same-origin /cdn/assets JS only
+PASS - Module bridge retains RegExp-v transformer
+PASS - Module bridge retains import.meta.url preservation
+PASS - Module bridge retains relative import rewriting
+PASS - Module bridge retains import map replay
+PASS - Module bridge never fakes Navigation API
+PASS - Existing URL.canParse shim preserved
+PASS - Existing Object.groupBy shim preserved
+PASS - Existing Map.groupBy shim preserved
+PASS - Evidence-selected Set shims preserved
+PASS - Evidence-selected ArrayBuffer.transfer shim preserved
+PASS - Evidence-selected Uint8Array Base64 shims preserved
+PASS - RegExp.escape shim preserved
+PASS - ViewTransition fallback preserved
+PASS - Diagnostic reports CSP rule expectation
+PASS - Diagnostic reports replacement CSP install state
+PASS - Diagnostic report stores no module source snippets
+PASS - Asset scanner still never persists source text
+PASS - No MutationObserver in ordinary diagnostics main probe
+PASS - No PerformanceObserver in diagnostics
+PASS - No click tracking in diagnostics
+PASS - No page textContent collection in diagnostic probe
+PASS - No input value collection in diagnostic probe
+PASS - No cookie access
+PASS - No localStorage/sessionStorage access
+PASS - No external runtime library URLs
+PASS - Self-test includes DNR scope test
+PASS - Self-test includes production replacement CSP helper test
+TOTAL: 74 PASS / 0 FAIL
