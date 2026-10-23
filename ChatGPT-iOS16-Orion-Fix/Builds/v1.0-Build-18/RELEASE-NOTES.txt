@@ -1,0 +1,17 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 18
+
+Changes from Build 17:
+- Preserves every Build 17 compatibility shim and existing optional diagnostics.
+- Adds a targeted Safari/iOS 16 module bridge for the remaining RegExp-v parser incompatibility.
+- Intercepts the single deferred module bootstrap before it executes.
+- Scans same-origin public ChatGPT /cdn/assets/*.js modulepreload files one at a time with credentials omitted.
+- Transforms only actual RegExp literals carrying the v flag into calls to a compatibility helper.
+- Keeps ordinary division, strings, comments, and non-v regex literals unchanged in Safe Self-Test coverage.
+- Rewrites relative static/export/dynamic module specifiers in transformed Blob modules to their original absolute ChatGPT URLs.
+- Preserves import.meta.url as the original asset URL inside transformed modules.
+- Uses a native import map to redirect only transformed original asset URLs to in-memory Blob copies.
+- Does not spoof the Navigation API, URLPattern, scheduler.postTask, or unrelated browser APIs.
+- Does not save transformed source, source snippets, chat text, typed text, cookies, storage contents, request bodies, or clipboard contents.
+
+Compatibility limitation:
+- If a v-only Unicode-set expression cannot be represented by Safari 16's u-mode RegExp engine, the fallback produces a non-matching RegExp so module startup can continue. Real-device testing determines whether ChatGPT's startup path depends on such semantics.
