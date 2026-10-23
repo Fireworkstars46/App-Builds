@@ -1,0 +1,60 @@
+PASS - Manifest MV3
+PASS - Manifest version 1.0.17
+PASS - Only storage permission
+PASS - No webRequest/declarativeNetRequest permissions
+PASS - Polyfill MAIN document_start
+PASS - Module bridge MAIN document_start
+PASS - Module bridge chatgpt.com only
+PASS - Main probe MAIN document_start
+PASS - Build 18 identity main probe
+PASS - Build 18 identity isolated reporter
+PASS - Popup label Build 18
+PASS - Diagnostics default OFF
+PASS - Original URL.canParse shim preserved
+PASS - Original Object.groupBy shim preserved
+PASS - Original Map.groupBy shim preserved
+PASS - Preserved compatibility shim Set.prototype, "union"
+PASS - Preserved compatibility shim Set.prototype, "intersection"
+PASS - Preserved compatibility shim ArrayBuffer.prototype, "transfer"
+PASS - Preserved compatibility shim Uint8Array, "fromBase64"
+PASS - Preserved compatibility shim Uint8Array.prototype, "toBase64"
+PASS - Preserved compatibility shim HTMLElement.prototype, "showPopover"
+PASS - Preserved compatibility shim RegExp.escape
+PASS - Preserved compatibility shim startViewTransition
+PASS - Module bridge RegExp-v transformer present
+PASS - Module bridge does not globally replace RegExp
+PASS - Navigation API not faked
+PASS - URLPattern not polyfilled
+PASS - Module bridge uses short-lived MutationObserver
+PASS - No long-lived interval/polling in module bridge
+PASS - Module bridge same-origin /cdn/assets scope
+PASS - Module compatibility fetch omits credentials
+PASS - Module compatibility fetch force-cache
+PASS - Module compatibility fetch bounded count
+PASS - Module compatibility fetch bounded size
+PASS - Module compatibility fetch bounded timeout
+PASS - Transforms only v-flag regex literals
+PASS - Uses import map only for transformed assets
+PASS - Preserves import.meta.url original URL
+PASS - Rewrites relative module specifiers for Blob modules
+PASS - No transformed source persisted in diagnostics
+PASS - No cookie reads
+PASS - No localStorage reads
+PASS - No sessionStorage reads
+PASS - No clipboard reads
+PASS - No typed input value reads in diagnostics
+PASS - Module bridge only reads script source text
+PASS - CSP sample not collected
+PASS - No external runtime library added
+PASS - Self-test 60 PASS / 0 FAIL
+PASS - Syntax polyfill.js
+PASS - Syntax module-compat.js
+PASS - Syntax main-probe.js
+PASS - Syntax light-diagnostic.js
+PASS - Syntax popup.js
+PASS - Syntax selftest.js
+PASS - BUILD-INFO.txt Version/Build identity
+PASS - INSTALL.txt Version/Build identity
+PASS - RELEASE-NOTES.txt Version/Build identity
+PASS - RELEASE-EVIDENCE.txt Version/Build identity
+TOTAL: 59 PASS / 0 FAIL
