@@ -1,0 +1,7 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 13
+Manifest version: 1.0.12
+
+Purpose: corrective diagnostic build after Build 12 exposed a strict-boolean mismatch in feature results. Build 13 normalizes every feature probe to true/false, adds a canonical missing-at-8-seconds list, and makes the compact copy button return only that focused result plus startup changes.
+
+Compatibility polyfill behavior is unchanged from Build 12.
