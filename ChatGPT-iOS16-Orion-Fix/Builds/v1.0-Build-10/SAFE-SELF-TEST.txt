@@ -1,0 +1,25 @@
+ChatGPT iOS 16 Orion Fix — Safe Self-Test
+Version 1.0 | Build 10
+
+Automated Safe Self-Test result: 21 PASS / 0 FAIL
+
+Covered production-path behaviors include:
+- URL.canParse compatibility behavior.
+- Object.groupBy and Map.groupBy compatibility behavior.
+- Diagnostic lightweight/no-observer/no-polling architecture.
+- Privacy guards against page text/input/cookie/storage/clipboard/request capture.
+- Immediate early error capture before the settings lookup.
+- Diagnostics OFF clears buffered errors and the early feature matrix and saves no report.
+- Diagnostics ON produces the one-time page snapshot and early feature matrix.
+- Resource URL query/token redaction.
+- Popup Build 10 identity and default-OFF setting.
+- Version/build consistency.
+- Existing compatibility shim behavior remains intact.
+
+SKIPPED / NOT TESTED here (requires the user's real device/live site):
+1. Orion 1.4.4 extension install on iPhone 8 Plus / iOS 16.6.
+2. Live ChatGPT Build 10 feature-matrix values.
+3. Whether the matrix identifies the specific ChatGPT silent hydration dependency.
+4. Real-device responsiveness/performance while diagnostics are enabled.
+
+Status: PENDING / NOT DONE until the skipped real-device checks are performed.
