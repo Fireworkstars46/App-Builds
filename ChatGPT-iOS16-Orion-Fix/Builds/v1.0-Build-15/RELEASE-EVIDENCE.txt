@@ -6,8 +6,6 @@ Release evidence generated locally before packaging:
 - Context classifier uses the same one-at-a-time public-asset fetch path as Build 14; no second asset-download pass.
 - Asset fetch remains same-origin /cdn/assets/*.js only, credentials omitted, bounded count/size/timeout, short yields.
 - No source snippets or source text are persisted into the report/storage.
-- Safe Self-Test: 37 PASS / 0 FAIL.
-- Static audit: 45 PASS / 0 FAIL.
-- Fresh-extracted package checksums and JavaScript syntax checks passed.
+- Safe Self-Test and static audit results are recorded in their release files after final test.
 
 Status: PENDING / NOT DONE pending real-device classifier log.
