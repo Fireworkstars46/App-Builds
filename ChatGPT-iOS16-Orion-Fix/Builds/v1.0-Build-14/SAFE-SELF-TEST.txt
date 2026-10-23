@@ -1,0 +1,34 @@
+SAFE SELF-TEST — ChatGPT iOS 16 Orion Fix Version 1.0 Build 14
+
+PASS - manifest identifies Version 1.0 Build 14 manifest 1.0.13
+PASS - URL.canParse compatibility behavior preserved
+PASS - Object.groupBy compatibility behavior preserved
+PASS - Map.groupBy compatibility behavior preserved
+PASS - diagnostic has no heavy observer/polling/click architecture
+PASS - diagnostic creates no on-page UI
+PASS - page-world probe does not read page text or input values
+PASS - CSP-invalid new Function syntax probes removed
+PASS - API feature matrix still includes targeted modern capabilities
+PASS - feature matrix remains diagnostic-only and defines no missing APIs
+PASS - early matrix captured before setting resolution
+PASS - 8-second matrix and early-vs-late comparison are produced
+PASS - all feature values are normalized to strict booleans
+PASS - comparison exposes canonical missing-at-8-seconds list
+PASS - OFF resolution removes listeners and clears early matrix/error buffer
+PASS - resource timing remains one-time API read
+PASS - early-vs-late comparison detects capability becoming supported during startup
+PASS - diagnostics OFF saves no report
+PASS - resource URL secrets and long IDs are redacted
+PASS - popup identifies Build 14 and default remains OFF
+PASS - Copy Missing Features Only copies compact 8-second result through production popup handler
+PASS - Copy Missing Features Only fallback selects compact result on older clipboard path
+PASS - version/build strings consistent across release docs
+PASS - polyfill contains only three targeted compatibility shims
+PASS - Build 14 scanner is limited to same-origin public /cdn/assets JS and credentials omitted
+PASS - Build 14 scanner has bounded asset count/size/timeout and sequential yield
+PASS - Build 14 scanner never persists static asset source text
+PASS - Build 14 scans only APIs still missing at 8 seconds
+PASS - Build 14 asset scan reports only filenames/hit metadata
+PASS - Build 14 popup adds Copy Asset Scan Only
+PASS - Copy Asset Scan Only copies only the production asset-scan section
+TOTAL: 31 PASS / 0 FAIL
