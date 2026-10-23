@@ -1,0 +1,10 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 17
+
+GitHub archive status:
+- Exact changed compatibility source polyfill.js is archived as numbered UTF-8 chunks with reconstruction SHA-256.
+- Manifest and popup UI are archived directly.
+- Build 16 runtime source is already archived in the previous build; Build 17 source hashes and release evidence record the remaining version/reporting changes.
+- Safe Self-Test output, static audit, source hashes, and verified ZIP hash are archived.
+- Exact binary ZIP is NOT archived by this connector; ZIP-SHA256.txt records the verified local ZIP hash.
+
+Status: PENDING / NOT DONE until real-device runtime test.
