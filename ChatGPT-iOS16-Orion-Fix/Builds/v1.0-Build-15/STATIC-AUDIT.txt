@@ -1,0 +1,50 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 15
+STATIC AUDIT
+
+PASS - Manifest is MV3
+PASS - Manifest version is 1.0.14
+PASS - Only storage permission requested
+PASS - Polyfill MAIN document_start
+PASS - Main probe MAIN document_start
+PASS - Isolated diagnostic document_start
+PASS - Build 15 main probe identity
+PASS - Build 15 isolated diagnostic identity
+PASS - Popup Build 15 label
+PASS - Diagnostics default OFF
+PASS - No MutationObserver construction
+PASS - No PerformanceObserver construction
+PASS - No setInterval polling
+PASS - No page click tracking
+PASS - No on-page UI creation
+PASS - No page textContent/innerText reads
+PASS - No input value reads
+PASS - No placeholder reads
+PASS - No CSP event.sample access
+PASS - No new Function syntax probing
+PASS - Feature values normalized booleans
+PASS - Canonical missing-at-late comparison present
+PASS - Early error capture remains immediate
+PASS - OFF path removes capture
+PASS - OFF path clears errors
+PASS - OFF path clears early feature matrix
+PASS - Asset scanner only same-origin /cdn/assets JS
+PASS - Asset fetch omits credentials
+PASS - Asset fetch removes referrer
+PASS - Asset scanner bounded count
+PASS - Asset scanner bounded size
+PASS - Asset scanner bounded timeout
+PASS - Asset scanner sequential yields
+PASS - Context classifier integrated in same scan pass
+PASS - Classifier covers Build 14 ten hit APIs
+PASS - Classifier has direct/guard/optional/fallback/definition categories
+PASS - Classifier has RegExp-v constructor/literal categories
+PASS - No source snippets stored in isolated reporter
+PASS - No raw source field emitted
+PASS - Context report stores filenames/counts only
+PASS - Popup has context-only copy
+PASS - Popup retains asset-only copy
+PASS - Popup retains missing-features copy
+PASS - Compatibility polyfill still three shims
+PASS - Polyfill byte-identical to Build 14
+
+TOTAL: 45 PASS / 0 FAIL
