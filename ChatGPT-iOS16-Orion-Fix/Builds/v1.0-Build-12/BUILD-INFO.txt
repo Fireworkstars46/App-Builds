@@ -1,0 +1,6 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 12
+Manifest version: 1.0.11
+
+Purpose: correct the Build 10/11 syntax-probe defect caused by ChatGPT CSP blocking eval/new Function, while preserving all compatibility fixes and lightweight diagnostics. Build 12 compares the same API feature matrix at document_start and again at the 8-second stuck-page snapshot so we can see which APIs ChatGPT itself polyfills and which remain absent.
+Release status: PENDING / NOT DONE until real-device Orion/iOS 16 testing confirms the corrected comparison report.
