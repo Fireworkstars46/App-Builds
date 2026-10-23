@@ -1,0 +1,13 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 8
+
+1. Disable older Builds 1-7.
+2. Install the Build 8 ZIP itself in Orion; do not extract it.
+3. Enable only Build 8.
+4. Open the extension popup and turn Light Diagnostics (Build 8) ON.
+5. Reload chatgpt.com once.
+6. Try the sidebar and Send.
+7. After about 10 seconds, open the extension popup, Refresh Report, then Copy Report.
+8. If ChatGPT freezes, close the ChatGPT tab first, open a blank tab, then retrieve the saved report from the extension popup.
+
+Diagnostics default OFF. Compatibility fixes remain active even when diagnostics are OFF.
