@@ -1,0 +1,13 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 10
+
+1. Disable Builds 1 through 9 in Orion.
+2. Install the Build 10 ZIP itself; do not extract it first.
+3. Enable only Build 10.
+4. Open the extension popup and turn Light Diagnostics (Build 10) ON.
+5. Reload https://chatgpt.com once. Do not clear cookies or cache.
+6. Try the sidebar and sending a harmless test message.
+7. Wait about 10 seconds.
+8. Open the extension popup, tap Refresh Report, then Copy Report.
+9. Paste the saved report into ChatGPT from another working device if needed.
+
+Diagnostics default OFF. When OFF, the early error listeners are detached, the transient early error/feature buffers are cleared, and no diagnostic report is saved.
