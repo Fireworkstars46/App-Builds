@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ChatGPT iOS 16 Fix</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 16px; min-width: 280px; line-height: 1.35; }
+    h1 { font-size: 18px; margin: 0 0 10px; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid rgba(127,127,127,.35); border-bottom: 1px solid rgba(127,127,127,.35); }
+    .label { font-size: 16px; font-weight: 600; }
+    .hint, #status, #reportStatus { font-size: 12px; opacity: .8; margin-top: 8px; }
+    input[type="checkbox"] { width: 24px; height: 24px; }
+    textarea { width: 100%; min-height: 180px; margin-top: 10px; font: 11px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; box-sizing: border-box; }
+    .buttons { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    button { font-size: 13px; padding: 8px 10px; }
+  </style>
+</head>
+<body>
+  <h1>ChatGPT iOS 16 Fix</h1>
+  <div class="row">
+    <label class="label" for="diagnostics">Light Diagnostics (Build 8)</label>
+    <input id="diagnostics" type="checkbox">
+  </div>
+  <div class="hint">Default OFF. When ON, reload ChatGPT once. Build 8 takes one page-world hydration/resource snapshot after 8 seconds. No diagnostic bubble is added to the page. If ChatGPT freezes, close that tab, open a blank tab, then open this popup to retrieve the saved report.</div>
+  <div id="status" role="status" aria-live="polite">Loading…</div>
+  <textarea id="report" readonly spellcheck="false" aria-label="Saved diagnostic report"></textarea>
+  <div class="buttons">
+    <button id="refresh" type="button">Refresh Report</button>
+    <button id="copy" type="button">Copy Report</button>
+    <button id="clear" type="button">Clear Report</button>
+  </div>
+  <div id="reportStatus" role="status" aria-live="polite"></div>
+  <script src="popup.js"></script>
+</body>
+</html>
