@@ -1,0 +1,5 @@
+ChatGPT iOS 16 Orion Fix — Archive Status
+Version 1.0 | Build 8
+
+Source/text/audit artifacts are archived to GitHub. Exact release ZIP permanent binary archive remains INCOMPLETE because the available GitHub binary path cannot be independently retrieved/verified as the exact local ZIP bytes.
+Release status remains PENDING / NOT DONE until real-device testing confirms Build 8 returns a usable report and does not regress performance.
