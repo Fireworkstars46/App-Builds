@@ -1,0 +1,8 @@
+Project: ChatGPT iOS 16 Orion Fix
+Version: 1.0
+Build: 6
+Manifest version: 1.0.5
+Target: Orion on iOS 16 / iPhone 8 Plus
+Compatibility polyfills: URL.canParse, Object.groupBy, Map.groupBy
+Diagnostics: lightweight, default OFF, no on-page UI
+Release status: PENDING / NOT DONE until real Orion+iOS16 validation
