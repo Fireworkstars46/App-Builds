@@ -1,0 +1,41 @@
+ChatGPT iOS 16 Orion Fix — Static Audit
+Version 1.0 | Build 13
+
+1. PASS - Manifest JSON parses
+2. PASS - Manifest version is 1.0.12
+3. PASS - MAIN-world polyfill remains document_start
+4. PASS - MAIN-world diagnostic probe remains document_start
+5. PASS - Only storage permission requested
+6. PASS - Compatibility polyfill has URL.canParse
+7. PASS - Compatibility polyfill has Object.groupBy
+8. PASS - Compatibility polyfill has Map.groupBy
+9. PASS - Compatibility polyfill unchanged from Build 12
+10. PASS - Build 13 normalizes every raw feature result
+11. PASS - Feature matrix stores normalized map only
+12. PASS - Canonical missing-at-8-seconds list exists
+13. PASS - Compact report uses missingAtLate
+14. PASS - Compact report includes became-supported startup changes
+15. PASS - Compact report includes became-missing startup changes
+16. PASS - Detailed report still contains early matrix
+17. PASS - Detailed report still contains 8-second matrix
+18. PASS - CSP-invalid new Function probes remain removed
+19. PASS - No MutationObserver construction
+20. PASS - No PerformanceObserver construction
+21. PASS - No interval polling
+22. PASS - No click tracking listener
+23. PASS - No on-page diagnostic UI creation
+24. PASS - No page text reads
+25. PASS - No input value reads
+26. PASS - No placeholder reads
+27. PASS - CSP sample content is not read
+28. PASS - Diagnostics OFF path clears early errors
+29. PASS - Diagnostics OFF path clears early matrix
+30. PASS - Popup identifies Build 13
+31. PASS - Popup keeps Copy Missing Features Only
+32. PASS - Popup extracts only Compact feature result
+33. PASS - Popup default setting remains OFF
+34. PASS - Release docs identify Build 13
+35. PASS - Privacy statement remains present
+36. PASS - Performance statement remains present
+
+TOTAL: 36 PASS / 0 FAIL
