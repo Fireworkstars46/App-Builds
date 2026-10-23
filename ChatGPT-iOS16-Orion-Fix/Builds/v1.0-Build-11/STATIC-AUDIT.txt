@@ -1,0 +1,36 @@
+ChatGPT iOS 16 Orion Fix — STATIC AUDIT
+Version 1.0 | Build 11
+
+1. PASS - Manifest JSON parses
+2. PASS - Manifest identifies version 1.0.10
+3. PASS - Only storage permission requested
+4. PASS - MAIN polyfill script remains document_start
+5. PASS - MAIN diagnostic probe remains document_start
+6. PASS - polyfill.js syntax
+7. PASS - main-probe.js syntax
+8. PASS - light-diagnostic.js syntax
+9. PASS - popup.js syntax
+10. PASS - selftest.js syntax
+11. PASS - polyfill.js byte-for-byte unchanged from Build 10
+12. PASS - main-probe diagnostic logic unchanged from Build 10 except Build number
+13. PASS - light-diagnostic logic unchanged from Build 10 except Build number
+14. PASS - Popup identifies Build 11
+15. PASS - Copy Missing Features Only button exists
+16. PASS - Copy action starts at feature matrix heading
+17. PASS - Copy action stops before full feature results
+18. PASS - Older clipboard fallback selects exact subsection
+19. PASS - Diagnostics remain default OFF
+20. PASS - Feature matrix retained
+21. PASS - Feature matrix remains diagnostic-only
+22. PASS - No MutationObserver use
+23. PASS - No PerformanceObserver use
+24. PASS - No DOM polling interval
+25. PASS - No click tracking
+26. PASS - No on-page diagnostic UI creation
+27. PASS - No page text/input value collection in MAIN probe
+28. PASS - No CSP sample/code content collection
+29. PASS - No external network fetch/XHR added
+30. PASS - Persistent report key preserved
+31. PASS - Release docs identify Build 11
+
+TOTAL: 31 PASS / 0 FAIL
