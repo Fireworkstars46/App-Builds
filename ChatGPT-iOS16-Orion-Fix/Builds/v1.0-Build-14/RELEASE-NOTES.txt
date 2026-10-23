@@ -1,0 +1,13 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 14
+
+Changes from Build 13:
+- Adds one-time source-token scanning of same-origin public ChatGPT /cdn/assets/*.js files already loaded by the page.
+- Scans only APIs still missing at the 8-second feature snapshot.
+- Fetches static assets with credentials omitted.
+- Processes assets one at a time with short yields and discards source immediately after scanning.
+- Saves only API hit counts, conservative confidence labels, and sanitized static asset filenames.
+- Adds Copy Asset Scan Only in the popup.
+- Preserves Build 13 strict-boolean feature comparison and existing compatibility polyfills unchanged.
+
+A source-token hit is evidence of a bundle reference, not proof that the code path executed. A no-hit can miss minified/indirect access.
+Status: PENDING / NOT DONE until real-device test.
