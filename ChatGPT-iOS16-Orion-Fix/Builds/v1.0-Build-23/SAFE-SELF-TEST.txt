@@ -1,0 +1,64 @@
+PASS - manifest identifies Version 1.0 Build 23 manifest 1.0.22
+PASS - Build 23 UA override is ChatGPT-origin scoped and changes only userAgent/appVersion identity
+PASS - Build 23 UA override records original/effective identity and defers HTTP status to background
+PASS - Build 23 UA override does nothing outside chatgpt.com
+PASS - Build 23 UA override has no network, DOM, storage, cookie, clipboard, or timer behavior
+PASS - Build 23 removes unsupported Orion iOS DNR and uses scoped webRequest background transport
+PASS - Build 23 webRequest background installs both UA rewrite and exact asset redirect listeners
+PASS - Build 23 main probe and report expose UA plus RegExp-v learner/redirect status without source text
+PASS - URL.canParse compatibility behavior preserved
+PASS - Object.groupBy compatibility behavior preserved
+PASS - Map.groupBy compatibility behavior preserved
+PASS - diagnostic has no heavy observer/polling/click architecture
+PASS - diagnostic creates no on-page UI
+PASS - page-world probe does not read page text or input values
+PASS - CSP-invalid new Function syntax probes removed
+PASS - API feature matrix still includes targeted modern capabilities
+PASS - feature matrix remains diagnostic-only and defines no missing APIs
+PASS - early matrix captured before setting resolution
+PASS - 8-second matrix and early-vs-late comparison are produced
+PASS - all feature values are normalized to strict booleans
+PASS - comparison exposes canonical missing-at-8-seconds list
+PASS - OFF resolution removes listeners and clears early matrix/error buffer
+PASS - resource timing remains one-time API read
+PASS - early-vs-late comparison detects capability becoming supported during startup
+PASS - diagnostics OFF saves no report
+PASS - resource URL secrets and long IDs are redacted
+PASS - popup identifies Build 23 and default remains OFF
+PASS - Copy Missing Features Only copies compact 8-second result through production popup handler
+PASS - Copy Missing Features Only fallback selects compact result on older clipboard path
+PASS - version/build strings consistent across release docs
+PASS - Build 23 polyfill contains evidence-selected compatibility shims
+PASS - Build 23 scanner is limited to same-origin public /cdn/assets JS and credentials omitted
+PASS - Build 23 scanner has bounded asset count/size/timeout and sequential yield
+PASS - Build 23 scanner never persists static asset source text
+PASS - Build 23 scans only APIs still missing at 8 seconds
+PASS - Build 23 asset scan reports only filenames/hit metadata
+PASS - Build 23 popup adds Copy Asset Scan Only
+PASS - Build 23 context classifier covers the 10 Build 14 hit APIs
+PASS - Build 23 classifier persists only aggregate metadata, never source snippets
+PASS - Build 23 classifier distinguishes direct/guard/optional/fallback/definition and RegExp-v forms
+PASS - Build 23 production classifier recognizes representative direct, guard, definition, optional, and RegExp-v contexts
+PASS - Build 23 popup adds Copy Context Classifier Only
+PASS - Copy Asset Scan Only copies only the production asset-scan section
+PASS - Copy Context Classifier Only copies only classifier section
+PASS - Build 23 Set.union returns this values then new other values in order
+PASS - Build 23 Set.intersection returns common values
+PASS - Build 23 Set methods accept set-like values with size/has/keys
+PASS - Build 23 Uint8Array Base64 default round-trip works
+PASS - Build 23 Uint8Array Base64 URL-safe and omit-padding options work
+PASS - Build 23 Uint8Array Base64 rejects invalid alphabet input
+PASS - Build 23 ArrayBuffer.transfer preserves bytes and requested size
+PASS - Build 23 ArrayBuffer.transfer detaches source when transferable structuredClone works
+PASS - Build 23 Popover fallbacks install show/hide/toggle without DOM mutation requirements
+PASS - Build 23 keeps Navigation API/URLPattern/scheduler unmodified while adding isolated RegExp-v asset compatibility
+PASS - Build 23 RegExp-v scanner distinguishes true literals from strings comments and division
+PASS - Build 23 RegExp-v transformer safely downgrades compatible v to u and uses never-match for v-only sets
+PASS - Build 23 patched data modules absolutize relative imports and preserve original import.meta.url
+PASS - Build 23 RegExp.escape handles leading alphanumeric and regexp syntax
+PASS - Build 23 RegExp.escape escapes whitespace and punctuators safely
+PASS - Build 23 RegExp.escape output matches the original string literally
+PASS - Build 23 startViewTransition fallback installs on Document prototype
+PASS - Build 23 startViewTransition fallback exposes expected promises and skipTransition
+PASS - Build 23 background stores only validated public ChatGPT data-module patches and redirects exact cached URL
+TOTAL: 63 PASS / 0 FAIL
