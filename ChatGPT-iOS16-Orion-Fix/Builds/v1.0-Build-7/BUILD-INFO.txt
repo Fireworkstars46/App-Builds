@@ -1,0 +1,4 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 7
+
+Build 7 preserves the existing compatibility polyfills and replaces no production compatibility behavior. It deepens only the optional lightweight diagnostic with one page-world startup snapshot for hydration markers, script/module/resource timing, navigation timing, and sanitized page-world errors.
