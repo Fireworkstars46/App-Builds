@@ -1,0 +1,12 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 9
+
+1. Disable Builds 1-8.
+2. Install this Build 9 ZIP itself in Orion; do not extract it first.
+3. Enable only Build 9.
+4. Open the extension popup and turn Light Diagnostics ON.
+5. Reload ChatGPT once.
+6. Try the sidebar and Send, wait about 10 seconds, then use Refresh Report -> Copy Report.
+7. If ChatGPT freezes, close that tab, open a blank tab, and retrieve the saved report from the extension popup.
+
+Diagnostics default OFF. When OFF, the immediate document_start listeners are removed as soon as the saved OFF setting resolves, their tiny in-memory buffer is cleared, and no diagnostic report is persisted.
