@@ -1,0 +1,9 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 6
+
+CHANGES FROM BUILD 5
+- Replaced heavy live diagnostics after real-device feedback that Build 5 caused severe lag/freezing on iPhone 8 Plus / iOS 16.
+- Removed MutationObserver, PerformanceObserver, DOM polling, click tracking, and the on-page DIAG UI.
+- Diagnostics remain default OFF.
+- Added a tiny startup recorder that captures only lifecycle events, JavaScript/resource failures, and one 8-second UI-presence snapshot.
+- Diagnostic report is saved to extension-owned storage and viewed/copied from the extension popup, so it can still be recovered after closing a frozen ChatGPT tab.
+- Preserved the Build 3/4/5 compatibility polyfills byte-for-byte.
