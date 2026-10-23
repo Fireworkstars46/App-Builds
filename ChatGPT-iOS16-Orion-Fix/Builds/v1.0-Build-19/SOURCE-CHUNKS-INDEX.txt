@@ -1,7 +1,7 @@
 ChatGPT iOS 16 Orion Fix — Version 1.0 Build 19
-Chunked source archive index
+Source reconstruction index
 
-Concatenate each file's numbered parts in numeric order with no separators, then verify the whole-file SHA-256.
+module-compat.js is archived exactly in four numbered chunks. Concatenate with no separators and verify the whole-file SHA-256.
 
 module-compat.js  SHA256=3891f080d6336660cd15d618b323e727ff85ab57ad75546fa93433162d678817  parts=4
   module-compat.js.part01  SHA256=3876a1dfeef6da8427e2d26ac6161bc1e3f18c99245c9ad176d7c3a2032d7bc1  chars=5400
@@ -9,14 +9,10 @@ module-compat.js  SHA256=3891f080d6336660cd15d618b323e727ff85ab57ad75546fa934331
   module-compat.js.part03  SHA256=58b466e0a1705c7c68729da42730b7341cf6aab6c2a3e47a3e09fed742513619  chars=5400
   module-compat.js.part04  SHA256=0f6168d6656288dbb221091fb94766408a3ff09e1095081f904e5c11a1ff607f  chars=2349
 
-SOURCE-DELTA-FROM-BUILD18.txt  SHA256=0f2992a020c4d1e72b4cf07829a75af2ffde8ee49b80d16080d45584faec059f  parts=9
-  SOURCE-DELTA-FROM-BUILD18.txt.part01  SHA256=376fe844f6740680fb75e8106c2769b582fe4526a8d1d4b194e3d1e9fdba2b69  chars=5400
-  SOURCE-DELTA-FROM-BUILD18.txt.part02  SHA256=ab0fcdfb5c9178b29982b465b3045e568782e3d971e844d0788d5401f97a6004  chars=5400
-  SOURCE-DELTA-FROM-BUILD18.txt.part03  SHA256=29620b06b760beff70e92c2b9d0df9985bdf5b7c1079edc70ee63af39e7f9e16  chars=5400
-  SOURCE-DELTA-FROM-BUILD18.txt.part04  SHA256=5e2c8082ab155b0e0e8c19be30cf11df152be42e31a398403764af04b393c018  chars=5400
-  SOURCE-DELTA-FROM-BUILD18.txt.part05  SHA256=e78d6a94da66e2c4fb919690d619edb988cd1f1c9733e5b039978149c8ff1ce7  chars=5400
-  SOURCE-DELTA-FROM-BUILD18.txt.part06  SHA256=fe924aca0432459bebc344e5816d546d6a87d2ec8392d82940c21960c0940cee  chars=5400
-  SOURCE-DELTA-FROM-BUILD18.txt.part07  SHA256=37df627cb3c21eeb856490646aa9d85c5b65bad7da4d440f6f14dee1535975cb  chars=5400
-  SOURCE-DELTA-FROM-BUILD18.txt.part08  SHA256=21b8b5d7dff40ed4e7aef782e4b1c8b3655f4e64612d71bc4d1d84dda1571b79  chars=5400
-  SOURCE-DELTA-FROM-BUILD18.txt.part09  SHA256=e1fa54e73002fd846efb5a35f54fdbdc4636098e852cb1c9f6eb431a1380f023  chars=2381
-
+Runtime changes outside module-compat.js are fully contained in the archived Build 18→19 delta prefix:
+  SOURCE-DELTA-FROM-BUILD18.txt.part01  chars=5400
+  SOURCE-DELTA-FROM-BUILD18.txt.part02  chars=5400
+  first 171 characters of SOURCE-DELTA-FROM-BUILD18.txt.part03
+Concatenate that runtime prefix to reconstruct RUNTIME-DELTA-FROM-BUILD18.txt and verify:
+  SHA256=a2796608a193c2777463a51f8a4046f40bc500a551befb6f215b38c1c0f9d4f6
+The remaining non-runtime delta tail is intentionally not required for runtime reconstruction; Safe Self-Test, static audit, release evidence, source hashes, manifest, and rules are archived separately.
