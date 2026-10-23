@@ -1,0 +1,26 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 6
+
+PURPOSE
+- Keeps the iOS 16 compatibility fixes for URL.canParse, Object.groupBy, and Map.groupBy.
+- Replaces Build 5's heavy live diagnostics with a lightweight startup recorder.
+- Light Diagnostics defaults OFF and adds no on-page DIAG bubble.
+
+INSTALL / UPDATE
+1. Disable older Builds 1-5 in Orion.
+2. In Orion -> Extensions -> +, select ChatGPT-iOS16-Orion-Fix-v1.0-Build6.zip itself.
+3. Enable only Build 6.
+4. Do NOT clear ChatGPT cookies/cache.
+
+LIGHT DIAGNOSTIC TEST
+1. Open the extension popup and turn Light Diagnostics ON.
+2. Reload ChatGPT once.
+3. Try the broken sidebar/send controls if the page remains responsive.
+4. If ChatGPT freezes, close that ChatGPT tab. Open a blank/new tab.
+5. Open this extension popup again.
+6. Tap Refresh Report, then Copy Report.
+7. Send the copied report back for analysis.
+8. Turn Light Diagnostics OFF afterward.
+
+PRIVACY
+The lightweight diagnostic does not collect message text, typed text, page text, cookies, local/session storage contents, request bodies, or clipboard contents.
