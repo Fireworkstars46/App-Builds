@@ -1,0 +1,155 @@
+      const response = await fetch(url, {
+        credentials: "omit",
+        cache: "force-cache",
+        redirect: "error",
+        referrerPolicy: "no-referrer",
+        signal: controller ? controller.signal : undefined
+      });
+      if (!response || !response.ok) return { ok: false, reason: "http" };
+      const lengthHeader = response.headers && response.headers.get ? response.headers.get("content-length") : null;
+      const contentLength = lengthHeader ? Number(lengthHeader) : 0;
+      if (Number.isFinite(contentLength) && contentLength > ASSET_SCAN_MAX_BYTES) {
+        return { ok: false, reason: "too-large" };
+      }
+      const text = await response.text();
+      if (text.length > ASSET_SCAN_MAX_BYTES) return { ok: false, reason: "too-large" };
+      return { ok: true, text };
+    } catch (_) {
+      return { ok: false, reason: "fetch-failed" };
+    } finally {
+      if (timer != null) clearTimeout(timer);
+    }
+  }
+
+  async function scanLoadedPublicAssets(targetFeatures) {
+    const targets = Array.isArray(targetFeatures) ? targetFeatures.filter((name) => ASSET_API_PATTERNS[name]) : [];
+    const urls = collectChatGptAssetUrls();
+    const hitMap = {};
+    for (const name of targets) hitMap[name] = { feature: name, confidence: ASSET_API_PATTERNS[name].confidence || "heuristic", assetHits: 0, assets: [] };
+
+    let fetchedAssets = 0;
+    let failedAssets = 0;
+    let skippedLargeAssets = 0;
+
+    for (const url of urls) {
+      const result = await fetchAssetText(url);
+      if (!result.ok) {
+        if (result.reason === "too-large") skippedLargeAssets += 1;
+        else failedAssets += 1;
+        await delay(ASSET_SCAN_YIELD_MS);
+        continue;
+      }
+      fetchedAssets += 1;
+      const source = result.text;
+      const fileName = assetFileName(url);
+      for (const name of targets) {
+        if (sourceMatchesPattern(source, ASSET_API_PATTERNS[name])) {
+          hitMap[name].assetHits += 1;
+          if (hitMap[name].assets.length < 8) hitMap[name].assets.push(fileName);
+        }
+      }
+      // Drop the source before yielding to reduce peak memory pressure on older iPhones.
+      await delay(ASSET_SCAN_YIELD_MS);
+    }
+
+    const hits = targets.map((name) => hitMap[name]).filter((item) => item.assetHits > 0);
+    const noHits = targets.filter((name) => hitMap[name].assetHits === 0);
+
+    return {
+      captured: new Date().toISOString(),
+      scope: "same-origin public ChatGPT /cdn/assets/*.js loaded by this page; fetch credentials omitted",
+      note: "Source-token hits are evidence of bundle references, not proof of execution. No-hit can miss minified or indirect access.",
+      targetFeatureCount: targets.length,
+      discoveredAssets: urls.length,
+      fetchedAssets,
+      failedAssets,
+      skippedLargeAssets,
+      matchedFeatureCount: hits.length,
+      hits,
+      noHits
+    };
+  }
+
+  function makeSnapshot() {
+    const root = query("#root");
+    const composer = query("#prompt-textarea, textarea, [contenteditable='true']");
+    const send = query("[data-testid='send-button'], button[aria-label='Send prompt'], button[aria-label='Send message']");
+    const sidebar = query("button[aria-label*='sidebar' i], button[aria-label*='menu' i]");
+    const lateFeatureMatrix = buildFeatureMatrix("8-second snapshot after ChatGPT startup attempt");
+    const featureComparison = compareFeatureMatrices(earlyFeatureMatrix, lateFeatureMatrix);
+
+    return {
+      captured: new Date().toISOString(),
+      browser: {
+        userAgent: clip(navigator.userAgent || "", 320),
+        platform: clip(navigator.platform || "", 80),
+        vendor: clip(navigator.vendor || "", 80)
+      },
+      document: {
+        readyState: document.readyState || "unknown",
+        bodyPresent: Boolean(document.body),
+        root: elementState(root),
+        composer: elementState(composer),
+        send: elementState(send),
+        sidebar: elementState(sidebar),
+        buttonCount: count("button"),
+        scriptCount: count("script"),
+        externalScriptCount: count("script[src]"),
+        moduleScriptCount: count("script[type='module']"),
+        inlineModuleScriptCount: count("script[type='module']:not([src])"),
+        externalModuleScriptCount: count("script[type='module'][src]"),
+        modulePreloadCount: count("link[rel='modulepreload']"),
+        preloadScriptCount: count("link[rel='preload'][as='script']"),
+        stylesheetCount: count("link[rel='stylesheet']")
+      },
+      resources: resourceSummary(),
+      navigation: navigationSummary(),
+      featureMatrixEarly: earlyFeatureMatrix,
+      featureMatrixLate: lateFeatureMatrix,
+      featureComparison,
+      errors: errors.slice()
+    };
+  }
+
+  function addError(kind, message, source) {
+    errors.push({
+      time: new Date().toISOString(),
+      kind: clip(kind, 40),
+      message: safeMessage(message || ""),
+      source: sanitizeUrl(source || "")
+    });
+    if (errors.length > MAX_ERRORS) errors.splice(0, errors.length - MAX_ERRORS);
+  }
+
+  function onEarlyError(event) {
+    if (event && event.target && event.target !== window) {
+      const target = event.target;
+      const tag = String(target && target.tagName ? target.tagName : "resource").toUpperCase();
+      const url = target && (target.src || target.href) ? (target.src || target.href) : "";
+      if (url) {
+        addError("resource-error", tag, url);
+      } else if (tag === "SCRIPT") {
+        let type = "classic";
+        try {
+          const rawType = target.getAttribute && target.getAttribute("type");
+          if (rawType) type = clip(rawType, 40);
+        } catch (_) {}
+        addError("inline-script-error", "inline " + type + " script failed", "");
+      } else {
+        addError("resource-error", tag + " failed without URL", "");
+      }
+      return;
+    }
+    addError("javascript-error", event && event.message ? event.message : "JavaScript error", event && event.filename ? event.filename : "");
+  }
+
+  function onEarlyCsp(event) {
+    const directive = event && (event.effectiveDirective || event.violatedDirective) ?
+      (event.effectiveDirective || event.violatedDirective) : "CSP";
+    const blocked = event && event.blockedURI ? sanitizeUrl(event.blockedURI) : "";
+    addError("csp-violation", clip(directive, 80) + (blocked ? " blocked " + blocked : ""), "");
+  }
+
+  function onEarlyRejection(event) {
+    const reason = event ? event.reason : null;
+    let message = "Promise rejected";
