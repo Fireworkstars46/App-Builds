@@ -1,0 +1,250 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 22
+Permanent runtime reconstruction / release evidence
+
+STATUS: PENDING / NOT DONE pending real-device test.
+ZIP SHA-256: d9f55b2ff522add5ae148e65745fcfab156372fa94dcb10483bebcdf8b6d576a
+Safe Self-Test: 60 PASS / 0 FAIL
+Static/privacy audit: 43 PASS / 0 FAIL
+Fresh extracted ZIP checksums, JS syntax, JSON parse, Safe Self-Test, and static audit passed.
+
+Reconstruction: start from archived Build 21 runtime source, apply the unified runtime delta below, then verify SOURCE-SHA256. background.js is new. rules.json is removed.
+
+===== SOURCE-SHA256.txt =====
+ab764625c6110bd8b644b60a8ccf375d57e75b631de1a4da2c95505299bec69e  manifest.json
+7ca824f1f15d1a867452b71e234519c532ec37c4bc1a9e18dc3b0fe04f261357  background.js
+f4f6edad64f2bcc4145b8ee20aae7fd22789da47e25ad741db00f3929f2a24d9  ua-compat.js
+98cf66ed37be0f1ef5c4b4f6f3781b84302575aa95108c22468e95fc23a81068  polyfill.js
+19d6a2c72efc9cb7b3f0e8cc27967e7b00181b4081572cae7311a6c9ff34568c  main-probe.js
+a21548155cbf6cc30b2734f66d568bf31bf2b129906e48fd2ca5fd1dfa26881d  light-diagnostic.js
+843d85b381bb50edd1489984925eb846d063f93c5641ded35069f9608578ead9  popup.html
+b66fe0c51b210349aa8d81ee300b6764efb3a4706266692cb9d27f11b5b88677  popup.js
+b99e0431090e8125e44194990ed6be79386882b1862d564751350aa705333759  selftest.js
+
+===== RUNTIME DELTA FROM BUILD 21 =====
+--- /mnt/data/b22inspect/manifest.json	2026-10-23 17:42:12.000000000 +0000
++++ /mnt/data/build22_src/manifest.json	2026-10-23 17:51:33.832695356 +0000
+@@ -1,11 +1,12 @@
+ {
+   "manifest_version": 3,
+   "name": "ChatGPT iOS 16 URL.canParse Fix",
+-  "version": "1.0.20",
+-  "description": "Adds targeted iOS 16 compatibility shims for ChatGPT plus Build 21 client-side and HTTP request User-Agent overrides presenting iOS/Safari 18.7 on chatgpt.com only. Optional diagnostics default OFF.",
++  "version": "1.0.21",
++  "description": "Adds targeted iOS 16 compatibility shims for ChatGPT plus Build 22 client-side and Orion iOS webRequest User-Agent overrides presenting iOS/Safari 18.7 on chatgpt.com only. Optional diagnostics default OFF.",
+   "permissions": [
+     "storage",
+-    "declarativeNetRequestWithHostAccess"
++    "webRequest",
++    "webRequestBlocking"
+   ],
+@@ -42,12 +43,8 @@
+   "host_permissions": [
+     "https://chatgpt.com/*"
+   ],
+-  "declarative_net_request": {
+-    "rule_resources": [
+-      {
+-        "id": "chatgpt_http_ua",
+-        "enabled": true,
+-        "path": "rules.json"
+-      }
+-    ]
++  "background": {
++    "service_worker": "background.js"
+   }
+ }
+--- /dev/null	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/build22_src/background.js	2026-10-23 17:51:33.835973086 +0000
+@@ -0,0 +1,75 @@
++(() => {
++  "use strict";
++
++  const VERSION = "1.0";
++  const BUILD = 22;
++  const TARGET_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.7 Mobile/15E148 Safari/604.1";
++  const api = typeof browser !== "undefined" ? browser : (typeof chrome !== "undefined" ? chrome : null);
++
++  const status = {
++    version: VERSION,
++    build: BUILD,
++    transport: "webRequest.onBeforeSendHeaders",
++    listenerInstalled: false,
++    modifiedRequestCount: 0,
++    targetUserAgent: TARGET_UA,
++    lastError: ""
++  };
++
++  function copyStatus() {
++    return {
++      version: status.version,
++      build: status.build,
++      transport: status.transport,
++      listenerInstalled: status.listenerInstalled === true,
++      modifiedRequestCount: Number(status.modifiedRequestCount) || 0,
++      targetUserAgent: status.targetUserAgent,
++      lastError: String(status.lastError || "").slice(0, 180)
++    };
++  }
++
++  function rewriteUserAgent(details) {
++    try {
++      const headers = Array.isArray(details && details.requestHeaders)
++        ? details.requestHeaders.map((h) => ({ name: h.name, value: h.value }))
++        : [];
++      let found = false;
++      for (const header of headers) {
++        if (String(header.name || "").toLowerCase() === "user-agent") {
++          header.value = TARGET_UA;
++          found = true;
++          break;
++        }
++      }
++      if (!found) headers.push({ name: "User-Agent", value: TARGET_UA });
++      status.modifiedRequestCount += 1;
++      return { requestHeaders: headers };
++    } catch (error) {
++      status.lastError = error && error.message ? String(error.message) : "request header rewrite failed";
++      return {};
++    }
++  }
++
++  try {
++    if (!api || !api.webRequest || !api.webRequest.onBeforeSendHeaders || typeof api.webRequest.onBeforeSendHeaders.addListener !== "function") {
++      status.lastError = "webRequest.onBeforeSendHeaders unavailable";
++    } else {
++      api.webRequest.onBeforeSendHeaders.addListener(
++        rewriteUserAgent,
++        { urls: ["https://chatgpt.com/*"] },
++        ["blocking", "requestHeaders"]
++      );
++      status.listenerInstalled = true;
++    }
++  } catch (error) {
++    status.lastError = error && error.message ? String(error.message) : "listener install failed";
++  }
++
++  try {
++    if (api && api.runtime && api.runtime.onMessage && typeof api.runtime.onMessage.addListener === "function") {
++      api.runtime.onMessage.addListener((message) => {
++        if (!message || message.type !== "chatgpt-ios16-http-ua-status") return undefined;
++        return Promise.resolve(copyStatus());
++      });
++    }
++  } catch (error) {
++    status.lastError = error && error.message ? String(error.message) : status.lastError;
++  }
++})();
+--- /mnt/data/b22inspect/ua-compat.js	2026-10-23 17:42:12.000000000 +0000
++++ /mnt/data/build22_src/ua-compat.js	2026-10-23 17:51:33.833575254 +0000
+@@ -1,10 +1,10 @@
+ (() => {
+   "use strict";
+ 
+-  // Build 21: narrowly scoped ChatGPT browser-version compatibility gate override.
++  // Build 22: narrowly scoped ChatGPT browser-version compatibility gate override.
+   // Keep the real iPhone/WebKit identity while presenting a currently supported
+-  // iOS/Safari version to client-side browser-version gates. Build 21 also configures a Safari/WebExtension declarative network rule to present the same identity in the HTTP User-Agent request header for chatgpt.com only. No other request headers are changed.
++  // iOS/Safari version to client-side browser-version gates. Build 22 also uses Orion iOS webRequest.onBeforeSendHeaders in the extension background context to present the same identity in the HTTP User-Agent request header for chatgpt.com only. No other request headers are changed.
+   if (location.origin !== "https://chatgpt.com") return;
+@@ -52,7 +52,7 @@
+   const status = Object.freeze({
+     version: "1.0",
+-    build: 21,
++    build: 22,
+@@ -60,7 +60,7 @@
+     userAgentMode,
+     appVersionMode,
+     target: "iOS/Safari 18.7",
+-    httpUserAgentOverrideConfigured: true,
++    httpUserAgentOverrideConfigured: null,
+     httpUserAgentTarget: TARGET_UA
+   });
+--- /mnt/data/b22inspect/main-probe.js	2026-10-23 17:42:38.000000000 +0000
++++ /mnt/data/build22_src/main-probe.js	2026-10-23 17:51:33.833782764 +0000
+@@ -2,7 +2,7 @@
+   "use strict";
+ 
+   const VERSION = "1.0";
+-  const BUILD = 21;
++  const BUILD = 22;
+--- /mnt/data/b22inspect/light-diagnostic.js	2026-10-23 17:42:12.000000000 +0000
++++ /mnt/data/build22_src/light-diagnostic.js	2026-10-23 17:51:34.482227020 +0000
+@@ -2,7 +2,7 @@
+   "use strict";
+ 
+   const VERSION = "1.0";
+-  const BUILD = 21;
++  const BUILD = 22;
+@@ -40,6 +40,29 @@
+     callback(defaults);
+   }
++
++  function queryHttpUaStatus(callback) {
++    const message = { type: "chatgpt-ios16-http-ua-status" };
++    if (chromeApi && chromeApi.runtime && typeof chromeApi.runtime.sendMessage === "function") {
++      try {
++        chromeApi.runtime.sendMessage(message, (result) => {
++          if (chromeApi.runtime && chromeApi.runtime.lastError) callback(null);
++          else callback(result && typeof result === "object" ? result : null);
++        });
++        return;
++      } catch (_) {}
++    }
++    if (browserApi && browserApi.runtime && typeof browserApi.runtime.sendMessage === "function") {
++      try {
++        Promise.resolve(browserApi.runtime.sendMessage(message))
++          .then((result) => callback(result && typeof result === "object" ? result : null))
++          .catch(() => callback(null));
++        return;
++      } catch (_) {}
++    }
++    callback(null);
++  }
+@@ -58,9 +81,15 @@
+       completed: false,
+       events: [],
+       snapshot: null,
+-      assetScan: null
++      assetScan: null,
++      httpUaStatus: null
+     };
++
++    queryHttpUaStatus((result) => {
++      state.httpUaStatus = result;
++      persist();
++    });
+@@ -122,8 +151,12 @@
+           lines.push("- original user agent: " + (ua.originalUserAgent || "unavailable"));
+           lines.push("- effective user agent: " + (ua.effectiveUserAgent || b.userAgent || "unavailable"));
+           lines.push("- UA override mode: " + (ua.userAgentMode || "unknown") + "; appVersion override mode: " + (ua.appVersionMode || "unknown"));
+-          lines.push("- HTTP User-Agent override configured: " + (ua.httpUserAgentOverrideConfigured === true ? "yes" : "no/unknown"));
+-          if (ua.httpUserAgentOverrideConfigured === true) lines.push("- HTTP User-Agent target: " + (ua.httpUserAgentTarget || ua.effectiveUserAgent || "unknown"));
++          const hu = state.httpUaStatus;
++          lines.push("- HTTP User-Agent transport: " + (hu && hu.transport ? hu.transport : "webRequest.onBeforeSendHeaders"));
++          lines.push("- HTTP User-Agent listener installed: " + (hu ? (hu.listenerInstalled === true ? "yes" : "no") : "unknown"));
++          lines.push("- HTTP User-Agent rewritten requests: " + (hu && Number.isFinite(Number(hu.modifiedRequestCount)) ? Number(hu.modifiedRequestCount) : "unknown"));
++          lines.push("- HTTP User-Agent target: " + (hu && hu.targetUserAgent ? hu.targetUserAgent : (ua.effectiveUserAgent || "unknown")));
++          if (hu && hu.lastError) lines.push("- HTTP User-Agent listener error: " + clip(hu.lastError, 180));
+@@ -200,7 +233,7 @@
+-        lines.push("- every Build 21 feature value is normalized to strict true/false before comparison");
++        lines.push("- every Build 22 feature value is normalized to strict true/false before comparison");
+@@ -298,7 +331,7 @@
+-      lines.push("Performance: no MutationObserver, PerformanceObserver, DOM polling, click tracking, or on-page diagnostic UI is used; resource timing is read once at the 8-second snapshot. Build 21 then scans and classifies the already-loaded same-origin public /cdn/assets/*.js files one at a time with short yields.");
++      lines.push("Performance: no MutationObserver, PerformanceObserver, DOM polling, click tracking, or on-page diagnostic UI is used; resource timing is read once at the 8-second snapshot. Build 22 then scans and classifies the already-loaded same-origin public /cdn/assets/*.js files one at a time with short yields.");
+--- /mnt/data/b22inspect/popup.html	2026-10-23 17:50:17.004005835 +0000
++++ /mnt/data/build22_src/popup.html	2026-10-23 17:51:43.137058615 +0000
+@@ -20,10 +20,10 @@
+ <body>
+   <h1>ChatGPT iOS 16 Fix</h1>
+   <div class="row">
+-    <label class="label" for="diagnostics">Light Diagnostics (Build 21)</label>
++    <label class="label" for="diagnostics">Light Diagnostics (Build 22)</label>
+@@
+-  <div class="hint">Default OFF. Build 21 keeps the clean Build 20 runtime and adds a chatgpt.com-only HTTP User-Agent request-header override matching the existing client-side iOS/Safari 18.7 identity. It does not modify CSP or other request headers. When diagnostics are ON, reload ChatGPT once; reports include original/effective UA, HTTP-UA configuration status, and the existing privacy-safe feature/public-asset checks.</div>
++  <div class="hint">Default OFF. Build 22 keeps the clean Build 20 runtime and adds a chatgpt.com-only HTTP User-Agent request-header override matching the existing client-side iOS/Safari 18.7 identity. It does not modify CSP or other request headers. When diagnostics are ON, reload ChatGPT once; reports include original/effective UA, HTTP-UA configuration status, and the existing privacy-safe feature/public-asset checks.</div>
+--- /mnt/data/b22inspect/rules.json	2026-10-23 17:42:12.000000000 +0000
++++ /dev/null	1970-01-01 00:00:00.000000000 +0000
+@@ -1,29 +0,0 @@
+-[Build 21 rules.json removed entirely in Build 22; exact prior file remains archived with Build 21.]
+
+Unchanged runtime files verified by SHA-256: polyfill.js and popup.js remain byte-identical to Build 21.
