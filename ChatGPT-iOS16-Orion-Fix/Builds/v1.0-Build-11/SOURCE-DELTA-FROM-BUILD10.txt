@@ -1,0 +1,39 @@
+ChatGPT iOS 16 Orion Fix — Build 11 source delta from Build 10
+
+main-probe.js:
+--- build10_src/main-probe.js
++++ build11_src/main-probe.js
+@@
+-  const BUILD = 10;
++  const BUILD = 11;
+
+light-diagnostic.js:
+--- build10_src/light-diagnostic.js
++++ build11_src/light-diagnostic.js
+@@
+-  const BUILD = 10;
++  const BUILD = 11;
+
+popup.html:
+- Light Diagnostics (Build 10)
++ Light Diagnostics (Build 11)
+- Build 10 takes one page-world hydration/resource snapshot after 8 seconds and includes an early browser feature matrix.
++ Build 11 keeps the one-time hydration/resource snapshot and early browser feature matrix, and adds a compact missing-features copy button.
++ Added button: <button id="copyMissing" type="button">Copy Missing Features Only</button>
+
+popup.js:
++ Added copyMissing button binding.
++ Added extractMissingFeatures(text), which starts at "Early browser feature matrix:" and stops before "- full feature results:" (or before Page-world errors/rejections as fallback).
++ Added copyText(text) and fallbackCopy(text).
++ Full Copy Report now uses copyText(report.value).
++ Copy Missing Features Only copies just the compact matrix summary/missing list.
++ Older clipboard fallback selects only the compact subsection with setSelectionRange(start, start + text.length) before document.execCommand("copy").
+
+manifest.json:
+- version 1.0.9
++ version 1.0.10
+- Build 10 description
++ Build 11 description mentioning compact missing-features copy action
+
+Verification note:
+The exact package files and their SHA-256 values are recorded in SOURCE-SHA256.txt and SHA256SUMS.txt. polyfill.js is byte-for-byte unchanged from Build 10. main-probe.js and light-diagnostic.js are unchanged in logic except their Build constants.
