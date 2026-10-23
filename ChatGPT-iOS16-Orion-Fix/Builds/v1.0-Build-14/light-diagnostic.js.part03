@@ -1,0 +1,74 @@
+        else errs.forEach((item) => lines.push("- " + item.time + " [" + item.kind + "] " + item.message + (item.source ? " | " + item.source : "")));
+      }
+
+      lines.push("");
+      lines.push("Privacy: no message text, typed text, cookies, local/session storage contents, request bodies, clipboard contents, placeholders, labels, or page text are collected.");
+      lines.push("Performance: no MutationObserver, PerformanceObserver, DOM polling, click tracking, or on-page diagnostic UI is used; resource timing is read once at the 8-second snapshot. Build 14 then scans the already-loaded same-origin public /cdn/assets/*.js files one at a time with short yields.");
+      return lines.join("\n");
+    }
+
+    function persist() {
+      storageSet({
+        [REPORT_KEY]: {
+          version: VERSION,
+          build: BUILD,
+          updated: new Date().toISOString(),
+          report: buildReport()
+        }
+      });
+    }
+
+    function onMainReport(event) {
+      let data = null;
+      try { data = JSON.parse(event && typeof event.detail === "string" ? event.detail : ""); } catch (_) {}
+      if (!data || data.build !== BUILD) return;
+      if (data.kind === "started") {
+        const buffered = data.payload && Number.isFinite(Number(data.payload.earlyBufferedErrorCount)) ? Number(data.payload.earlyBufferedErrorCount) : 0;
+        const featureCount = data.payload && Number.isFinite(Number(data.payload.earlyFeatureCount)) ? Number(data.payload.earlyFeatureCount) : 0;
+        addEvent("page-probe", "page-world probe started; early buffered errors=" + buffered + "; early feature probes=" + featureCount);
+      } else if (data.kind === "snapshot" && data.payload) {
+        state.snapshot = data.payload;
+        state.completed = true;
+        addEvent("snapshot", "8-second page-world snapshot saved; public asset scan started");
+        persist();
+      } else if (data.kind === "asset-scan" && data.payload) {
+        state.assetScan = data.payload;
+        const matched = Array.isArray(data.payload.hits) ? data.payload.hits.length : 0;
+        addEvent("asset-scan", "public JS asset scan saved; matched APIs=" + matched + "; scanned assets=" + (data.payload.fetchedAssets || 0));
+        persist();
+      }
+    }
+
+    document.addEventListener(REPORT_EVENT, onMainReport);
+    persist();
+
+    function resolveMainProbe(enabled) {
+      try { if (document.documentElement) document.documentElement.setAttribute(ENABLE_ATTR, enabled ? "1" : "0"); } catch (_) {}
+      try { document.dispatchEvent(new Event(RESOLVE_EVENT)); } catch (_) {}
+    }
+
+    resolveMainProbe(true);
+    if (!document.documentElement) document.addEventListener("DOMContentLoaded", () => resolveMainProbe(true), { once: true });
+
+    document.addEventListener("DOMContentLoaded", () => addEvent("lifecycle", "DOMContentLoaded"), { once: true });
+    window.addEventListener("load", () => addEvent("lifecycle", "window load"), { once: true });
+
+    setTimeout(() => {
+      if (!state.completed) addEvent("probe-timeout", "No page-world snapshot received by 9.5 seconds");
+      persist();
+    }, FALLBACK_DELAY_MS);
+  }
+
+  storageGet({ [ENABLE_KEY]: false }, (settings) => {
+    if (settings && settings[ENABLE_KEY] === true) {
+      start();
+      return;
+    }
+    function resolveOff() {
+      try { if (document.documentElement) document.documentElement.setAttribute(ENABLE_ATTR, "0"); } catch (_) {}
+      try { document.dispatchEvent(new Event(RESOLVE_EVENT)); } catch (_) {}
+    }
+    resolveOff();
+    if (!document.documentElement) document.addEventListener("DOMContentLoaded", resolveOff, { once: true });
+  });
+})();
