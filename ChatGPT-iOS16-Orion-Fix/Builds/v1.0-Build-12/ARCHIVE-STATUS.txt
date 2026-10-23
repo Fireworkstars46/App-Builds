@@ -1,0 +1,6 @@
+ChatGPT iOS 16 Orion Fix — Archive Status
+Version 1.0 | Build 12
+
+Source, audit, self-test, and checksum records are intended for permanent GitHub archival after local verification.
+Exact binary ZIP archival remains INCOMPLETE unless the available GitHub connector can preserve and verify the exact release bytes.
+Release status remains PENDING / NOT DONE until real-device testing returns the corrected early-vs-late feature comparison.
