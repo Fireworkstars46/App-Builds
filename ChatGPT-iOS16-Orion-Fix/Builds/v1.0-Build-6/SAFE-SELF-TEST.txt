@@ -1,0 +1,26 @@
+ChatGPT iOS 16 Orion Fix — Safe Self-Test
+Version 1.0 | Build 6
+
+RESULT: 12 PASS / 0 FAIL / 4 SKIPPED-NOT TESTED
+
+PASS
+1. manifest JSON parses and identifies manifest version 3 / package version 1.0.5.
+2. URL.canParse compatibility behavior preserved.
+3. Object.groupBy compatibility behavior preserved.
+4. Map.groupBy compatibility behavior preserved.
+5. Build 5 heavy observer architecture removed from lightweight diagnostic.
+6. Lightweight diagnostic creates no on-page diagnostic UI.
+7. Diagnostics OFF path performs no report write.
+8. Diagnostics ON saves a report to extension-owned storage.
+9. Saved report includes explicit privacy/performance boundaries.
+10. Error/resource URLs are sanitized before storage.
+11. Popup defaults diagnostics OFF and exposes saved-report refresh/copy.
+12. Version/Build strings are consistent across release files.
+
+SKIPPED / NOT TESTED
+1. Actual Orion 1.4.4 installation on iOS 16 — requires user's device.
+2. Actual live ChatGPT startup/freeze capture — requires user's device and current site.
+3. Actual extension-popup retrieval after closing a frozen ChatGPT tab — requires user's device.
+4. Whether the captured report identifies the root ChatGPT compatibility failure — depends on live site behavior.
+
+The previous Build 5 real-device result (severe lag/freezing) is treated as a regression blocker for that diagnostic design. Build 6 intentionally removes the heavy observer/UI paths that could contribute to that lag.
