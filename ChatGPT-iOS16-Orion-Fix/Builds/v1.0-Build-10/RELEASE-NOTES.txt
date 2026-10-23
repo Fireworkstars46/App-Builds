@@ -1,0 +1,12 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 10
+
+Changes from Build 9:
+- Added a diagnostic-only browser feature matrix captured at document_start before ChatGPT bootstrap code can add its own polyfills.
+- The matrix checks modern collection/iterator APIs, Set methods, URLPattern, Intl.DurationFormat, newer stream/buffer/base64 helpers, RegExp v support, newer DOM/browser APIs, and safe parse-only syntax probes.
+- The matrix records only feature names and true/false support state.
+- No new compatibility polyfills were added.
+- Existing URL.canParse, Object.groupBy, and Map.groupBy compatibility code is unchanged.
+- Existing lightweight one-time hydration/resource/error diagnostics are preserved.
+
+Status: PENDING / NOT DONE until real iPhone 8 Plus / iOS 16.6 / Orion testing.
