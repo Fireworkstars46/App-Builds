@@ -1,5 +1,8 @@
 ChatGPT iOS 16 Orion Fix — Archive Status
 Version 1.0 | Build 7
 
-Exact release ZIP and checksum are committed to GitHub together with Build 7 source/audit records. Archive completion is verified separately by retrieval and checksum/identity checks.
+Source/text/audit artifacts are being archived to GitHub and can be retrieved there.
+The exact binary release ZIP is NOT permanently archived through the currently verified GitHub path. A binary blob upload attempt failed identity verification and was removed rather than left as a misleading artifact.
+The local release ZIP SHA-256 is 1ff2c71e438ff4e35fe096036b68b38be3ffc202d48fa8bf480611903a941a12.
+Permanent binary archive status is INCOMPLETE.
 Release status remains PENDING / NOT DONE until real-device testing confirms Build 7 runs without the Build 5 lag/freezing regression and returns a usable report.
