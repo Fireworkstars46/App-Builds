@@ -1,0 +1,20 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 16
+
+First actual compatibility-fix build selected from the Build 15 real-device classifier.
+
+Added only for APIs with direct/unguarded bundle evidence and practical polyfill paths:
+- Set.prototype.union
+- Set.prototype.intersection
+- ArrayBuffer.prototype.transfer
+- Uint8Array.fromBase64
+- Uint8Array.prototype.toBase64
+- HTMLElement.prototype.showPopover, plus matching hidePopover/togglePopover safety fallbacks
+
+Intentionally NOT patched because Build 15 showed guards/fallbacks or insufficient evidence:
+- Navigation API
+- RegExp.escape
+- document.startViewTransition
+- RegExp v flag (cannot be safely function-polyfilled; classifier evidence remains heuristic)
+
+Diagnostics remain optional and default OFF.
+Status: PENDING / NOT DONE pending real-device fix verification.
