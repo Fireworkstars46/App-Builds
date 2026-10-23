@@ -1,0 +1,14 @@
+ChatGPT iOS 16 Orion Fix — Install/Test
+Version 1.0 | Build 13
+
+1. Disable Builds 1-12.
+2. In Orion Extensions, select the Build 13 ZIP itself.
+3. Enable only Build 13.
+4. Open the extension popup and turn Light Diagnostics (Build 13) ON.
+5. Reload ChatGPT once.
+6. Try the broken sidebar/Send behavior and wait about 10 seconds.
+7. Open the popup, tap Refresh Report, then Copy Missing Features Only.
+8. Paste the compact result into the ChatGPT support/development chat.
+9. Turn diagnostics OFF after testing.
+
+Do not clear ChatGPT cookies/cache for this test.
