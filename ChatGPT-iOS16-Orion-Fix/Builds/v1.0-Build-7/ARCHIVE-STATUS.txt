@@ -1,0 +1,5 @@
+ChatGPT iOS 16 Orion Fix — Archive Status
+Version 1.0 | Build 7
+
+Exact release ZIP and checksum are committed to GitHub together with Build 7 source/audit records. Archive completion is verified separately by retrieval and checksum/identity checks.
+Release status remains PENDING / NOT DONE until real-device testing confirms Build 7 runs without the Build 5 lag/freezing regression and returns a usable report.
