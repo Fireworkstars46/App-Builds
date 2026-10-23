@@ -1,0 +1,105 @@
+        const n = s.navigation || {};
+        lines.push("");
+        lines.push("Navigation timing:");
+        lines.push("- supported: " + bool(n.supported));
+        if (n.supported) {
+          lines.push("- DOM interactive: " + n.domInteractiveMs + " ms");
+          lines.push("- DOMContentLoaded end: " + n.domContentLoadedEventEndMs + " ms");
+          lines.push("- load event end: " + n.loadEventEndMs + " ms");
+        }
+
+        const fmEarly = s.featureMatrixEarly || null;
+        const fmLate = s.featureMatrixLate || null;
+        const fc = s.featureComparison || null;
+        function featureSummary(title, fm) {
+          lines.push(title);
+          if (!fm || !fm.features) {
+            lines.push("- unavailable");
+            return;
+          }
+          const featureNames = Object.keys(fm.features).sort();
+          const missingNames = featureNames.filter((name) => fm.features[name] !== true);
+          lines.push("- captured: " + (fm.captured || "unknown"));
+          lines.push("- phase: " + (fm.phase || "unknown"));
+          lines.push("- checked: " + featureNames.length);
+          lines.push("- supported: " + (featureNames.length - missingNames.length));
+          lines.push("- missing/unsupported: " + missingNames.length);
+          if (!missingNames.length) lines.push("  - none");
+          else missingNames.forEach((name) => lines.push("  - " + name));
+        }
+        const compactMissing = fc && Array.isArray(fc.missingAtLate) ? fc.missingAtLate : [];
+        const compactBecameSupported = fc && Array.isArray(fc.becameSupported) ? fc.becameSupported : [];
+        const compactBecameMissing = fc && Array.isArray(fc.becameMissing) ? fc.becameMissing : [];
+        lines.push("");
+        lines.push("Compact feature result:");
+        lines.push("- checked at 8 seconds: " + (fc && Number.isFinite(Number(fc.checked)) ? Number(fc.checked) : 0));
+        lines.push("- missing at 8 seconds: " + compactMissing.length);
+        if (!compactMissing.length) lines.push("  - none");
+        else compactMissing.forEach((name) => lines.push("  - " + name));
+        lines.push("- became supported during startup: " + compactBecameSupported.length);
+        if (!compactBecameSupported.length) lines.push("  - none");
+        else compactBecameSupported.forEach((name) => lines.push("  - " + name));
+        lines.push("- became missing during startup: " + compactBecameMissing.length);
+        if (!compactBecameMissing.length) lines.push("  - none");
+        else compactBecameMissing.forEach((name) => lines.push("  - " + name));
+
+        lines.push("");
+        lines.push("Detailed browser feature comparison:");
+        lines.push("- every Build 14 feature value is normalized to strict true/false before comparison");
+        lines.push("- syntax probes remain removed because ChatGPT CSP blocks eval/new Function");
+        featureSummary("Early matrix (document_start):", fmEarly);
+        featureSummary("8-second matrix (after ChatGPT startup attempt):", fmLate);
+        lines.push("Changes during ChatGPT startup:");
+        if (!fc) {
+          lines.push("- unavailable");
+        } else {
+          const becameSupported = Array.isArray(fc.becameSupported) ? fc.becameSupported : [];
+          const stillMissing = Array.isArray(fc.stillMissing) ? fc.stillMissing : [];
+          const becameMissing = Array.isArray(fc.becameMissing) ? fc.becameMissing : [];
+          const missingAtLate = Array.isArray(fc.missingAtLate) ? fc.missingAtLate : [];
+          lines.push("- became supported: " + becameSupported.length);
+          if (!becameSupported.length) lines.push("  - none");
+          else becameSupported.forEach((name) => lines.push("  - " + name));
+          lines.push("- missing at 8 seconds: " + missingAtLate.length);
+          if (!missingAtLate.length) lines.push("  - none");
+          else missingAtLate.forEach((name) => lines.push("  - " + name));
+          lines.push("- continuously missing from document_start through 8 seconds: " + stillMissing.length);
+          if (!stillMissing.length) lines.push("  - none");
+          else stillMissing.forEach((name) => lines.push("  - " + name));
+          lines.push("- became missing: " + becameMissing.length);
+          if (!becameMissing.length) lines.push("  - none");
+          else becameMissing.forEach((name) => lines.push("  - " + name));
+        }
+
+
+        const scan = state.assetScan;
+        lines.push("");
+        lines.push("Asset source-token scan:");
+        if (!scan) {
+          lines.push("- pending/not received yet");
+        } else {
+          lines.push("- captured: " + (scan.captured || "unknown"));
+          lines.push("- scope: " + (scan.scope || "unknown"));
+          lines.push("- note: " + (scan.note || "none"));
+          lines.push("- target missing APIs: " + (scan.targetFeatureCount == null ? "unknown" : scan.targetFeatureCount));
+          lines.push("- discovered JS assets: " + (scan.discoveredAssets == null ? "unknown" : scan.discoveredAssets));
+          lines.push("- fetched/scanned assets: " + (scan.fetchedAssets == null ? "unknown" : scan.fetchedAssets));
+          lines.push("- failed assets: " + (scan.failedAssets == null ? "unknown" : scan.failedAssets));
+          lines.push("- skipped too-large assets: " + (scan.skippedLargeAssets == null ? "unknown" : scan.skippedLargeAssets));
+          const hits = Array.isArray(scan.hits) ? scan.hits : [];
+          lines.push("- APIs with source-token hits: " + hits.length);
+          if (!hits.length) lines.push("  - none");
+          else hits.forEach((item) => {
+            const assets = Array.isArray(item.assets) ? item.assets : [];
+            lines.push("  - " + item.feature + " | confidence=" + (item.confidence || "heuristic") + " | asset hits=" + (item.assetHits || 0) + (assets.length ? " | " + assets.join(", ") : ""));
+          });
+          const noHits = Array.isArray(scan.noHits) ? scan.noHits : [];
+          lines.push("- APIs with no source-token hit: " + noHits.length);
+          if (!noHits.length) lines.push("  - none");
+          else noHits.forEach((name) => lines.push("  - " + name));
+        }
+
+        const errs = Array.isArray(s.errors) ? s.errors : [];
+        lines.push("");
+        lines.push("Page-world errors/rejections (" + errs.length + "):");
+        if (!errs.length) lines.push("- None captured");
