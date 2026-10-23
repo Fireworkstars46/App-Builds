@@ -1,0 +1,67 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT iOS 16 URL.canParse Fix",
+  "version": "1.0.22",
+  "description": "Adds targeted iOS 16 compatibility shims for ChatGPT plus Build 23 self-learning RegExp-v asset patching for Orion iOS. Optional diagnostics default OFF.",
+  "permissions": [
+    "storage",
+    "webRequest",
+    "webRequestBlocking"
+  ],
+  "action": {
+    "default_title": "ChatGPT iOS 16 Fix",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://auth.openai.com/*",
+        "https://auth0.openai.com/*",
+        "https://setup.auth.openai.com/*",
+        "https://frontend-apps-multi-region.workos.com/*",
+        "https://forwarder.workos.com/*"
+      ],
+      "js": [
+        "ua-compat.js",
+        "polyfill.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "main-probe.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "light-diagnostic.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "asset-compat.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
