@@ -1,0 +1,30 @@
+ChatGPT iOS 16 Orion Fix — Static Audit
+Version 1.0 | Build 7
+
+1. PASS - Manifest parses | 1.0.6
+2. PASS - Manifest Version 1.0 line is 1.0.6
+3. PASS - Polyfill is byte-for-byte unchanged from Build 6
+4. PASS - Popup storage/copy logic is byte-for-byte unchanged from Build 6
+5. PASS - MAIN page probe is scoped only to chatgpt.com
+6. PASS - Storage permission only
+7. PASS - No MutationObserver construction
+8. PASS - No PerformanceObserver construction
+9. PASS - No polling interval
+10. PASS - No click tracking
+11. PASS - No on-page diagnostic UI creation
+12. PASS - No page textContent read
+13. PASS - No page innerText read
+14. PASS - No page input value read
+15. PASS - No placeholder capture
+16. PASS - No cookie access
+17. PASS - No localStorage/sessionStorage access
+18. PASS - No fetch/XHR/network interception
+19. PASS - One-time resource timing read present
+20. PASS - React markers checked by own-property names only
+21. PASS - Resource URL sanitizer strips query strings
+22. PASS - Diagnostics setting defaults OFF
+23. PASS - No extra host permissions added
+
+TOTAL: 23 PASS / 0 FAIL
+
+Real Orion/iOS 16 behavior is NOT TESTED by this static audit.
