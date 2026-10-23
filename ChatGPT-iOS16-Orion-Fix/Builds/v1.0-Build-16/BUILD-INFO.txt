@@ -1,0 +1,9 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 16
+Manifest version: 1.0.15
+
+Purpose: first evidence-selected compatibility-fix build after Build 15 classifier.
+Always-on compatibility additions: Set.union/intersection, ArrayBuffer.transfer, Uint8Array.fromBase64/toBase64, and minimal Popover method fallbacks.
+Existing URL.canParse, Object.groupBy, and Map.groupBy shims are preserved.
+
+Status: PENDING / NOT DONE until real Orion 1.4.4 + iOS 16.6 runtime test confirms ChatGPT hydrates and Send/sidebar work.
