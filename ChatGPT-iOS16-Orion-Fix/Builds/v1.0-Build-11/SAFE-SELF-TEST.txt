@@ -1,0 +1,29 @@
+ChatGPT iOS 16 Orion Fix — SAFE SELF-TEST
+Version 1.0 | Build 11
+
+PASS - manifest JSON parses and identifies Version 1.0 Build 11 manifest 1.0.10
+PASS - URL.canParse compatibility behavior preserved
+PASS - Object.groupBy compatibility behavior preserved
+PASS - Map.groupBy compatibility behavior preserved
+PASS - diagnostic has no heavy observer/polling/click architecture
+PASS - diagnostic creates no on-page UI
+PASS - page-world probe does not read page text or input values
+PASS - immediate early capture is attached before setting resolution
+PASS - OFF resolution removes listeners and clears buffer
+PASS - resource timing remains one-time API read
+PASS - CSP capture does not read CSP sample/code content
+PASS - feature matrix is captured immediately before setting resolution
+PASS - feature matrix includes targeted modern APIs and syntax probes
+PASS - feature matrix is diagnostic-only and does not define missing APIs
+PASS - early inline module failure before storage lookup is retained when diagnostics ON
+PASS - early failure is discarded and no report saved when diagnostics OFF
+PASS - diagnostics ON produces completed snapshot and early feature matrix
+PASS - resource URL secrets and long IDs are redacted
+PASS - popup identifies Build 11 and default remains OFF
+PASS - Copy Missing Features Only copies compact matrix summary through production popup handler
+PASS - Copy Missing Features Only fallback selects only compact section on older clipboard path
+PASS - version/build strings are consistent across release docs
+PASS - polyfill source remains unchanged in behavior and contains only three targeted shims
+TOTAL: 23 PASS / 0 FAIL
+
+Real-device Orion/iOS 16 install/runtime and Copy Missing Features Only action: NOT TESTED.
