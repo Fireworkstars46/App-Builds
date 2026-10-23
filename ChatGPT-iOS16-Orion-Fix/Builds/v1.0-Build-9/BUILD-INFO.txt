@@ -1,0 +1,6 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 9
+
+Purpose: preserve the existing iOS 16 compatibility polyfills and improve lightweight diagnostics by buffering startup errors immediately at document_start, before the extension storage lookup finishes.
+
+Status: PENDING / NOT DONE until real Orion 1.4.4 + iOS 16.6 testing confirms behavior.
