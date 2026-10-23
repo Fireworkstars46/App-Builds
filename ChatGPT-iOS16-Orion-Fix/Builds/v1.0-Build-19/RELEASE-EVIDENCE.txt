@@ -1,0 +1,14 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 19
+
+Release evidence:
+- MASTER_RULES.md re-read from the connected GitHub repository before this corrective build.
+- Build 18 real-device result: page complete, shell/composer/sidebar present, Send absent, all React markers false; Build 18 remained NOT DONE.
+- Build 19 adds a narrowly scoped declarativeNetRequest response-header rule only for https://chatgpt.com/ main-frame documents.
+- The rule removes only Content-Security-Policy and Content-Security-Policy-Report-Only, then module-compat.js installs a replacement CSP at document_start.
+- Replacement script policy permits same-origin scripts, Blob modules, and the inline compatibility bootstrap/import map required by the bridge; object-src remains none and base-uri remains self.
+- No other site host permission is added.
+- Safe Self-Test: 64 PASS / 0 FAIL.
+- Static audit: 74 PASS / 0 FAIL.
+- Fresh-extracted package verification is recorded after final packaging.
+
+Status: PENDING / NOT DONE pending real Orion iOS 16.6 hydration test.
