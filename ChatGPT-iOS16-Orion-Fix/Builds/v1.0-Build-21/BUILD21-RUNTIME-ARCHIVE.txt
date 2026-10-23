@@ -1,0 +1,519 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 21
+Permanent runtime reconstruction / release evidence
+
+STATUS: PENDING / NOT DONE pending real-device test.
+ZIP SHA-256: f321cc0c2fdbcfdf0e8506b1ab1c5bfe48d0415e6b58473791c2bb30b26b35ab
+Safe Self-Test: 60 PASS / 0 FAIL
+Static/privacy audit: 78 PASS / 0 FAIL
+Fresh extracted ZIP checksums, JS syntax, JSON parse, Safe Self-Test, and static audit passed.
+
+Reconstruction:
+1. Start from archived Version 1.0 Build 20 runtime source.
+2. Apply SOURCE-DELTA-FROM-BUILD20 below and add rules.json.
+3. Verify runtime files against SOURCE-SHA256 below.
+
+===== SOURCE-SHA256.txt =====
+9a95209b1af69ed3f2a3c34d6c7550188c4e0a5a77132de848fba8d4d46b33b0  manifest.json
+0e2de44c46e5bc5d4902c3aa2713db57a8ec6767aa6cfeb40f2a7c5f68d6058f  rules.json
+619ce0c4fcb649b5aa50aab63d3fb225cdd8dcded35cb6a406cfffd538f2ef09  ua-compat.js
+98cf66ed37be0f1ef5c4b4f6f3781b84302575aa95108c22468e95fc23a81068  polyfill.js
+acb1aa8be3bdb5bb01d05d74f99ecdc8002a9596c5fdc146c2b5f7b83209ca32  main-probe.js
+c7e5f633a93cd6ec9728bdcc9a5236ccfef2951c2081ce943f7d5e6393cf4bb2  light-diagnostic.js
+58623694e235e0ddc524f91893706eeb6272c602f21e039d2459c62f873151dc  popup.html
+b66fe0c51b210349aa8d81ee300b6764efb3a4706266692cb9d27f11b5b88677  popup.js
+c80d2d999a09dde9207d4bf324570b399af797a985a64340c31e45727b5e9dc8  selftest.js
+
+===== manifest.json =====
+{
+  "manifest_version": 3,
+  "name": "ChatGPT iOS 16 URL.canParse Fix",
+  "version": "1.0.20",
+  "description": "Adds targeted iOS 16 compatibility shims for ChatGPT plus Build 21 client-side and HTTP request User-Agent overrides presenting iOS/Safari 18.7 on chatgpt.com only. Optional diagnostics default OFF.",
+  "permissions": [
+    "storage",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "action": {
+    "default_title": "ChatGPT iOS 16 Fix",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://auth.openai.com/*",
+        "https://auth0.openai.com/*",
+        "https://setup.auth.openai.com/*",
+        "https://frontend-apps-multi-region.workos.com/*",
+        "https://forwarder.workos.com/*"
+      ],
+      "js": [
+        "ua-compat.js",
+        "polyfill.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "main-probe.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "light-diagnostic.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*"
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "chatgpt_http_ua",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  }
+}
+
+===== rules.json =====
+[
+  {
+    "id": 2101,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        {
+          "header": "User-Agent",
+          "operation": "set",
+          "value": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.7 Mobile/15E148 Safari/604.1"
+        }
+      ]
+    },
+    "condition": {
+      "regexFilter": "^https://chatgpt\\.com/",
+      "resourceTypes": [
+        "main_frame",
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "xmlhttprequest",
+        "ping",
+        "media",
+        "websocket",
+        "other"
+      ]
+    }
+  }
+]
+
+===== ua-compat.js =====
+(() => {
+  "use strict";
+
+  // Build 21: narrowly scoped ChatGPT browser-version compatibility gate override.
+  // Keep the real iPhone/WebKit identity while presenting a currently supported
+  // iOS/Safari version to client-side browser-version gates. Build 21 also configures a Safari/WebExtension declarative network rule to present the same identity in the HTTP User-Agent request header for chatgpt.com only. No other request headers are changed.
+  if (location.origin !== "https://chatgpt.com") return;
+
+  const STATUS_KEY = "__chatgptIOS16UaCompatStatus";
+  const TARGET_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.7 Mobile/15E148 Safari/604.1";
+  const TARGET_APP_VERSION = "5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.7 Mobile/15E148 Safari/604.1";
+
+  const original = {
+    userAgent: safeString(() => navigator.userAgent),
+    appVersion: safeString(() => navigator.appVersion)
+  };
+
+  function safeString(read) {
+    try { return String(read() || ""); }
+    catch (_) { return ""; }
+  }
+
+  function installGetter(name, value) {
+    try {
+      Object.defineProperty(navigator, name, {
+        configurable: true,
+        enumerable: true,
+        get: () => value
+      });
+      if (safeString(() => navigator[name]) === value) return "instance";
+    } catch (_) {}
+
+    try {
+      const proto = Object.getPrototypeOf(navigator);
+      if (!proto) return "failed";
+      const current = Object.getOwnPropertyDescriptor(proto, name);
+      if (current && current.configurable === false) return "failed";
+      Object.defineProperty(proto, name, {
+        configurable: true,
+        enumerable: current ? Boolean(current.enumerable) : true,
+        get: () => value
+      });
+      if (safeString(() => navigator[name]) === value) return "prototype";
+    } catch (_) {}
+
+    return "failed";
+  }
+
+  const userAgentMode = installGetter("userAgent", TARGET_UA);
+  const appVersionMode = installGetter("appVersion", TARGET_APP_VERSION);
+
+  const status = Object.freeze({
+    version: "1.0",
+    build: 21,
+    active: userAgentMode !== "failed" && appVersionMode !== "failed",
+    originalUserAgent: original.userAgent,
+    originalAppVersion: original.appVersion,
+    effectiveUserAgent: safeString(() => navigator.userAgent),
+    effectiveAppVersion: safeString(() => navigator.appVersion),
+    userAgentMode,
+    appVersionMode,
+    target: "iOS/Safari 18.7",
+    httpUserAgentOverrideConfigured: true,
+    httpUserAgentTarget: TARGET_UA
+  });
+
+  try {
+    Object.defineProperty(window, STATUS_KEY, {
+      configurable: true,
+      value: status
+    });
+  } catch (_) {
+    try { window[STATUS_KEY] = status; } catch (_) {}
+  }
+})();
+
+===== SOURCE-DELTA-FROM-BUILD20.txt =====
+ChatGPT iOS 16 Orion Fix — Build 20 to Build 21 runtime/source delta
+
+===== manifest.json =====
+--- /mnt/data/b21base/manifest.json	2026-10-23 17:39:00.000000000 +0000
++++ /mnt/data/build21_src/manifest.json	2026-10-23 17:56:23.411544034 +0000
+@@ -1,8 +1,9 @@
+ {
+   "manifest_version": 3,
+   "name": "ChatGPT iOS 16 URL.canParse Fix",
+-  "version": "1.0.19",
+-  "description": "Adds targeted iOS 16 compatibility shims for ChatGPT plus a Build 20 client-side browser-version gate override that presents iOS/Safari 18.7 on chatgpt.com only. Optional diagnostics default OFF.",
++  "version": "1.0.20",
++  "description": "Adds targeted iOS 16 compatibility shims for ChatGPT plus Build 21 client-side and HTTP request User-Agent overrides presenting iOS/Safari 18.7 on chatgpt.com only. Optional diagnostics default OFF.",
+   "permissions": [
+-    "storage"
++    "storage",
++    "declarativeNetRequestWithHostAccess"
+   ],
+@@ -45,5 +46,17 @@
+       "run_at": "document_start"
+     }
+-  ]
++  ],
++  "host_permissions": [
++    "https://chatgpt.com/*"
++  ],
++  "declarative_net_request": {
++    "rule_resources": [
++      {
++        "id": "chatgpt_http_ua",
++        "enabled": true,
++        "path": "rules.json"
++      }
++    ]
++  }
+ }
+
+===== ua-compat.js =====
+--- /mnt/data/b21base/ua-compat.js	2026-10-23 17:39:00.000000000 +0000
++++ /mnt/data/build21_src/ua-compat.js	2026-10-23 17:56:23.411820592 +0000
+@@ -1,10 +1,9 @@
+ (() => {
+   "use strict";
+ 
+-  // Build 20: narrowly scoped ChatGPT browser-version compatibility gate override.
++  // Build 21: narrowly scoped ChatGPT browser-version compatibility gate override.
+   // Keep the real iPhone/WebKit identity while presenting a currently supported
+-  // iOS/Safari version to client-side browser-version gates. This does not change
+-  // the network User-Agent header and does not add or fake unrelated APIs.
++  // iOS/Safari version to client-side browser-version gates. Build 21 also configures a Safari/WebExtension declarative network rule to present the same identity in the HTTP User-Agent request header for chatgpt.com only. No other request headers are changed.
+   if (location.origin !== "https://chatgpt.com") return;
+@@ -52,7 +51,7 @@
+ 
+   const status = Object.freeze({
+     version: "1.0",
+-    build: 20,
++    build: 21,
+@@ -63,7 +62,9 @@
+     userAgentMode,
+     appVersionMode,
+-    target: "iOS/Safari 18.7"
++    target: "iOS/Safari 18.7",
++    httpUserAgentOverrideConfigured: true,
++    httpUserAgentTarget: TARGET_UA
+   });
+
+===== main-probe.js =====
+--- /mnt/data/b21base/main-probe.js	2026-10-23 17:39:00.000000000 +0000
++++ /mnt/data/build21_src/main-probe.js	2026-10-23 17:58:43.653481513 +0000
+@@ -2,7 +2,7 @@
+   "use strict";
+ 
+   const VERSION = "1.0";
+-  const BUILD = 20;
++  const BUILD = 21;
+
+===== light-diagnostic.js =====
+--- /mnt/data/b21base/light-diagnostic.js	2026-10-23 17:39:00.000000000 +0000
++++ /mnt/data/build21_src/light-diagnostic.js	2026-10-23 17:56:23.412057247 +0000
+@@ -2,7 +2,7 @@
+   "use strict";
+ 
+   const VERSION = "1.0";
+-  const BUILD = 20;
++  const BUILD = 21;
+@@ -121,6 +121,8 @@
+           lines.push("- original user agent: " + (ua.originalUserAgent || "unavailable"));
+           lines.push("- effective user agent: " + (ua.effectiveUserAgent || b.userAgent || "unavailable"));
+           lines.push("- UA override mode: " + (ua.userAgentMode || "unknown") + "; appVersion override mode: " + (ua.appVersionMode || "unknown"));
++          lines.push("- HTTP User-Agent override configured: " + (ua.httpUserAgentOverrideConfigured === true ? "yes" : "no/unknown"));
++          if (ua.httpUserAgentOverrideConfigured === true) lines.push("- HTTP User-Agent target: " + (ua.httpUserAgentTarget || ua.effectiveUserAgent || "unknown"));
+         }
+@@ -198,7 +200,7 @@
+         lines.push("- syntax probes removed: ChatGPT CSP blocks eval/new Function, which made Build 10/11 syntax results unreliable");
+-        lines.push("- every Build 20 feature value is normalized to strict true/false before comparison");
++        lines.push("- every Build 21 feature value is normalized to strict true/false before comparison");
+@@ -296,7 +298,7 @@
+-      lines.push("Performance: no MutationObserver, PerformanceObserver, DOM polling, click tracking, or on-page diagnostic UI is used; resource timing is read once at the 8-second snapshot. Build 20 then scans and classifies the already-loaded same-origin public /cdn/assets/*.js files one at a time with short yields.");
++      lines.push("Performance: no MutationObserver, PerformanceObserver, DOM polling, click tracking, or on-page diagnostic UI is used; resource timing is read once at the 8-second snapshot. Build 21 then scans and classifies the already-loaded same-origin public /cdn/assets/*.js files one at a time with short yields.");
+
+===== popup.html =====
+--- /mnt/data/b21base/popup.html	2026-10-23 17:39:00.000000000 +0000
++++ /mnt/data/build21_src/popup.html	2026-10-23 17:56:23.412160401 +0000
+@@ -20,10 +20,10 @@
+-    <label class="label" for="diagnostics">Light Diagnostics (Build 20)</label>
++    <label class="label" for="diagnostics">Light Diagnostics (Build 21)</label>
+@@ -23,7 +23,7 @@
+-  <div class="hint">Default OFF. Build 20 returns to the clean Build 17 runtime, removes the Build 18/19 CSP/module-bridge experiments, preserves the proven compatibility shims, and adds a chatgpt.com-only client-side iOS/Safari 18.7 browser-version gate override. When diagnostics are ON, reload ChatGPT once; reports include original/effective UA plus the existing privacy-safe feature and public-asset checks.</div>
++  <div class="hint">Default OFF. Build 21 keeps the clean Build 20 runtime and adds a chatgpt.com-only HTTP User-Agent request-header override matching the existing client-side iOS/Safari 18.7 identity. It does not modify CSP or other request headers. When diagnostics are ON, reload ChatGPT once; reports include original/effective UA, HTTP-UA configuration status, and the existing privacy-safe feature/public-asset checks.</div>
+
+===== rules.json (new) =====
+[
+  {
+    "id": 2101,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        {
+          "header": "User-Agent",
+          "operation": "set",
+          "value": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.7 Mobile/15E148 Safari/604.1"
+        }
+      ]
+    },
+    "condition": {
+      "regexFilter": "^https://chatgpt\\.com/",
+      "resourceTypes": [
+        "main_frame",
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "xmlhttprequest",
+        "ping",
+        "media",
+        "websocket",
+        "other"
+      ]
+    }
+  }
+]
+
+===== RELEASE-NOTES.txt =====
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 21
+
+Corrective changes from Build 20:
+- Preserved Build 20 client-side iOS/Safari 18.7 navigator.userAgent/appVersion override.
+- Added one Safari/WebExtension declarativeNetRequest rule that sets only the HTTP User-Agent request header on https://chatgpt.com/* to the matching iOS/Safari 18.7 identity.
+- The rule does not change response headers, CSP, cookies, authorization, request bodies, or any other site.
+- Build 18/19 module/CSP experiments remain removed.
+- Diagnostics report that the HTTP-UA rule is configured (configuration is not itself proof that Safari applied the rule).
+- Diagnostics remain default OFF.
+
+Status: PENDING / NOT DONE until real-device functionality is confirmed.
+
+===== RELEASE-EVIDENCE.txt =====
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 21
+
+Release evidence generated locally before packaging:
+- Latest MASTER_RULES.md re-read from GitHub before Build 21.
+- Build 20 runtime preserved except for Build 21 identity/report wording and scoped HTTP-UA rule integration.
+- DNR permission/host access limited to https://chatgpt.com/*.
+- Exactly one request header is modified: User-Agent.
+- No CSP/response-header modification and no Build 18/19 module bridge.
+- Safe Self-Test and static audit results are recorded in their release files after final test.
+
+Status: PENDING / NOT DONE pending real-device test.
+- Safe Self-Test: 60 PASS / 0 FAIL.
+- Static/privacy audit: 78 PASS / 0 FAIL.
+- JavaScript syntax and JSON parse checks passed before packaging.
+
+===== SAFE-SELF-TEST.txt =====
+PASS - manifest identifies Version 1.0 Build 21 manifest 1.0.20
+PASS - Build 21 UA override is ChatGPT-origin scoped and changes only userAgent/appVersion identity
+PASS - Build 21 UA override records original/effective identity and success status
+PASS - Build 21 UA override does nothing outside chatgpt.com
+PASS - Build 21 UA override has no network, DOM, storage, cookie, clipboard, or timer behavior
+PASS - Build 21 keeps Build 18/19 CSP/module bridge removed and adds only scoped HTTP-UA DNR access
+PASS - Build 21 HTTP User-Agent rule is exact-host scoped and changes no other header
+PASS - Build 21 HTTP User-Agent rule covers normal ChatGPT request resource types without unrelated domains
+PASS - Build 21 main probe and report expose UA override status without page content
+PASS - URL.canParse compatibility behavior preserved
+PASS - Object.groupBy compatibility behavior preserved
+PASS - Map.groupBy compatibility behavior preserved
+PASS - diagnostic has no heavy observer/polling/click architecture
+PASS - diagnostic creates no on-page UI
+PASS - page-world probe does not read page text or input values
+PASS - CSP-invalid new Function syntax probes removed
+PASS - API feature matrix still includes targeted modern capabilities
+PASS - feature matrix remains diagnostic-only and defines no missing APIs
+PASS - early matrix captured before setting resolution
+PASS - 8-second matrix and early-vs-late comparison are produced
+PASS - all feature values are normalized to strict booleans
+PASS - comparison exposes canonical missing-at-8-seconds list
+PASS - OFF resolution removes listeners and clears early matrix/error buffer
+PASS - resource timing remains one-time API read
+PASS - early-vs-late comparison detects capability becoming supported during startup
+PASS - diagnostics OFF saves no report
+PASS - resource URL secrets and long IDs are redacted
+PASS - popup identifies Build 21 and default remains OFF
+PASS - Copy Missing Features Only copies compact 8-second result through production popup handler
+PASS - Copy Missing Features Only fallback selects compact result on older clipboard path
+PASS - version/build strings consistent across release docs
+PASS - Build 21 polyfill contains evidence-selected compatibility shims
+PASS - Build 21 scanner is limited to same-origin public /cdn/assets JS and credentials omitted
+PASS - Build 21 scanner has bounded asset count/size/timeout and sequential yield
+PASS - Build 21 scanner never persists static asset source text
+PASS - Build 21 scans only APIs still missing at 8 seconds
+PASS - Build 21 asset scan reports only filenames/hit metadata
+PASS - Build 21 popup adds Copy Asset Scan Only
+PASS - Build 21 context classifier covers the 10 Build 14 hit APIs
+PASS - Build 21 classifier persists only aggregate metadata, never source snippets
+PASS - Build 21 classifier distinguishes direct/guard/optional/fallback/definition and RegExp-v forms
+PASS - Build 21 production classifier recognizes representative direct, guard, definition, optional, and RegExp-v contexts
+PASS - Build 21 popup adds Copy Context Classifier Only
+PASS - Copy Asset Scan Only copies only the production asset-scan section
+PASS - Copy Context Classifier Only copies only classifier section
+PASS - Build 21 Set.union returns this values then new other values in order
+PASS - Build 21 Set.intersection returns common values
+PASS - Build 21 Set methods accept set-like values with size/has/keys
+PASS - Build 21 Uint8Array Base64 default round-trip works
+PASS - Build 21 Uint8Array Base64 URL-safe and omit-padding options work
+PASS - Build 21 Uint8Array Base64 rejects invalid alphabet input
+PASS - Build 21 ArrayBuffer.transfer preserves bytes and requested size
+PASS - Build 21 ArrayBuffer.transfer detaches source when transferable structuredClone works
+PASS - Build 21 Popover fallbacks install show/hide/toggle without DOM mutation requirements
+PASS - Build 21 intentionally leaves Navigation API, URLPattern, scheduler.postTask, and RegExp-v rewrite untouched
+PASS - Build 21 RegExp.escape handles leading alphanumeric and regexp syntax
+PASS - Build 21 RegExp.escape escapes whitespace and punctuators safely
+PASS - Build 21 RegExp.escape output matches the original string literally
+PASS - Build 21 startViewTransition fallback installs on Document prototype
+PASS - Build 21 startViewTransition fallback exposes expected promises and skipTransition
+TOTAL: 60 PASS / 0 FAIL
+
+===== STATIC-AUDIT.txt =====
+Build 21 Static / Privacy Audit
+PASS - Manifest is MV3
+PASS - Manifest version is 1.0.20
+PASS - Manifest identifies Build 21 behavior
+PASS - Permissions are exactly storage + declarativeNetRequestWithHostAccess
+PASS - Host permissions are exactly chatgpt.com HTTPS
+PASS - No tabs permission
+PASS - No cookies permission
+PASS - No history permission
+PASS - No clipboard permission
+PASS - No webRequest permission
+PASS - No background service worker
+PASS - Exactly one static DNR ruleset
+PASS - DNR ruleset enabled
+PASS - DNR ruleset path is rules.json
+PASS - Exactly one DNR rule
+PASS - DNR rule id is stable 2101
+PASS - DNR action is modifyHeaders
+PASS - DNR modifies request headers only
+PASS - Exactly one request header modification
+PASS - Modified header is User-Agent
+PASS - Header operation is set
+PASS - HTTP UA target is iOS 18.7
+PASS - HTTP UA target is Safari 18.7
+PASS - DNR regex is exact HTTPS chatgpt.com
+PASS - No unrelated host appears in DNR rule
+PASS - DNR rule covers main frame
+PASS - DNR rule covers scripts
+PASS - DNR rule covers XHR
+PASS - No CSP header modification
+PASS - No authorization header modification
+PASS - No cookie header modification
+PASS - No redirect action
+PASS - No block action
+PASS - Build 18/19 module bridge absent
+PASS - UA compat is chatgpt origin scoped
+PASS - UA compat reports Build 21
+PASS - UA compat target is iOS/Safari 18.7
+PASS - UA compat status marks HTTP UA configured
+PASS - UA compat has no fetch/XHR
+PASS - UA compat has no DOM mutation
+PASS - UA compat has no storage access
+PASS - UA compat has no cookies
+PASS - Polyfill preserves URL.canParse
+PASS - Polyfill preserves Object.groupBy
+PASS - Polyfill preserves Map.groupBy
+PASS - Polyfill contains evidence-selected Set shims
+PASS - Polyfill contains Base64 typed-array shims
+PASS - Polyfill contains RegExp.escape
+PASS - Polyfill contains startViewTransition fallback
+PASS - No Navigation API fake
+PASS - No URLPattern fake
+PASS - No RegExp-v source rewrite
+PASS - Main probe Build 21
+PASS - Light diagnostic Build 21
+PASS - Popup labels Build 21
+PASS - Diagnostics default OFF
+PASS - Diagnostic has no MutationObserver construction
+PASS - Diagnostic has no PerformanceObserver construction
+PASS - Diagnostic has no polling interval
+PASS - Diagnostic has no click tracking
+PASS - Diagnostic has no on-page UI creation
+PASS - Main probe does not read textContent
+PASS - Main probe does not read innerText
+PASS - Main probe does not read input values
+PASS - Main probe does not read placeholder attributes
+PASS - Asset scan same-origin path constrained
+PASS - Asset scan omits credentials
+PASS - Asset scan bounded by count
+PASS - Asset scan bounded by bytes
+PASS - Asset scan bounded by timeout
+PASS - No static asset source persisted
+PASS - HTTP-UA diagnostic wording says configured
+PASS - HTTP-UA diagnostic includes target
+PASS - No external runtime script URLs in content-script JS entries
+PASS - Manifest content script order keeps UA before polyfill
+PASS - Main-world compatibility script at document_start
+PASS - Main probe at document_start MAIN
+PASS - Isolated diagnostic at document_start
+TOTAL: 78 PASS / 0 FAIL
