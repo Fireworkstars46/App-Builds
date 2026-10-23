@@ -1,0 +1,45 @@
+ChatGPT iOS 16 Orion Fix — Static Audit
+Version 1.0 | Build 10
+
+1. PASS - manifest JSON valid
+2. PASS - manifest version is 1.0.9
+3. PASS - polyfill loads first in MAIN world
+4. PASS - main-probe loads at document_start in MAIN world
+5. PASS - light diagnostic loads at document_start
+6. PASS - only storage permission requested
+7. PASS - polyfill scope preserved
+8. PASS - diagnostics only scoped to chatgpt.com
+9. PASS - polyfill contains URL.canParse shim
+10. PASS - polyfill contains Object.groupBy shim
+11. PASS - polyfill contains Map.groupBy shim
+12. PASS - main probe contains early feature matrix
+13. PASS - feature matrix runs before early listener attach
+14. PASS - feature matrix records booleans only
+15. PASS - feature matrix includes RegExp v probe
+16. PASS - feature matrix includes Iterator helpers
+17. PASS - feature matrix includes Set methods
+18. PASS - feature matrix includes newer buffer/base64 helpers
+19. PASS - feature matrix includes browser/DOM gates
+20. PASS - feature matrix includes safe syntax probes
+21. PASS - no MutationObserver construction
+22. PASS - no PerformanceObserver construction
+23. PASS - no setInterval polling
+24. PASS - no click tracking
+25. PASS - no on-page diagnostic UI construction
+26. PASS - no document.cookie access
+27. PASS - no localStorage/sessionStorage access
+28. PASS - no clipboard read access
+29. PASS - no typed/page text reads
+30. PASS - no network interception APIs added
+31. PASS - CSP sample/code content is not read
+32. PASS - OFF path detaches listeners
+33. PASS - OFF path clears early error buffer
+34. PASS - OFF path clears early feature matrix
+35. PASS - popup identifies Build 10
+36. PASS - popup setting still defaults OFF
+37. PASS - Build 9 polyfill bytes preserved
+38. PASS - Build 9 popup.js bytes preserved
+39. PASS - self-test source identifies Build 10
+
+Total: 39 PASS / 0 FAIL
+Status: PENDING / NOT DONE until real-device testing.
