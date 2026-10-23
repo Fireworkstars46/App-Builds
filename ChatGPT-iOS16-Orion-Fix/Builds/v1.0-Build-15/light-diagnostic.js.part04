@@ -1,0 +1,25 @@
+inProbe(true);
+    if (!document.documentElement) document.addEventListener("DOMContentLoaded", () => resolveMainProbe(true), { once: true });
+
+    document.addEventListener("DOMContentLoaded", () => addEvent("lifecycle", "DOMContentLoaded"), { once: true });
+    window.addEventListener("load", () => addEvent("lifecycle", "window load"), { once: true });
+
+    setTimeout(() => {
+      if (!state.completed) addEvent("probe-timeout", "No page-world snapshot received by 9.5 seconds");
+      persist();
+    }, FALLBACK_DELAY_MS);
+  }
+
+  storageGet({ [ENABLE_KEY]: false }, (settings) => {
+    if (settings && settings[ENABLE_KEY] === true) {
+      start();
+      return;
+    }
+    function resolveOff() {
+      try { if (document.documentElement) document.documentElement.setAttribute(ENABLE_ATTR, "0"); } catch (_) {}
+      try { document.dispatchEvent(new Event(RESOLVE_EVENT)); } catch (_) {}
+    }
+    resolveOff();
+    if (!document.documentElement) document.addEventListener("DOMContentLoaded", resolveOff, { once: true });
+  });
+})();
