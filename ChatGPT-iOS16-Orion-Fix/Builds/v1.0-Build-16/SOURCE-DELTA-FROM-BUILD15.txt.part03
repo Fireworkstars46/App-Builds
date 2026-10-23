@@ -1,0 +1,45 @@
+on-page diagnostic UI is used; resource timing is read once at the 8-second snapshot. Build 15 then scans and classifies the already-loaded same-origin public /cdn/assets/*.js files one at a time with short yields.");
++      lines.push("Performance: no MutationObserver, PerformanceObserver, DOM polling, click tracking, or on-page diagnostic UI is used; resource timing is read once at the 8-second snapshot. Build 16 then scans and classifies the already-loaded same-origin public /cdn/assets/*.js files one at a time with short yields.");
+       return lines.join("\n");
+     }
+ 
+--- Build15/popup.html
++++ Build16/popup.html
+@@ -20,10 +20,10 @@
+ <body>
+   <h1>ChatGPT iOS 16 Fix</h1>
+   <div class="row">
+-    <label class="label" for="diagnostics">Light Diagnostics (Build 15)</label>
++    <label class="label" for="diagnostics">Light Diagnostics (Build 16)</label>
+     <input id="diagnostics" type="checkbox">
+   </div>
+-  <div class="hint">Default OFF. When ON, reload ChatGPT once. Build 15 preserves the corrected feature matrix and public-asset scan, then classifies the matched API references as direct calls, guards, optional access, fallback-style use, definitions/polyfills, or RegExp-v candidates. Asset source is discarded immediately; no snippets, page text, or chat text are saved.</div>
++  <div class="hint">Default OFF. When ON, reload ChatGPT once. Build 16 adds the first targeted compatibility fixes selected from the real-device classifier. Diagnostics remain optional and default OFF; when enabled they keep the corrected feature matrix and public-asset scan without saving bundle source, page text, or chat text.</div>
+   <div id="status" role="status" aria-live="polite">Loading…</div>
+   <textarea id="report" readonly spellcheck="false" aria-label="Saved diagnostic report"></textarea>
+   <div class="buttons">
+--- Build15/selftest.js
++++ Build16/selftest.js
+@@ -7,7 +7,7 @@
+ function read(name) { return fs.readFileSync(path.join(root, name), 'utf8'); }
+ function polyfillContext() { class TestURL extends URL {} const c={URL:TestURL,Object,Map,Number,TypeError,Symbol,console}; vm.createContext(c); vm.runInContext(read('polyfill.js'),c); return c; }
+ 
+-check('manifest identifies Version 1.0 Build 15 manifest 1.0.14',()=>{const m=JSON.parse(read('manifest.json'));return m.manifest_version===3&&m.version==='1.0.14'&&m.content_scripts.some(x=>x.js&&x.js.includes('main-probe.js')&&x.world==='MAIN');});
++check('manifest identifies Version 1.0 Build 16 manifest 1.0.15',()=>{const m=JSON.parse(read('manifest.json'));return m.manifest_version===3&&m.version==='1.0.15'&&m.content_scripts.some(x=>x.js&&x.js.includes('main-probe.js')&&x.world==='MAIN');});
+ check('URL.canParse compatibility behavior preserved',()=>{const c=polyfillContext();return c.URL.canParse('https://example.com')===true&&c.URL.canParse('::::')===false&&c.URL.canParse('/a','https://example.com')===true;});
+ check('Object.groupBy compatibility behavior preserved',()=>{const c=polyfillContext();const r=c.Object.groupBy([1,2,3,4],v=>v%2?'odd':'even');return r.odd.join(',')==='1,3'&&r.even.join(',')==='2,4'&&Object.getPrototypeOf(r)===null;});
+ check('Map.groupBy compatibility behavior preserved',()=>{const c=polyfillContext();const k={};const r=c.Map.groupBy([1,2,3],v=>v===1?k:NaN);return r.get(k)[0]===1&&r.get(NaN).join(',')==='2,3';});
+@@ -51,11 +51,11 @@
+   const compact = r.match(/Compact feature result:[\s\S]*?(?=\nDetailed browser feature comparison:)/);
+   const late = r.match(/8-second matrix \(after ChatGPT startup attempt\):[\s\S]*?- missing\/unsupported: (\d+)/);
+   const compactCount = compact && compact[0].match(/- missing at 8 seconds: (\d+)/);
+-  return /Version 1.0 \| Build 15/.test(r)&&/Detailed browser feature comparison:/.test(r)&&/Promise.withResolvers/.test(r)&&/became supported:/.test(r)&&/8-second matrix/.test(r)&&compact&&late&&compactCount&&late[1]===compactCount[1]&&compact[0].includes('navigator.scheduling.isInputPending')&&!/syntax: optional chaining/.test(r);
++  return /Version 1.0 \| Build 16/.test(r)&&/Detailed browser feature comparison:/.test(r)&&/Promise.withResolvers/.test(r)&&/became supported:/.test(r)&&/8-second matrix/.test(r)&&compact&&late&&compactCount&&late[1]===compactCount[1]&&compact[0].includes('navigator.scheduling.isInputPending')&&!/syntax: optional chaining/.test(r);
+ });
+ check('diagnostics OFF saves no report',()=>{const h=buildBase(false);vm.runInContext(read('main-probe.js'),h.context);vm.runInContext(read('light-diagnostic.js'),h.context);finish(h);return !Object.prototype.hasOwnProperty.call(h.saved,'lightDiagnosticReport');});
+ check('resource URL secrets and long IDs are redacted',()=>{const h=buildBase(true);vm.runInContext(read('main-probe.js'),h.context);vm.runInContext(read('light-diagnostic.js'),h.context);finish(h);const r=h.saved.lightDiagnosticReport.report;return !r.includes('SECRET')&&!r.includes('?token=')&&(r.includes(':hex')||r.includes(':token'));});
+-check('popup identifies Build 15 and default remains OFF',()=>{const h=read('popup.html'),j=read('popup.js');return /Light Diagnostics \(Build 15\)/.test(h)&&/\[ENABLE_KEY\]: false/.test(j);});
++check('popup identifies Build 16 and default remains OFF',()=>{const h=read('popup.html'),j=read('popup.js');return /Light Diagnostics \(Build 16\)/.test(h)&&/\[ENABLE_KEY\]: false/.test(j);});
+ check('Copy Missing Features Only copies compact 8-second result through production popup handler',()=>{
+   class PopEl {constructor(){this.handlers={};this.checked=false;this.textContent='';this.value='';this.selection=null;}addEventListener(t,f){this.handlers[t]=f;}focus(){}select(){this.selection=[0,this.value.length];}setSelectionRange(a,b){this.selection=[a,b];}}
+   const ids=['diagnostics','status','report','reportStatus','refresh',
