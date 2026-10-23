@@ -1,0 +1,11 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 15
+
+Changes from Build 14:
+- Keeps the existing URL.canParse, Object.groupBy, and Map.groupBy compatibility layer unchanged.
+- Keeps Build 13 strict-boolean feature comparison and Build 14 one-pass public /cdn/assets JS scan.
+- Adds in-memory context classification for the 10 APIs that had source-token hits in the real Build 14 iPhone report.
+- Classifies asset-level evidence as direct use, feature guard, optional access, fallback-style use, definition/polyfill, RegExp constructor-v, RegExp literal-v candidate, or unclassified.
+- Adds Copy Context Classifier Only.
+- Does not save source snippets or surrounding bundle code.
+
+Status: PENDING / NOT DONE until tested on the real Orion/iOS 16.6 device.
