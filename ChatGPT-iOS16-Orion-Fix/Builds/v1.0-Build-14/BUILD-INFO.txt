@@ -1,0 +1,7 @@
+ChatGPT iOS 16 Orion Fix
+Version: 1.0
+Build: 14
+Manifest version: 1.0.13
+Purpose: Preserve the corrected Build 13 diagnostics and add a one-time privacy-limited source-token scan of already-loaded public ChatGPT /cdn/assets/*.js files for APIs still missing after 8 seconds.
+Compatibility shims remain unchanged: URL.canParse, Object.groupBy, Map.groupBy.
+Status: PENDING / NOT DONE until real iPhone/Orion test.
