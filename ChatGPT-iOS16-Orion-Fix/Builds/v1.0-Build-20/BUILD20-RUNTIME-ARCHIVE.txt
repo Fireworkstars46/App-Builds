@@ -1,0 +1,233 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 20
+Permanent runtime reconstruction / release evidence
+
+STATUS: PENDING / NOT DONE pending real-device test.
+ZIP SHA-256: 7ced8a45d15860161409ae79c3e358a9adcd0582db033de486ce3620ddfecd83
+Safe Self-Test: 58 PASS / 0 FAIL
+Static audit: 53 PASS / 0 FAIL
+Fresh extracted ZIP checksums, JS syntax, manifest parse, and Safe Self-Test passed.
+
+Reconstruction:
+1. Start from archived Version 1.0 Build 17 runtime source.
+2. Apply the runtime delta below.
+3. Verify runtime files against the source hashes below.
+Build 17 polyfill.js and popup.js remain byte-identical.
+
+===== SOURCE-SHA256.txt =====
+9dd4080f31a49feebd60108f33c134ba627e83e296d6a2f433b95b0dbc0a87e0  manifest.json
+f5f43094361fc7bd40d189c0b72c6ecd6791b433ab1dd0ebbbe4de847270f196  ua-compat.js
+98cf66ed37be0f1ef5c4b4f6f3781b84302575aa95108c22468e95fc23a81068  polyfill.js
+cfe1962f4a32cbc4c26c3df90f5b692ff5daf7830defb946402b5d8b1a4e0880  main-probe.js
+3754faac58bc796b536cc1d31a3e54b39cd4d1ea924810e502431ad4196ccfdc  light-diagnostic.js
+9681b8484a1da934c79b511157993ee81d34c86a56eced5b0d33b86638e8bb6b  popup.html
+b66fe0c51b210349aa8d81ee300b6764efb3a4706266692cb9d27f11b5b88677  popup.js
+80e61a821c8fe2f9823003f5b1420e765b53fdb09229e933e8eaed915249c58a  selftest.js
+
+===== manifest.json =====
+{
+  "manifest_version": 3,
+  "name": "ChatGPT iOS 16 URL.canParse Fix",
+  "version": "1.0.19",
+  "description": "Adds targeted iOS 16 compatibility shims for ChatGPT plus a Build 20 client-side browser-version gate override that presents iOS/Safari 18.7 on chatgpt.com only. Optional diagnostics default OFF.",
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_title": "ChatGPT iOS 16 Fix",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://auth.openai.com/*",
+        "https://auth0.openai.com/*",
+        "https://setup.auth.openai.com/*",
+        "https://frontend-apps-multi-region.workos.com/*",
+        "https://forwarder.workos.com/*"
+      ],
+      "js": [
+        "ua-compat.js",
+        "polyfill.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "main-probe.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "light-diagnostic.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}
+
+===== ua-compat.js =====
+(() => {
+  "use strict";
+
+  // Build 20: narrowly scoped ChatGPT browser-version compatibility gate override.
+  // Keep the real iPhone/WebKit identity while presenting a currently supported
+  // iOS/Safari version to client-side browser-version gates. This does not change
+  // the network User-Agent header and does not add or fake unrelated APIs.
+  if (location.origin !== "https://chatgpt.com") return;
+
+  const STATUS_KEY = "__chatgptIOS16UaCompatStatus";
+  const TARGET_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.7 Mobile/15E148 Safari/604.1";
+  const TARGET_APP_VERSION = "5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.7 Mobile/15E148 Safari/604.1";
+
+  const original = {
+    userAgent: safeString(() => navigator.userAgent),
+    appVersion: safeString(() => navigator.appVersion)
+  };
+
+  function safeString(read) {
+    try { return String(read() || ""); }
+    catch (_) { return ""; }
+  }
+
+  function installGetter(name, value) {
+    try {
+      Object.defineProperty(navigator, name, {
+        configurable: true,
+        enumerable: true,
+        get: () => value
+      });
+      if (safeString(() => navigator[name]) === value) return "instance";
+    } catch (_) {}
+
+    try {
+      const proto = Object.getPrototypeOf(navigator);
+      if (!proto) return "failed";
+      const current = Object.getOwnPropertyDescriptor(proto, name);
+      if (current && current.configurable === false) return "failed";
+      Object.defineProperty(proto, name, {
+        configurable: true,
+        enumerable: current ? Boolean(current.enumerable) : true,
+        get: () => value
+      });
+      if (safeString(() => navigator[name]) === value) return "prototype";
+    } catch (_) {}
+
+    return "failed";
+  }
+
+  const userAgentMode = installGetter("userAgent", TARGET_UA);
+  const appVersionMode = installGetter("appVersion", TARGET_APP_VERSION);
+
+  const status = Object.freeze({
+    version: "1.0",
+    build: 20,
+    active: userAgentMode !== "failed" && appVersionMode !== "failed",
+    originalUserAgent: original.userAgent,
+    originalAppVersion: original.appVersion,
+    effectiveUserAgent: safeString(() => navigator.userAgent),
+    effectiveAppVersion: safeString(() => navigator.appVersion),
+    userAgentMode,
+    appVersionMode,
+    target: "iOS/Safari 18.7"
+  });
+
+  try {
+    Object.defineProperty(window, STATUS_KEY, {
+      configurable: true,
+      value: status
+    });
+  } catch (_) {
+    try { window[STATUS_KEY] = status; } catch (_) {}
+  }
+})();
+
+===== RUNTIME-DELTA-FROM-BUILD17.txt =====
+--- Build17/manifest.json
++++ Build20/manifest.json
+@@
+-  "version": "1.0.16",
+-  "description": "Adds targeted iOS 16 compatibility shims for ChatGPT, including URL.canParse, groupBy, Set union/intersection, ArrayBuffer.transfer, Uint8Array Base64 helpers, Popover fallback, RegExp.escape, and a no-animation View Transition fallback. Optional Build 17 diagnostics default OFF.",
++  "version": "1.0.19",
++  "description": "Adds targeted iOS 16 compatibility shims for ChatGPT plus a Build 20 client-side browser-version gate override that presents iOS/Safari 18.7 on chatgpt.com only. Optional diagnostics default OFF.",
+@@
+       "js": [
++        "ua-compat.js",
+         "polyfill.js"
+       ],
+
+--- /dev/null
++++ Build20/ua-compat.js
+@@
++Add the exact ua-compat.js archived above.
+
+--- Build17/main-probe.js
++++ Build20/main-probe.js
+@@
+-  const BUILD = 17;
++  const BUILD = 20;
+@@
+       browser: {
+         userAgent: clip(navigator.userAgent || "", 320),
+         platform: clip(navigator.platform || "", 80),
+-        vendor: clip(navigator.vendor || "", 80)
++        vendor: clip(navigator.vendor || "", 80),
++        uaCompat: (() => {
++          try {
++            const st = window.__chatgptIOS16UaCompatStatus;
++            if (!st || typeof st !== "object") return null;
++            return {
++              active: st.active === true,
++              target: clip(st.target || "", 60),
++              originalUserAgent: clip(st.originalUserAgent || "", 320),
++              effectiveUserAgent: clip(st.effectiveUserAgent || "", 320),
++              userAgentMode: clip(st.userAgentMode || "", 24),
++              appVersionMode: clip(st.appVersionMode || "", 24)
++            };
++          } catch (_) {
++            return null;
++          }
++        })()
+       },
+
+--- Build17/light-diagnostic.js
++++ Build20/light-diagnostic.js
+@@
+-  const BUILD = 17;
++  const BUILD = 20;
+@@
+         lines.push("- user agent: " + (b.userAgent || "unavailable"));
+         lines.push("- platform: " + (b.platform || "unavailable"));
+         lines.push("- vendor: " + (b.vendor || "unavailable"));
++        const ua = b.uaCompat;
++        lines.push("- UA compatibility override: " + (ua ? (ua.active ? "active" : "failed") : "unavailable"));
++        if (ua) {
++          lines.push("- UA compatibility target: " + (ua.target || "unknown"));
++          lines.push("- original user agent: " + (ua.originalUserAgent || "unavailable"));
++          lines.push("- effective user agent: " + (ua.effectiveUserAgent || b.userAgent || "unavailable"));
++          lines.push("- UA override mode: " + (ua.userAgentMode || "unknown") + "; appVersion override mode: " + (ua.appVersionMode || "unknown"));
++        }
+@@
+-        lines.push("- every Build 17 feature value is normalized to strict true/false before comparison");
++        lines.push("- every Build 20 feature value is normalized to strict true/false before comparison");
+@@
+-      lines.push("Performance: no MutationObserver, PerformanceObserver, DOM polling, click tracking, or on-page diagnostic UI is used; resource timing is read once at the 8-second snapshot. Build 17 then scans and classifies the already-loaded same-origin public /cdn/assets/*.js files one at a time with short yields.");
++      lines.push("Performance: no MutationObserver, PerformanceObserver, DOM polling, click tracking, or on-page diagnostic UI is used; resource timing is read once at the 8-second snapshot. Build 20 then scans and classifies the already-loaded same-origin public /cdn/assets/*.js files one at a time with short yields.");
+
+--- Build17/popup.html
++++ Build20/popup.html
+@@
+-    <label class="label" for="diagnostics">Light Diagnostics (Build 17)</label>
++    <label class="label" for="diagnostics">Light Diagnostics (Build 20)</label>
+@@
+-  <div class="hint">Default OFF. When ON, reload ChatGPT once. Build 17 adds the second targeted compatibility layer: RegExp.escape and a no-animation View Transition fallback, while preserving the Build 16 fixes. Diagnostics remain optional and default OFF; when enabled they keep the corrected feature matrix and public-asset scan without saving bundle source, page text, or chat text.</div>
++  <div class="hint">Default OFF. Build 20 returns to the clean Build 17 runtime, removes the Build 18/19 CSP/module-bridge experiments, preserves the proven compatibility shims, and adds a chatgpt.com-only client-side iOS/Safari 18.7 browser-version gate override. When diagnostics are ON, reload ChatGPT once; reports include original/effective UA plus the existing privacy-safe feature and public-asset checks.</div>
