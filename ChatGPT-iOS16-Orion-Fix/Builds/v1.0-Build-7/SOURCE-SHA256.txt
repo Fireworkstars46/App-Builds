@@ -1,0 +1,9 @@
+ebd354ffc6499654885ec30287453226c739d5a0ca25b979459d9fa440bdcc94  manifest.json
+79b2814539dbb14a885cff1661e194ef213fbfefb1d4f4bbf0ad09029ca6d4be  polyfill.js
+930c17e7217096820f6f59f2c9a429617e4e505dd4dd400a3e967fc7991501d1  main-probe.js
+055a5a82f9ee26c62c464fea6a2045f7b1cf35cf87a587bc064e7475dcf3752b  light-diagnostic.js
+5197d513d2e3a52895391f7543bc2040a556825a6653e5a2101298382e07ad77  popup.html
+b303b2ccaf1208970be90991c325ae20ffbe78763e55f6e8a39d22086777a41c  popup.js
+54e25feeaae7a3c630b5770b6b38efc625f7ea4e1c6df4f2f4f76b7b8db980f7  selftest.js
+
+polyfill.js and popup.js are intentionally byte-for-byte unchanged from Build 6.
