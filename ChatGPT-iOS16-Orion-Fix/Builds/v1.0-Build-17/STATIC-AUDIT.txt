@@ -1,0 +1,40 @@
+PASS - Manifest MV3
+PASS - Manifest version 1.0.16
+PASS - Only storage permission
+PASS - Polyfill MAIN document_start
+PASS - Main probe MAIN document_start
+PASS - Build 17 identity in main probe
+PASS - Build 17 identity in isolated reporter
+PASS - Popup labels Build 17
+PASS - URL.canParse preserved
+PASS - Object.groupBy preserved
+PASS - Map.groupBy preserved
+PASS - Set.union preserved
+PASS - Set.intersection preserved
+PASS - ArrayBuffer.transfer preserved
+PASS - Uint8Array.fromBase64 preserved
+PASS - Uint8Array.toBase64 preserved
+PASS - Popover fallback preserved
+PASS - RegExp.escape added
+PASS - View Transition fallback added
+PASS - View Transition promises/methods
+PASS - Navigation API not faked
+PASS - URLPattern not added
+PASS - scheduler.postTask not added
+PASS - No RegExp-v rewrite
+PASS - No MutationObserver
+PASS - No PerformanceObserver
+PASS - No setInterval
+PASS - No click tracking
+PASS - No on-page diagnostic UI
+PASS - No page text collection
+PASS - No cookie access
+PASS - No local/session storage reads
+PASS - No clipboard read
+PASS - Asset fetch credentials omitted
+PASS - Asset scan same-origin restricted
+PASS - Asset source not persisted
+PASS - Diagnostics default OFF
+PASS - CSP sample not read
+PASS - Selftest identifies Build 17
+TOTAL: 39 PASS / 0 FAIL
