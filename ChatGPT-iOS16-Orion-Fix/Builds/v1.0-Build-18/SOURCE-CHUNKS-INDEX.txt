@@ -1,0 +1,13 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 18
+Chunked source archive index
+
+Reconstruct module-compat.js by concatenating its parts in numeric order with NO separators.
+Verify the reconstructed SHA-256 below.
+
+module-compat.js  SHA256=7cf00e976bd0e188910da73f7407e92843018b0edd106c6796dcc89d344fbd1c  parts=4
+  module-compat.js.part01  SHA256=3972c312cb438bbdcf2119765273c77057bc5449c27e791ee310886f0d7b5c4b  chars=5000
+  module-compat.js.part02  SHA256=004196197d91442ad074343472c02e3423cf57dc1ad60b2a60f5b709673693fa  chars=5000
+  module-compat.js.part03  SHA256=9830618be69498b2b4d306178cb03e8e1fabc3ae8fcfd83f8f84b99c87b6045b  chars=5000
+  module-compat.js.part04  SHA256=8321c1ba07e1f436557d7cf1fa0d39f09eac1ad1ea7a9ec590cd74c3220c3f97  chars=1719
+
+Full Build 17 -> Build 18 delta SHA256 (not fully uploaded through connector): 4d150be997e656a553d9754660ea9408941514fb1884286d5c3e947990a97cc8
