@@ -1,0 +1,119 @@
+ Boolean(intl && hasFunction(intl.DurationFormat)),
+        "ReadableStream.from": Boolean(readableStreamCtor && hasFunction(readableStreamCtor.from)),
+        "ArrayBuffer.prototype.transfer": Boolean(arrayBufferProto && hasFunction(arrayBufferProto.transfer)),
+        "ArrayBuffer.prototype.transferToFixedLength": Boolean(arrayBufferProto && hasFunction(arrayBufferProto.transferToFixedLength)),
+        "Resizable ArrayBuffer": Boolean(arrayBufferProto && "resizable" in arrayBufferProto),
+        "Uint8Array.fromBase64": hasFunction(Uint8Array.fromBase64),
+        "Uint8Array.fromHex": hasFunction(Uint8Array.fromHex),
+        "Uint8Array.prototype.toBase64": Boolean(uint8Proto && hasFunction(uint8Proto.toBase64)),
+        "Uint8Array.prototype.toHex": Boolean(uint8Proto && hasFunction(uint8Proto.toHex)),
+        "Uint8Array.prototype.setFromBase64": Boolean(uint8Proto && hasFunction(uint8Proto.setFromBase64)),
+        "Uint8Array.prototype.setFromHex": Boolean(uint8Proto && hasFunction(uint8Proto.setFromHex)),
+        "Array.prototype.toSorted": hasFunction(Array.prototype.toSorted),
+        "Array.prototype.toReversed": hasFunction(Array.prototype.toReversed),
+        "Array.prototype.toSpliced": hasFunction(Array.prototype.toSpliced),
+        "Array.prototype.with": hasFunction(Array.prototype.with),
+        "Object.hasOwn": hasFunction(Object.hasOwn),
+        "WeakRef": typeof WeakRef === "function",
+        "FinalizationRegistry": typeof FinalizationRegistry === "function",
+        "Intl.Segmenter": Boolean(intl && hasFunction(intl.Segmenter)),
+        "Intl.supportedValuesOf": Boolean(intl && hasFunction(intl.supportedValuesOf)),
+        "URL.canParse": typeof URL !== "undefined" && hasFunction(URL.canParse),
+        "CSS :has selector support": typeof CSS !== "undefined" && CSS && hasFunction(CSS.supports) ? Boolean(CSS.supports("selector(:has(*))")) : false,
+        "scheduler.postTask": typeof scheduler !== "undefined" && scheduler && hasFunction(scheduler.postTask),
+        "navigator.scheduling.isInputPending": typeof navigator !== "undefined" && navigator.scheduling && hasFunction(navigator.scheduling.isInputPending),
+        "trustedTypes.createPolicy": typeof trustedTypes !== "undefined" && trustedTypes && hasFunction(trustedTypes.createPolicy),
+        "document.startViewTransition": typeof document !== "undefined" && hasFunction(document.startViewTransition),
+        "HTMLElement.prototype.showPopover": typeof HTMLElement !== "undefined" && hasFunction(HTMLElement.prototype.showPopover),
+        "Navigation API": typeof navigation !== "undefined",
+        "CompressionStream": typeof CompressionStream === "function",
+        "DecompressionStream": typeof DecompressionStream === "function",
+        "TextEncoderStream": typeof TextEncoderStream === "function",
+        "TextDecoderStream": typeof TextDecoderStream === "function",
+        "AbortSignal.any": Boolean(abortSignalCtor && hasFunction(abortSignalCtor.any)),
+        "AbortSignal.timeout": Boolean(abortSignalCtor && hasFunction(abortSignalCtor.timeout)),
+        "structuredClone": typeof structuredClone === "function",
+        "crypto.randomUUID": Boolean(cryptoObj && hasFunction(cryptoObj.randomUUID))
+    };
+
+    return {
+      captured: new Date().toISOString(),
+      phase: phase || "unknown",
+      features: normalizeFeatureMap(rawFeatures)
+    };
+  }
+
+  earlyFeatureMatrix = buildFeatureMatrix("document_start before ChatGPT bootstrap; after this extension's compatibility polyfill");
+
+  function clip(value, maxLength) {
+    const text = String(value == null ? "" : value);
+    return text.length > maxLength ? text.slice(0, maxLength) + "…" : text;
+  }
+
+  function redactPath(pathname) {
+    return String(pathname || "")
+      .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/ig, ":uuid")
+      .replace(/\b[0-9a-f]{24,}\b/ig, ":hex")
+      .replace(/\b[A-Za-z0-9_-]{32,}\b/g, ":token")
+      .replace(/\/\d{9,}(?=\/|$)/g, "/:id");
+  }
+
+  function sanitizeUrl(value) {
+    const text = clip(value, 1400);
+    if (!text) return "";
+    try {
+      const parsed = new URL(text, window.location.origin);
+      if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+        return parsed.origin + redactPath(parsed.pathname);
+      }
+    } catch (_) {}
+    return clip(redactPath(text.replace(/[?#].*$/, "")), 500);
+  }
+
+  function safeMessage(value) {
+    return clip(value, 900).replace(/https?:\/\/[^\s)]+/g, (match) => sanitizeUrl(match));
+  }
+
+  function emit(kind, payload) {
+    const detail = JSON.stringify({
+      version: VERSION,
+      build: BUILD,
+      kind,
+      time: new Date().toISOString(),
+      payload: payload || null
+    });
+    try {
+      document.dispatchEvent(new CustomEvent(REPORT_EVENT, { detail }));
+    } catch (_) {
+      try {
+        const event = document.createEvent("CustomEvent");
+        event.initCustomEvent(REPORT_EVENT, false, false, detail);
+        document.dispatchEvent(event);
+      } catch (_) {}
+    }
+  }
+
+  function reactMarkers(element) {
+    const result = {
+      fiber: false,
+      props: false,
+      events: false,
+      container: false,
+      listeners: false,
+      handles: false,
+      listening: false,
+      markerCount: 0
+    };
+    if (!element) return result;
+    try {
+      const names = Object.getOwnPropertyNames(element);
+      for (const name of names) {
+        if (name.indexOf("__reactFiber$") === 0) result.fiber = true;
+        if (name.indexOf("__reactProps$") === 0) result.props = true;
+        if (name.indexOf("__reactEvents$") === 0) result.events = true;
+        if (name.indexOf("__reactContainer$") === 0) result.container = true;
+        if (name.indexOf("__reactListeners$") === 0) result.listeners = true;
+        if (name.indexOf("__reactHandles$") === 0) result.handles = true;
+        if (name.indexOf("_reactListening") === 0) result.listening = true;
+      }
+      result.markerCount = Number(result.fiber) + Number(res
