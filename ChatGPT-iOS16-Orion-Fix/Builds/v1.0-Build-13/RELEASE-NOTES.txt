@@ -1,0 +1,10 @@
+ChatGPT iOS 16 Orion Fix — Release Notes
+Version 1.0 | Build 13
+
+Corrective changes from Build 12:
+- Normalizes every browser feature probe to strict true/false before saving or comparing results.
+- Prevents undefined-valued probes (such as navigator.scheduling.isInputPending on older WebKit) from causing summary/count disagreements.
+- Adds a canonical missingAtLate list for every API absent at the 8-second snapshot.
+- Changes Copy Missing Features Only to return a compact section centered on APIs missing at 8 seconds, plus became-supported/became-missing changes.
+- Keeps CSP-invalid syntax probes removed.
+- Keeps URL.canParse, Object.groupBy, and Map.groupBy compatibility shims unchanged.
