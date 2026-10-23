@@ -1,0 +1,10 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 17
+Manifest version: 1.0.16
+Status: PENDING / NOT DONE until real Orion iOS 16.6 runtime testing.
+
+Build 17 preserves all Build 16 compatibility shims and adds the second evidence-selected compatibility layer:
+- RegExp.escape
+- document.startViewTransition no-animation fallback
+
+Navigation API and RegExp-v source rewriting are intentionally not faked by this build.
