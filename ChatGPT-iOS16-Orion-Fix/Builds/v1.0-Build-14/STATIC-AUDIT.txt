@@ -1,0 +1,46 @@
+STATIC AUDIT — ChatGPT iOS 16 Orion Fix Version 1.0 Build 14
+
+PASS - manifest v3
+PASS - manifest extension version 1.0.13
+PASS - only storage permission
+PASS - polyfill MAIN document_start
+PASS - main probe MAIN document_start chatgpt
+PASS - isolated light diagnostic document_start
+PASS - build 14 in main probe
+PASS - build 14 in light diagnostic
+PASS - no MutationObserver construction
+PASS - no PerformanceObserver construction
+PASS - no setInterval polling
+PASS - no click tracking on page
+PASS - no on-page element creation
+PASS - no page textContent read
+PASS - no page innerText read
+PASS - no input value read
+PASS - no clipboard read in page probe
+PASS - no cookies read
+PASS - no localStorage/sessionStorage read
+PASS - no request body collection
+PASS - no CSP event.sample read
+PASS - asset scan restricted to cdn assets js
+PASS - asset scan same origin
+PASS - asset fetch credentials omitted
+PASS - asset fetch no referrer
+PASS - asset fetch cached
+PASS - asset scan bounded to 60
+PASS - asset size bounded
+PASS - asset timeout bounded
+PASS - asset scan yields
+PASS - asset source not emitted
+PASS - asset report contains only metadata
+PASS - scanner targets missing-at-late only
+PASS - scanner runs after 8-second snapshot emit
+PASS - existing feature normalization preserved
+PASS - syntax probes still absent
+PASS - compatibility shims not in diagnostic code
+PASS - asset scan report has caveat
+PASS - popup has asset-only copy
+PASS - default diagnostics remains OFF
+PASS - polyfill has only three intended shim names
+PASS - no broad host permissions added
+
+TOTAL: 42 PASS / 0 FAIL
