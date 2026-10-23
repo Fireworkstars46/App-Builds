@@ -1,0 +1,4 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 8
+
+Build 8 preserves the existing compatibility polyfills and Build 7 lightweight architecture. It adds targeted diagnostics for inline script/module failures without src URLs, CSP violations, extra React hydration/container/listening markers, and inline-vs-external module counts.
