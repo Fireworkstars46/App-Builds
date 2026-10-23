@@ -1,0 +1,7 @@
+ChatGPT iOS 16 Orion Fix — Release Evidence
+Version 1.0 | Build 9
+
+Targeted reason for Build 9: Build 8 showed ChatGPT resources loaded but no React hydration markers, while its page-world error listener could start only after the isolated-world storage lookup. Build 9 closes that timing gap by attaching the minimal error listeners immediately at document_start and resolving them ON/OFF moments later.
+
+No signing identity applies to this file-based Orion extension.
+Release remains PENDING / NOT DONE until real-device testing.
