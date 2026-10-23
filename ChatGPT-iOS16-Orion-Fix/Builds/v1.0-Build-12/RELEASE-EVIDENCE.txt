@@ -1,0 +1,13 @@
+ChatGPT iOS 16 Orion Fix — Release Evidence
+Version 1.0 | Build 12
+
+Reason for corrective build:
+The real Build 11 iOS report marked syntax such as optional chaining/nullish coalescing/private fields unsupported even though Safari 16.6 supports them. Source audit confirmed the syntax probes used new Function(), which ChatGPT CSP blocks, causing false negatives.
+
+Correction:
+- Remove CSP-invalid syntax probes.
+- Compare API-only feature matrices at document_start and at 8 seconds.
+- Preserve all existing compatibility shims and lightweight/off-page diagnostics behavior.
+
+Automated static and Safe Self-Test evidence is packaged with this build.
+Real Orion/iOS 16 runtime result remains required before DONE.
