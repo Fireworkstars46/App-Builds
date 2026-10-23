@@ -1,0 +1,28 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 14
+Chunked source archive index
+
+Large UTF-8 text files are split only for GitHub connector upload limits.
+Reconstruct each original by concatenating its parts in numeric order with NO separators.
+The reconstructed file must match the SHA-256 shown below.
+
+main-probe.js  SHA256=0ce07f329687ea47d63195ec432d1fced7f8e68136e89deb1eb75c13b448d925  parts=5
+  main-probe.js.part01  SHA256=41d867a6c02396601b6c0a8ba88faab05406cfcc11fd86edc87557f13fdfc862  chars=6479
+  main-probe.js.part02  SHA256=940457d3b08f1af29e8bea448e264f14a8e817b7b0ee1bb039b5266e5c4379b2  chars=6475
+  main-probe.js.part03  SHA256=ee8c3c83e323510cf379912a5397391bbe52d86f35a56a726c5a41a77e4c307b  chars=6492
+  main-probe.js.part04  SHA256=7fcac30ac1d7f02596d9bb10ae7d9669f45f8b5024aa9c88d1d6179cbc837330  chars=6459
+  main-probe.js.part05  SHA256=1be8ec0e74b57aa9b71610beda3e15889f8091350b4b9cd4f95c4b11682a8dc0  chars=3438
+
+light-diagnostic.js  SHA256=738d4f8d6f15aeba1a410e581849e5a573813eefe7d1c25bd6ae68f1bd5ca1e2  parts=3
+  light-diagnostic.js.part01  SHA256=077e98f8b09010b45bee401ccf86f17886a2d8a2b097dcdf2eda87f208789c50  chars=6472
+  light-diagnostic.js.part02  SHA256=9ac669b7b3a1c9d9731185c178707e77f7ab2dc459668fb666ec057043b365a8  chars=6384
+  light-diagnostic.js.part03  SHA256=928c168c3cb97730946f45ff25d49ce30b4cd01a6347b49ae7d6a2af5f37695d  chars=3633
+
+selftest.js  SHA256=59f0cb17fb0e0a5a5db9b4a63ddc727f811266a3333a83a20549c444be6c94e3  parts=3
+  selftest.js.part01  SHA256=fdb02fad60d8a0c0db5991c4da67b5d42716076c2ff488a9a787d62b5640d9a1  chars=6487
+  selftest.js.part02  SHA256=2ae7426305b49b460dc10ea05a5de450de1e30ccb7bef5290bda7a378a79244d  chars=6431
+  selftest.js.part03  SHA256=e1d8376b82e9ef0f82eb58b954df0ea474a02d280208592eb85e4897d3549e0a  chars=3480
+
+SOURCE-DELTA-FROM-BUILD13.txt  SHA256=0f2801e619a00db84991e4bbdc7388321ed6115d4be04d4d4eb07de0a73b5d9b  parts=3
+  SOURCE-DELTA-FROM-BUILD13.txt.part01  SHA256=f397951d3422559817d3cece573ba9e223b2fb05b631807a78d45fec4c3d0e03  chars=6430
+  SOURCE-DELTA-FROM-BUILD13.txt.part02  SHA256=4967c0055f2d0bc18b6a62a9a7a11a1785302b9e12d27a1aefe8ab7f9e5a8a5d  chars=6418
+  SOURCE-DELTA-FROM-BUILD13.txt.part03  SHA256=33add2bdf79f2691e1815a693566259f9f2c18e282d86dbceb4dd0f567ff9306  chars=6331
