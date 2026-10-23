@@ -1,0 +1,74 @@
+.includes('snapshot.featureComparison.missingAtLate')&&s.includes('scanLoadedPublicAssets(targets)');});
++check('Build 16 asset scan reports only filenames/hit metadata',()=>{const s=read('main-probe.js');return s.includes('assetHits')&&s.includes('assets: []')&&s.includes('assetFileName(url)')&&s.includes('confidence')&&s.includes('noHits');});
++check('Build 16 popup adds Copy Asset Scan Only',()=>{const h=read('popup.html'),j=read('popup.js');return /Copy Asset Scan Only/.test(h)&&j.includes('extractAssetScan')&&j.includes('copyAsset.addEventListener');});
++check('Build 16 context classifier covers the 10 Build 14 hit APIs',()=>{const s=read('main-probe.js');const names=['ArrayBuffer.prototype.transfer','HTMLElement.prototype.showPopover','Navigation API','RegExp v flag','RegExp.escape','Set.prototype.intersection','Set.prototype.union','Uint8Array.fromBase64','Uint8Array.prototype.toBase64','document.startViewTransition'];return names.every(n=>s.includes('"'+n+'"'))&&s.includes('ASSET_CONTEXT_RULES')&&s.includes('classifyFeatureSource');});
++check('Build 16 classifier persists only aggregate metadata, never source snippets',()=>{const a=read('main-probe.js'),b=read('light-diagnostic.js');return a.includes('contextClassifier')&&a.includes('directAssets')&&a.includes('guardAssets')&&a.includes('unclassifiedAssets')&&!b.includes('sourceSnippet')&&!b.includes('contextSnippet')&&!b.includes('result.text');});
++check('Build 16 classifier distinguishes direct/guard/optional/fallback/definition and RegExp-v forms',()=>{const s=read('main-probe.js');return ['directAssets','guardAssets','optionalAssets','fallbackAssets','definitionAssets','regexpVConstructorAssets','regexpVLiteralCandidateAssets'].every(x=>s.includes(x));});
++check('Build 16 production classifier recognizes representative direct, guard, definition, optional, and RegExp-v contexts',()=>{
+   const h=buildBase(false);
+   const instrumented=read('main-probe.js').replace('  attachEarlyCapture();','  globalThis.__classifyFeatureSource = classifyFeatureSource;\n  attachEarlyCapture();');
+   vm.runInContext(instrumented,h.context);
+@@ -98,7 +98,7 @@
+   const rvLiteral=classify('RegExp v flag','const r=/[a-z&&[^q]]/v;');
+   return direct.direct===true&&guarded.guard===true&&guarded.direct===true&&defined.definition===true&&optional.optional===true&&rvCtor.regexpVConstructor===true&&rvLiteral.regexpVLiteral===true;
+ });
+-check('Build 15 popup adds Copy Context Classifier Only',()=>{const h=read('popup.html'),j=read('popup.js');return /Copy Context Classifier Only/.test(h)&&j.includes('extractContextClassifier')&&j.includes('copyContext.addEventListener');});
++check('Build 16 popup adds Copy Context Classifier Only',()=>{const h=read('popup.html'),j=read('popup.js');return /Copy Context Classifier Only/.test(h)&&j.includes('extractContextClassifier')&&j.includes('copyContext.addEventListener');});
+ check('Copy Asset Scan Only copies only the production asset-scan section',()=>{
+   class PopEl {constructor(){this.handlers={};this.checked=false;this.textContent='';this.value='';this.selection=null;}addEventListener(t,f){this.handlers[t]=f;}focus(){}select(){this.selection=[0,this.value.length];}setSelectionRange(a,b){this.selection=[a,b];}}
+   const ids=['diagnostics','status','report','reportStatus','refresh','copy','copyMissing','copyAsset','copyContext','clear']; const els=Object.fromEntries(ids.map(id=>[id,new PopEl()]));
+@@ -119,4 +119,77 @@
+   return copied.startsWith('Asset API context classifier:')&&copied.includes('RegExp.escape')&&copied.includes('direct-use assets=1')&&!copied.includes('Asset source-token scan')&&!copied.includes('Page-world errors');
+ });
+ 
++
++function compatibilityContext() {
++  class TestURL extends URL {}
++  class TestHTMLElement {}
++  const c = {
++    URL: TestURL,
++    Object,
++    Map,
++    Number,
++    TypeError,
++    RangeError,
++    SyntaxError,
++    Symbol,
++    console,
++    atob,
++    btoa,
++    structuredClone,
++    WeakSet,
++    HTMLElement: TestHTMLElement
++  };
++  vm.createContext(c);
++  vm.runInContext(`
++    Set.prototype.union = undefined;
++    Set.prototype.intersection = undefined;
++    ArrayBuffer.prototype.transfer = undefined;
++    Uint8Array.fromBase64 = undefined;
++    Uint8Array.prototype.toBase64 = undefined;
++  `, c);
++  vm.runInContext(read('polyfill.js'), c);
++  return c;
++}
++
++check('Build 16 Set.union returns this values then new other values in order',()=>{
++  const c=compatibilityContext();
++  return vm.runInContext(`JSON.stringify(Array.from(new Set([2,4,6]).union(new Set([1,4,9])))) === '[2,4,6,1,9]'`,c);
++});
++check('Build 16 Set.intersection returns common values',()=>{
++  const c=compatibilityContext();
++  return vm.runInContext(`JSON.stringify(Array.from(new Set([1,3,5,7,9]).intersection(new Set([1,4,9])))) === '[1,9]'`,c);
++});
++check('Build 16 Set methods accept set-like values with size/has/keys',()=>{
++  const c=compatibilityContext();
++  return vm.runInContext(`(()=>{const o={size:2,has(v){return v===2||v===3},keys(){return [2,3][Symbol.iterator]();}};return JSON.stringify(Array.from(new Set([1,2]).union(o)))==='[1,2,3]'&&JSON.stringify(Array.from(new Set([1,2]).intersection(o)))==='[2]'})()`,c);
++});
++check('Build 16 Uint8Array Base64 default round-trip works',()=>{
++  const c=compatibilityContext();
++  return vm.runInContext(`(()=>{const a=new Uint8Array([29,233,101,161]);const s=a.toBase64();const b=Uint8Array.fromBase64(s);return s==='HelloQ=='&&Array.from(b).join(',')==='29,233,101,161'})()`,c);
++});
++check('Build 16 Uint8Array Base64 URL-safe and omit-padding options work',()=>{
++  const c=compatibilityContext();
++  return vm.runInContext(`(()=>{const a=new Uint8Array([46,139,222,255,42,46]);const s=a.toBase64({alphabet:'base64url',omitPadding:true});const b=Uint8A
