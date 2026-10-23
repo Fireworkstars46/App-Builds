@@ -1,0 +1,139 @@
+on: "too-large" };
+      const text = await response.text();
+      if (text.length > MAX_ASSET_BYTES) return { ok: false, reason: "too-large" };
+      return { ok: true, text };
+    } catch (_) {
+      return { ok: false, reason: "fetch-failed" };
+    } finally {
+      if (timer != null) clearTimeout(timer);
+    }
+  }
+
+  function collectPreloads() {
+    const seen = new Set();
+    const urls = [];
+    let links = [];
+    try { links = document.querySelectorAll("link[rel='modulepreload'][href]"); } catch (_) {}
+    for (const link of links) {
+      const href = link && link.href ? link.href : "";
+      if (!isPublicAssetUrl(href) || seen.has(href)) continue;
+      seen.add(href);
+      urls.push(href);
+      if (urls.length >= MAX_ASSETS) break;
+    }
+    return urls;
+  }
+
+  function copyNonce(from, to) {
+    try {
+      const nonce = from && (from.nonce || from.getAttribute("nonce"));
+      if (nonce) to.setAttribute("nonce", nonce);
+    } catch (_) {}
+  }
+
+  function captureModuleScript(script) {
+    if (!script || script.nodeType !== 1 || String(script.tagName).toUpperCase() !== "SCRIPT") return false;
+    if (script.getAttribute(COMPAT_ATTR) === "1") return false;
+    const type = String(script.getAttribute("type") || "").toLowerCase();
+    if (type !== "module") return false;
+
+    if (!capturedEntry) {
+      capturedEntry = {
+        source: script.src ? "" : String(script.textContent || ""),
+        src: script.src || "",
+        nonce: script.nonce || script.getAttribute("nonce") || "",
+        crossOrigin: script.crossOrigin || "",
+        referrerPolicy: script.referrerPolicy || ""
+      };
+      status.intercepted = true;
+    }
+    try { script.remove(); } catch (_) {
+      try { if (script.parentNode) script.parentNode.removeChild(script); } catch (_) {}
+    }
+    return true;
+  }
+
+  function inspectAddedNode(node) {
+    if (!node || node.nodeType !== 1) return;
+    if (captureModuleScript(node)) return;
+    let scripts = [];
+    try { scripts = node.querySelectorAll ? node.querySelectorAll("script[type='module']") : []; } catch (_) {}
+    for (const script of scripts) captureModuleScript(script);
+  }
+
+  function startObserver() {
+    if (typeof MutationObserver !== "function") {
+      status.fallbackReason = "mutation-observer-unavailable";
+      return;
+    }
+    observer = new MutationObserver((records) => {
+      for (const record of records) {
+        if (!record || !record.addedNodes) continue;
+        for (const node of record.addedNodes) inspectAddedNode(node);
+      }
+    });
+    try {
+      observer.observe(document, { childList: true, subtree: true });
+    } catch (_) {
+      status.fallbackReason = "observer-start-failed";
+    }
+  }
+
+  async function buildTransformMap(urls) {
+    const imports = {};
+    for (const url of urls) {
+      const fetched = await fetchAsset(url);
+      if (!fetched.ok) {
+        if (fetched.reason === "too-large") status.skippedLargeAssets += 1;
+        else status.failedAssets += 1;
+        continue;
+      }
+      status.scannedAssets += 1;
+      const transformed = transformRegExpVLiterals(fetched.text);
+      if (!transformed.changed) continue;
+      const rewritten = rewriteModuleSpecifiers(transformed.source, url);
+      const blobUrl = URL.createObjectURL(new Blob([rewritten], { type: "application/javascript" }));
+      imports[url] = blobUrl;
+      status.transformedAssets += 1;
+      status.transformedRegexLiterals += transformed.changed;
+      if (status.transformedFiles.length < 12) status.transformedFiles.push(assetFileName(url));
+      // Yield after a transformed file to keep older iPhones responsive.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+    return imports;
+  }
+
+  function replayEntry(imports) {
+    const parent = document.head || document.documentElement;
+    if (!parent || !capturedEntry) return false;
+
+    if (Object.keys(imports).length) {
+      const mapScript = document.createElement("script");
+      mapScript.type = "importmap";
+      mapScript.setAttribute(COMPAT_ATTR, "1");
+      if (capturedEntry.nonce) mapScript.setAttribute("nonce", capturedEntry.nonce);
+      mapScript.textContent = JSON.stringify({ imports });
+      parent.appendChild(mapScript);
+    }
+
+    const script = document.createElement("script");
+    script.type = "module";
+    script.setAttribute(COMPAT_ATTR, "1");
+    if (capturedEntry.nonce) script.setAttribute("nonce", capturedEntry.nonce);
+    if (capturedEntry.crossOrigin) script.crossOrigin = capturedEntry.crossOrigin;
+    if (capturedEntry.referrerPolicy) script.referrerPolicy = capturedEntry.referrerPolicy;
+
+    if (capturedEntry.src) {
+      script.src = capturedEntry.src;
+    } else {
+      const transformedEntry = transformRegExpVLiterals(capturedEntry.source);
+      status.transformedRegexLiterals += transformedEntry.changed;
+      script.textContent = transformedEntry.source;
+    }
+
+    parent.appendChild(script);
+    status.replayed = true;
+    return true;
+  }
+
+  async function
