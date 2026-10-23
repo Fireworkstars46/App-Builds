@@ -1,6 +1,10 @@
 ChatGPT iOS 16 Orion Fix — Archive Status
 Version 1.0 | Build 6
 
-Source/text/audit artifacts are being archived to GitHub.
+Source/text/audit artifacts: archived and retrieval-verified on GitHub.
 Exact release ZIP SHA-256: f0088390ec8a2fc29b6a27aa2441787278fcfe6b4d7b8fd839b8cf04c64d6c7b
-Release status remains PENDING / NOT DONE until real-device testing confirms the lightweight diagnostic works without the Build 5 lag/freezing regression.
+Exact binary ZIP: NOT YET archived through the currently completed GitHub path. Permanent archive status is therefore INCOMPLETE.
+
+Release status remains PENDING / NOT DONE until:
+1. real-device testing confirms the lightweight diagnostic works without the Build 5 lag/freezing regression; and
+2. the exact release ZIP is permanently archived and verified.
