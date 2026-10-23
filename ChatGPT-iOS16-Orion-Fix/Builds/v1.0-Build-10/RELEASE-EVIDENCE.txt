@@ -1,0 +1,17 @@
+ChatGPT iOS 16 Orion Fix — Release Evidence
+Version 1.0 | Build 10
+Manifest extension version: 1.0.9
+
+Key runtime SHA-256:
+manifest.json 418c8b7c1f5a6ef1a9d47f289921e331550d8ee62c2f9ae5c5a4b147ab93b295
+polyfill.js 79b2814539dbb14a885cff1661e194ef213fbfefb1d4f4bbf0ad09029ca6d4be
+main-probe.js 71cec609c734c703c72174fff0f569b86225674035e2d8ab603de3ffd98f9f8b
+light-diagnostic.js f8270b49d102aaabd6bd78bc29815f6717d5467ae60a98d78e79e9e2a8ee22a6
+popup.html 85577314404b39f7de0b785feb79278ab429f524a58ee538d0b1eb81f30baab5
+popup.js b303b2ccaf1208970be90991c325ae20ffbe78763e55f6e8a39d22086777a41c
+
+Build 9 byte-preservation checks:
+- polyfill.js: identical SHA-256
+- popup.js: identical SHA-256
+
+Status: PENDING / NOT DONE until real-device Build 10 testing.
