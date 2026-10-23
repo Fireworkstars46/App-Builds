@@ -1,0 +1,53 @@
+ runBootstrap() {
+    if (started) return;
+    started = true;
+    if (observer) {
+      try { observer.disconnect(); } catch (_) {}
+      observer = null;
+    }
+
+    if (!capturedEntry) {
+      status.fallbackReason = status.fallbackReason || "module-bootstrap-not-intercepted";
+      return;
+    }
+
+    if (!status.importMapSupported) {
+      status.fallbackReason = "native-import-map-unavailable";
+      replayEntry({});
+      return;
+    }
+
+    const urls = collectPreloads();
+    status.modulePreloads = urls.length;
+    const imports = await buildTransformMap(urls);
+    if (status.failedAssets || status.skippedLargeAssets) {
+      // Do not block the whole page because a non-critical preload could not be inspected.
+      // Replay with the transforms we do have; diagnostics will expose the counts.
+      status.fallbackReason = "partial-asset-scan";
+    }
+    if (!replayEntry(imports)) {
+      status.fallbackReason = status.fallbackReason || "module-replay-failed";
+    }
+  }
+
+  if (window.__CHATGPT_IOS16_MODULE_COMPAT_SELFTEST__ === true) {
+    try {
+      Object.defineProperty(window, "__chatgptIOS16ModuleCompatTestHooks", {
+        configurable: true,
+        value: { transformRegExpVLiterals, rewriteModuleSpecifiers, regexpVCompat }
+      });
+    } catch (_) {
+      window.__chatgptIOS16ModuleCompatTestHooks = { transformRegExpVLiterals, rewriteModuleSpecifiers, regexpVCompat };
+    }
+    status.active = false;
+    status.fallbackReason = "selftest-mode";
+    return;
+  }
+
+  startObserver();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => { runBootstrap(); }, { once: true });
+  } else {
+    Promise.resolve().then(runBootstrap);
+  }
+})();
