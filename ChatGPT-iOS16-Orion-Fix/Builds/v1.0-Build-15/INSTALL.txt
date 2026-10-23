@@ -1,0 +1,12 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 15
+
+1. Disable Builds 1–14.
+2. Install the Build 15 ZIP itself in Orion; do not extract it.
+3. Enable only Build 15.
+4. Open the extension popup and turn Light Diagnostics (Build 15) ON.
+5. Reload ChatGPT once.
+6. Leave the page open about 15 seconds so the one-pass public asset scan/classifier can finish.
+7. Open the popup, tap Refresh Report, then Copy Context Classifier Only.
+8. Paste that compact classifier log into ChatGPT.
+
+Diagnostics default OFF. No bundle source snippets are saved.
