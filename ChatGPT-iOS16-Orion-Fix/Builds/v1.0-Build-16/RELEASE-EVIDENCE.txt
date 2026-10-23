@@ -1,0 +1,14 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 16
+
+Release evidence generated locally before packaging:
+- Latest MASTER_RULES.md re-read before modification.
+- Fix scope derived from the user's real Build 15 classifier log.
+- Existing URL.canParse/Object.groupBy/Map.groupBy behavior retained.
+- New compatibility shims are feature-detected and only installed when the browser lacks them.
+- Guarded/fallback APIs are intentionally left untouched.
+- Diagnostics remain default OFF and privacy constraints are preserved.
+- Safe Self-Test: 47 PASS / 0 FAIL.
+- Static audit: 44 PASS / 0 FAIL.
+- Fresh-extracted package checksums and JavaScript syntax checks passed.
+
+Status: PENDING / NOT DONE pending real-device compatibility test.
