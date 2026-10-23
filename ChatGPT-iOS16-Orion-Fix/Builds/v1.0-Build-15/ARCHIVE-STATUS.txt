@@ -1,0 +1,8 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 15
+
+Local release package: COMPLETE and checksum-verified before handoff.
+GitHub text/source archive: COMPLETE for exact runtime source (manifest/polyfill/popup normal files plus chunked main/light diagnostic source), release metadata, Safe Self-Test results, static audit, and source hashes.
+Self-test harness and Build 14→15 delta: hash-recorded in the local package; not required to reconstruct runtime extension source.
+Exact binary ZIP archive on GitHub: INCOMPLETE — connector cannot upload/verify the exact ZIP bytes.
+
+Release status: PENDING / NOT DONE until the real Orion/iOS 16.6 context-classifier log is reviewed.
