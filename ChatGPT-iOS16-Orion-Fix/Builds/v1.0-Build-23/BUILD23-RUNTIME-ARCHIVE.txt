@@ -1,0 +1,12 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 23
+Permanent runtime reconstruction / release evidence
+
+STATUS: PENDING / NOT DONE pending real-device test.
+ZIP SHA-256: 7f814b665eba76242b09bdfdb90cd1857a38f97575a4ed4c48088c40e983aa85
+Safe Self-Test: 63 PASS / 0 FAIL
+Static/privacy audit: 45 PASS / 0 FAIL
+Fresh extracted ZIP checksums, JS syntax, JSON parse, Safe Self-Test, and static audit passed.
+
+Reconstruction: start from archived Build 22 runtime source, apply SOURCE-DELTA-FROM-BUILD22 below, then verify SOURCE-SHA256. asset-compat.js and static_audit.py are new.
+
+See the final Build 23 conversation artifact for the exact ZIP. Exact binary ZIP bytes are not stored by this text connector; the verified ZIP SHA-256 above identifies the local release artifact.
