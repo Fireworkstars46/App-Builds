@@ -1,0 +1,18 @@
+PASS - manifest JSON parses and identifies Version 1.0 Build 7 manifest 1.0.6
+PASS - URL.canParse compatibility behavior preserved
+PASS - Object.groupBy compatibility behavior preserved
+PASS - Map.groupBy compatibility behavior preserved
+PASS - Build 7 diagnostic has no heavy observer/polling/click architecture
+PASS - Build 7 diagnostic creates no on-page UI
+PASS - page-world probe does not read page text or input values
+PASS - resource timing is one-time API read, not observer based
+PASS - page-world probe checks React marker names without dereferencing React data
+PASS - diagnostics OFF performs no saved diagnostic report write
+PASS - diagnostics ON produces completed Build 7 report
+PASS - report sees composer/sidebar hydration markers and missing send control
+PASS - report includes one-time resource and navigation timing
+PASS - resource URL query secrets and long asset IDs are redacted
+PASS - report contains explicit privacy and low-overhead statements
+PASS - popup keeps diagnostics default OFF and report retrieval controls
+PASS - version/build strings are consistent across release docs
+TOTAL: 17 PASS / 0 FAIL
