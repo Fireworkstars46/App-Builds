@@ -1,0 +1,13 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 12
+
+Changes from Build 11:
+- Removed seven syntax probes that used new Function(). ChatGPT CSP blocks eval/new Function, so those probes produced false unsupported results.
+- Keeps API capability checks only.
+- Captures the feature matrix at document_start and again at the 8-second snapshot.
+- Reports APIs that became supported during ChatGPT startup, APIs still missing at 8 seconds, and any unexpected APIs that became missing.
+- Copy Missing Features Only now copies the corrected comparison section.
+- Compatibility polyfills remain unchanged: URL.canParse, Object.groupBy, Map.groupBy.
+- Diagnostics remain default OFF and lightweight.
+
+Status: PENDING / NOT DONE until real-device Build 12 output is reviewed.
