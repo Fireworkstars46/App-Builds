@@ -1,0 +1,106 @@
+(() => {
+  "use strict";
+
+  const VERSION = "1.0";
+  const BUILD = 14;
+  const ENABLE_ATTR = "data-chatgpt-ios16-lightdiag";
+  const RESOLVE_EVENT = "chatgpt-ios16-lightdiag-resolved";
+  const REPORT_EVENT = "chatgpt-ios16-lightdiag-main-report";
+  const SNAPSHOT_DELAY_MS = 8000;
+  const MAX_ERRORS = 8;
+  const ASSET_SCAN_LIMIT = 60;
+  const ASSET_SCAN_MAX_BYTES = 8 * 1024 * 1024;
+  const ASSET_SCAN_TIMEOUT_MS = 3500;
+  const ASSET_SCAN_YIELD_MS = 20;
+
+  // Conservative source-token patterns. A hit means the public static bundle contains
+  // an indicative token/pattern; it does NOT prove that code path executed.
+  // A no-hit also does not prove absence because minification/indirection can hide usage.
+  const ASSET_API_PATTERNS = {
+    "ArrayBuffer.prototype.transfer": { confidence: "heuristic", strings: ["ArrayBuffer.prototype.transfer", ".transfer("] },
+    "ArrayBuffer.prototype.transferToFixedLength": { confidence: "strong", strings: ["transferToFixedLength"] },
+    "HTMLElement.prototype.showPopover": { confidence: "strong", strings: ["showPopover"] },
+    "Iterator global": { confidence: "strong", strings: ["Iterator.from", "Iterator.prototype", "globalThis.Iterator", "window.Iterator"] },
+    "Iterator.prototype.drop": { confidence: "strong", strings: ["Iterator.prototype.drop"] },
+    "Iterator.prototype.filter": { confidence: "strong", strings: ["Iterator.prototype.filter"] },
+    "Iterator.prototype.flatMap": { confidence: "strong", strings: ["Iterator.prototype.flatMap"] },
+    "Iterator.prototype.map": { confidence: "strong", strings: ["Iterator.prototype.map"] },
+    "Iterator.prototype.reduce": { confidence: "strong", strings: ["Iterator.prototype.reduce"] },
+    "Iterator.prototype.take": { confidence: "strong", strings: ["Iterator.prototype.take"] },
+    "Iterator.prototype.toArray": { confidence: "strong", strings: ["Iterator.prototype.toArray"] },
+    "Navigation API": { confidence: "strong", strings: ["window.navigation", "globalThis.navigation", "navigation.currentEntry", "navigation.navigate", "navigation.addEventListener"] },
+    "Promise.try": { confidence: "strong", strings: ["Promise.try"] },
+    "ReadableStream.from": { confidence: "strong", strings: ["ReadableStream.from"] },
+    "RegExp v flag": { confidence: "heuristic", regex: ["new\\s+RegExp\\([^\\n]{0,240},\\s*[\\\"']v[\\\"']\\s*\\)", "\\/(?:\\\\.|[^\\/\\n]){1,240}\\/[dgimsuy]*v[dgimsuvy]*"] },
+    "RegExp.escape": { confidence: "strong", strings: ["RegExp.escape"] },
+    "Set.prototype.difference": { confidence: "heuristic", strings: ["Set.prototype.difference", ".difference("] },
+    "Set.prototype.intersection": { confidence: "heuristic", strings: ["Set.prototype.intersection", ".intersection("] },
+    "Set.prototype.isDisjointFrom": { confidence: "strong", strings: ["isDisjointFrom"] },
+    "Set.prototype.isSubsetOf": { confidence: "strong", strings: ["isSubsetOf"] },
+    "Set.prototype.isSupersetOf": { confidence: "strong", strings: ["isSupersetOf"] },
+    "Set.prototype.symmetricDifference": { confidence: "strong", strings: ["symmetricDifference"] },
+    "Set.prototype.union": { confidence: "heuristic", strings: ["Set.prototype.union", ".union("] },
+    "URLPattern": { confidence: "strong", strings: ["URLPattern"] },
+    "Uint8Array.fromBase64": { confidence: "strong", strings: ["fromBase64"] },
+    "Uint8Array.fromHex": { confidence: "strong", strings: ["fromHex"] },
+    "Uint8Array.prototype.setFromBase64": { confidence: "strong", strings: ["setFromBase64"] },
+    "Uint8Array.prototype.setFromHex": { confidence: "strong", strings: ["setFromHex"] },
+    "Uint8Array.prototype.toBase64": { confidence: "strong", strings: ["toBase64"] },
+    "Uint8Array.prototype.toHex": { confidence: "strong", strings: ["toHex"] },
+    "document.startViewTransition": { confidence: "strong", strings: ["startViewTransition"] },
+    "navigator.scheduling.isInputPending": { confidence: "strong", strings: ["isInputPending"] },
+    "scheduler.postTask": { confidence: "strong", strings: ["scheduler.postTask", ".postTask("] },
+    "trustedTypes.createPolicy": { confidence: "strong", strings: ["trustedTypes.createPolicy"] }
+  };
+
+  let started = false;
+  let settingResolved = false;
+  let diagnosticsEnabled = false;
+  const errors = [];
+  let earlyFeatureMatrix = null;
+
+  function hasFunction(value) {
+    return typeof value === "function";
+  }
+
+  function regexpFlagSupported(flag) {
+    try {
+      new RegExp("", flag);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function normalizeFeatureMap(rawFeatures) {
+    const normalized = {};
+    for (const name of Object.keys(rawFeatures || {})) {
+      normalized[name] = rawFeatures[name] === true;
+    }
+    return normalized;
+  }
+
+  function buildFeatureMatrix(phase) {
+    const setProto = typeof Set !== "undefined" ? Set.prototype : null;
+    const arrayBufferProto = typeof ArrayBuffer !== "undefined" ? ArrayBuffer.prototype : null;
+    const uint8Proto = typeof Uint8Array !== "undefined" ? Uint8Array.prototype : null;
+    const iteratorProto = typeof Iterator !== "undefined" && Iterator && Iterator.prototype ? Iterator.prototype : null;
+    const intl = typeof Intl !== "undefined" ? Intl : null;
+    const readableStreamCtor = typeof ReadableStream !== "undefined" ? ReadableStream : null;
+    const abortSignalCtor = typeof AbortSignal !== "undefined" ? AbortSignal : null;
+    const cryptoObj = typeof crypto !== "undefined" ? crypto : null;
+
+    const rawFeatures = {
+        "Array.fromAsync": hasFunction(Array.fromAsync),
+        "Promise.withResolvers": hasFunction(Promise.withResolvers),
+        "Promise.try": hasFunction(Promise.try),
+        "Object.groupBy": hasFunction(Object.groupBy),
+        "Map.groupBy": hasFunction(Map.groupBy),
+        "RegExp.escape": typeof RegExp !== "undefined" && hasFunction(RegExp.escape),
+        "RegExp v flag": regexpFlagSupported("v"),
+        "Set.prototype.union": Boolean(setProto && hasFunction(setProto.union)),
+        "Set.prototype.intersection": Boolean(setProto && hasFunction(setProto.intersection)),
+        "Set.prototype.difference": Boolean(setProto && hasFunction(setProto.difference)),
+        "Set.prototype.symmetricDifference": Boolean(setProto && hasFunction(setProto.symmetricDifference)),
+        "Set.prototype.isSubsetOf": Boolean(setProto && hasFunction(setProto.isSubsetOf)),
+        "Set.prototype.isSupersetOf": Boolean(setProto && hasFunction(setProto.isSupersetOf)),
