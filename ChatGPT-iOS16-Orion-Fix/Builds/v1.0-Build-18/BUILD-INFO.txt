@@ -1,0 +1,17 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 18
+Manifest version: 1.0.17
+Status: PENDING / NOT DONE until real Orion iOS 16.6 runtime testing.
+
+Build 18 preserves all Build 17 compatibility shims and adds a targeted module compatibility bridge for the remaining RegExp-v parser blocker seen on the real iPhone.
+
+New Build 18 behavior:
+- Runs only on https://chatgpt.com/ at document_start in MAIN world.
+- Uses one short-lived MutationObserver to intercept the page's deferred module bootstrap, then disconnects at DOMContentLoaded.
+- Reads only same-origin public /cdn/assets/*.js modulepreload assets, with credentials omitted and bounded count/size/timeout.
+- Rewrites only RegExp literals using the unsupported v flag.
+- Maps only transformed assets to in-memory Blob module URLs, preserving original relative module specifiers and import.meta.url behavior.
+- Replays the original bootstrap after the transform map is installed.
+- Does not fake the Navigation API or globally replace RegExp.
+
+If a v-only Unicode-set pattern cannot be represented by Safari 16 u-mode, the helper returns a non-matching RegExp instead of aborting the entire module graph. This is a compatibility fallback and is why Build 18 remains PENDING until real-device testing.
