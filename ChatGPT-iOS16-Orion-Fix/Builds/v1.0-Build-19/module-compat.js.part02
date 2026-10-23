@@ -1,0 +1,171 @@
+ource[i++];
+      if (ch === "\\") {
+        i += 1;
+        continue;
+      }
+      if (ch === "`") return i;
+      // We intentionally treat ${...} as opaque here. Regex literals inside template
+      // expressions are uncommon in the affected startup chunks; leaving them untouched
+      // is safer than corrupting template text.
+    }
+    return source.length;
+  }
+
+  function readNumber(source, start) {
+    let i = start;
+    while (i < source.length && /[0-9A-Fa-f_xXoObBeE.+-]/.test(source[i])) i += 1;
+    return i;
+  }
+
+  function parseRegexLiteral(source, start) {
+    let i = start + 1;
+    let inClass = false;
+    while (i < source.length) {
+      const ch = source[i++];
+      if (ch === "\\") {
+        i += 1;
+        continue;
+      }
+      if (ch === "[") {
+        inClass = true;
+        continue;
+      }
+      if (ch === "]") {
+        inClass = false;
+        continue;
+      }
+      if (ch === "/" && !inClass) {
+        const bodyEnd = i - 1;
+        let flagEnd = i;
+        while (flagEnd < source.length && /[A-Za-z]/.test(source[flagEnd])) flagEnd += 1;
+        return {
+          end: flagEnd,
+          body: source.slice(start + 1, bodyEnd),
+          flags: source.slice(i, flagEnd)
+        };
+      }
+      if (ch === "\n" || ch === "\r") return null;
+    }
+    return null;
+  }
+
+  function transformRegExpVLiterals(source) {
+    let out = "";
+    let last = 0;
+    let i = 0;
+    let prev = null;
+    let changed = 0;
+
+    while (i < source.length) {
+      const ch = source[i];
+      const next = source[i + 1];
+
+      if (ch === "'" || ch === '"') {
+        i = readQuoted(source, i, ch);
+        prev = { type: "value", value: "string" };
+        continue;
+      }
+      if (ch === "`") {
+        i = readTemplate(source, i);
+        prev = { type: "value", value: "template" };
+        continue;
+      }
+      if (ch === "/" && next === "/") {
+        i += 2;
+        while (i < source.length && source[i] !== "\n" && source[i] !== "\r") i += 1;
+        continue;
+      }
+      if (ch === "/" && next === "*") {
+        const end = source.indexOf("*/", i + 2);
+        i = end === -1 ? source.length : end + 2;
+        continue;
+      }
+      if (/\s/.test(ch)) {
+        i += 1;
+        continue;
+      }
+      if (isIdentifierStart(ch)) {
+        const start = i++;
+        while (i < source.length && isIdentifierPart(source[i])) i += 1;
+        const word = source.slice(start, i);
+        prev = {
+          type: /^(?:return|throw|case|delete|void|typeof|instanceof|in|of|yield|await|else|do|new)$/.test(word) ? "keyword" : "value",
+          value: word
+        };
+        continue;
+      }
+      if (isDigit(ch) || (ch === "." && isDigit(next))) {
+        i = readNumber(source, i);
+        prev = { type: "value", value: "number" };
+        continue;
+      }
+      if (ch === "/" && regexAllowedAfterToken(prev)) {
+        const parsed = parseRegexLiteral(source, i);
+        if (parsed) {
+          if (parsed.flags.indexOf("v") !== -1) {
+            const flags = parsed.flags.replace(/v/g, "");
+            const helperFlags = flags.indexOf("u") === -1 ? flags + "u" : flags;
+            const replacement = "globalThis." + HELPER_KEY + "(" + JSON.stringify(parsed.body) + "," + JSON.stringify(helperFlags) + ")";
+            out += source.slice(last, i) + replacement;
+            last = parsed.end;
+            changed += 1;
+          }
+          i = parsed.end;
+          prev = { type: "value", value: "regexp" };
+          continue;
+        }
+      }
+
+      let punct = ch;
+      if (source.slice(i, i + 2) === "=>") {
+        punct = "=>";
+        i += 2;
+      } else {
+        i += 1;
+      }
+      if (/^[)\]}]$/.test(punct)) prev = { type: "value", value: punct };
+      else prev = { type: "punct", value: punct };
+    }
+
+    if (!changed) return { source, changed: 0 };
+    out += source.slice(last);
+    return { source: out, changed };
+  }
+
+  function absoluteSpecifier(specifier, baseUrl) {
+    if (!specifier || !/^(?:\.{1,2}\/|\/)/.test(specifier)) return specifier;
+    try { return new URL(specifier, baseUrl).href; }
+    catch (_) { return specifier; }
+  }
+
+  function rewriteModuleSpecifiers(source, baseUrl) {
+    function rewrite(prefix, quote, specifier, suffix) {
+      const absolute = absoluteSpecifier(specifier, baseUrl);
+      if (absolute === specifier) return prefix + quote + specifier + quote + (suffix || "");
+      return prefix + quote + absolute + quote + (suffix || "");
+    }
+
+    let result = source.replace(/\bimport\.meta\.url\b/g, JSON.stringify(baseUrl));
+    result = result.replace(/(\b(?:import|export)\b[\s\S]{0,320}?\bfrom\s*)(["'])(\.{1,2}\/[^"']+|\/[^"']+)\2/g,
+      (m, p, q, s) => rewrite(p, q, s, ""));
+    result = result.replace(/(\bimport\s*)(["'])(\.{1,2}\/[^"']+|\/[^"']+)\2/g,
+      (m, p, q, s) => rewrite(p, q, s, ""));
+    result = result.replace(/(\bimport\s*\(\s*)(["'])(\.{1,2}\/[^"']+|\/[^"']+)\2(\s*[,\)])/g,
+      (m, p, q, s, tail) => rewrite(p, q, s, tail));
+    return result;
+  }
+
+  function isPublicAssetUrl(url) {
+    try {
+      const parsed = new URL(url, location.href);
+      return parsed.origin === location.origin && /^\/cdn\/assets\/.+\.m?js$/i.test(parsed.pathname);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function assetFileName(url) {
+    try {
+      const parsed = new URL(url, location.href);
+      const parts = parsed.pathname.split("/");
+    
