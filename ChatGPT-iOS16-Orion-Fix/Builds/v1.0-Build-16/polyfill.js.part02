@@ -1,0 +1,137 @@
+ if (typeof ArrayBuffer !== "undefined") {
+    defineMethod(ArrayBuffer.prototype, "transfer", function transfer(newByteLength) {
+      if (Object.prototype.toString.call(this) !== "[object ArrayBuffer]") {
+        throw new TypeError("ArrayBuffer.transfer called on incompatible receiver");
+      }
+      return transferArrayBuffer(this, newByteLength);
+    });
+  }
+
+  function readBase64Options(options, encode) {
+    if (options === undefined) {
+      return encode
+        ? { alphabet: "base64", omitPadding: false }
+        : { alphabet: "base64", lastChunkHandling: "loose" };
+    }
+    if (options === null || (typeof options !== "object" && typeof options !== "function")) {
+      throw new TypeError("Base64 options must be an object");
+    }
+    const alphabet = options.alphabet === undefined ? "base64" : options.alphabet;
+    if (alphabet !== "base64" && alphabet !== "base64url") {
+      throw new TypeError("Invalid Base64 alphabet");
+    }
+    if (encode) {
+      return { alphabet, omitPadding: Boolean(options.omitPadding) };
+    }
+    const lastChunkHandling = options.lastChunkHandling === undefined
+      ? "loose"
+      : options.lastChunkHandling;
+    if (
+      lastChunkHandling !== "loose" &&
+      lastChunkHandling !== "strict" &&
+      lastChunkHandling !== "stop-before-partial"
+    ) {
+      throw new TypeError("Invalid Base64 lastChunkHandling");
+    }
+    return { alphabet, lastChunkHandling };
+  }
+
+  function decodeBase64(input, options) {
+    if (typeof input !== "string") throw new TypeError("Base64 input must be a string");
+    const parsed = readBase64Options(options, false);
+    let text = input.replace(/[\t\n\f\r ]/g, "");
+    if (parsed.alphabet === "base64url") {
+      if (/[^A-Za-z0-9_\-=]/.test(text)) throw new SyntaxError("Invalid Base64 input");
+      text = text.replace(/-/g, "+").replace(/_/g, "/");
+    } else if (/[^A-Za-z0-9+/=]/.test(text)) {
+      throw new SyntaxError("Invalid Base64 input");
+    }
+
+    if (!/^[A-Za-z0-9+/]*={0,2}$/.test(text)) {
+      throw new SyntaxError("Invalid Base64 input");
+    }
+
+    const firstPadding = text.indexOf("=");
+    const unpadded = firstPadding >= 0 ? text.slice(0, firstPadding) : text;
+    const remainder = unpadded.length % 4;
+    if (remainder === 1) throw new SyntaxError("Invalid Base64 input");
+
+    if (parsed.lastChunkHandling === "stop-before-partial" && firstPadding < 0 && remainder !== 0) {
+      text = unpadded.slice(0, unpadded.length - remainder);
+    } else if (parsed.lastChunkHandling === "strict") {
+      if (remainder !== 0 && text.length % 4 !== 0) {
+        throw new SyntaxError("Invalid Base64 input");
+      }
+    } else {
+      while (text.length % 4 !== 0) text += "=";
+    }
+
+    let binary;
+    try {
+      binary = atob(text);
+    } catch (_) {
+      throw new SyntaxError("Invalid Base64 input");
+    }
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+  }
+
+  function encodeBase64(bytes, options) {
+    const parsed = readBase64Options(options, true);
+    let binary = "";
+    const chunkSize = 0x8000;
+    for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+      const chunk = bytes.subarray(offset, Math.min(offset + chunkSize, bytes.length));
+      binary += String.fromCharCode.apply(null, chunk);
+    }
+    let encoded = btoa(binary);
+    if (parsed.alphabet === "base64url") {
+      encoded = encoded.replace(/\+/g, "-").replace(/\//g, "_");
+    }
+    if (parsed.omitPadding) encoded = encoded.replace(/=+$/, "");
+    return encoded;
+  }
+
+  if (typeof Uint8Array !== "undefined") {
+    defineMethod(Uint8Array, "fromBase64", function fromBase64(input, options) {
+      return decodeBase64(input, options);
+    });
+
+    defineMethod(Uint8Array.prototype, "toBase64", function toBase64(options) {
+      if (Object.prototype.toString.call(this) !== "[object Uint8Array]") {
+        throw new TypeError("Uint8Array.toBase64 called on incompatible receiver");
+      }
+      return encodeBase64(this, options);
+    });
+  }
+
+  // The Popover API cannot be fully reproduced without browser top-layer support.
+  // These shims intentionally provide only safe method presence/state tracking to
+  // prevent direct calls from aborting startup on iOS 16.
+  if (typeof HTMLElement !== "undefined" && HTMLElement.prototype) {
+    const openPopovers = typeof WeakSet === "function" ? new WeakSet() : null;
+
+    defineMethod(HTMLElement.prototype, "showPopover", function showPopover() {
+      if (openPopovers) openPopovers.add(this);
+      return undefined;
+    });
+
+    defineMethod(HTMLElement.prototype, "hidePopover", function hidePopover() {
+      if (openPopovers) openPopovers.delete(this);
+      return undefined;
+    });
+
+    defineMethod(HTMLElement.prototype, "togglePopover", function togglePopover(force) {
+      const currentlyOpen = openPopovers ? openPopovers.has(this) : false;
+      const shouldOpen = arguments.length > 0 && typeof force === "boolean"
+        ? force
+        : !currentlyOpen;
+      if (openPopovers) {
+        if (shouldOpen) openPopovers.add(this);
+        else openPopovers.delete(this);
+      }
+      return shouldOpen;
+    });
+  }
+})();
