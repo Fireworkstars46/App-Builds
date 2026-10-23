@@ -1,0 +1,45 @@
+PASS - Manifest is MV3
+PASS - Manifest version is 1.0.15
+PASS - Only storage permission requested
+PASS - Compatibility polyfill runs MAIN at document_start
+PASS - Page probe remains MAIN document_start
+PASS - Light diagnostic remains isolated document_start
+PASS - Polyfill contains URL.canParse
+PASS - Polyfill contains Object.groupBy
+PASS - Polyfill contains Map.groupBy
+PASS - Polyfill contains "union"
+PASS - Polyfill contains "intersection"
+PASS - Polyfill contains "transfer"
+PASS - Polyfill contains "fromBase64"
+PASS - Polyfill contains "toBase64"
+PASS - Polyfill contains "showPopover"
+PASS - Guarded Navigation API not patched
+PASS - Guarded RegExp.escape not patched
+PASS - Fallback startViewTransition not patched
+PASS - Heuristic RegExp v not rewritten
+PASS - No URLPattern speculative shim
+PASS - New shims feature-detect before installation
+PASS - ArrayBuffer transfer uses transferable structuredClone when available
+PASS - Base64 decoder supports base64url
+PASS - Base64 encoder supports omitPadding
+PASS - Popover fallback avoids DOM injection
+PASS - Diagnostics default OFF
+PASS - No MutationObserver construction
+PASS - No PerformanceObserver construction
+PASS - No interval polling
+PASS - No diagnostic click tracking
+PASS - No page textContent reads
+PASS - No page innerText reads
+PASS - No page input.value reads
+PASS - No placeholder reads
+PASS - Asset scanning credentials omitted
+PASS - Asset scanning same-origin constrained
+PASS - Asset scan sequential
+PASS - No source snippets persisted
+PASS - CSP sample not read
+PASS - Popup identifies Build 16
+PASS - Main probe identifies Build 16
+PASS - Light diagnostic identifies Build 16
+PASS - Selftest identifies Build 16
+PASS - Release docs mark PENDING / NOT DONE
+TOTAL: 44 PASS / 0 FAIL
