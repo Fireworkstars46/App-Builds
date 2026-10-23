@@ -1,0 +1,11 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 19
+
+Purpose: corrective build after Build 18 failed to hydrate ChatGPT on Orion/iOS 16.6.
+
+Build 19 preserves all Build 18 compatibility shims and RegExp-v transformer, and corrects the module bridge CSP conflict by:
+- narrowly removing Content-Security-Policy and Content-Security-Policy-Report-Only only from https://chatgpt.com/ main-frame responses through declarativeNetRequest;
+- immediately installing a replacement CSP that restricts scripts to same-origin, Blob modules, and required inline bootstrap/import-map compatibility;
+- exposing CSP-bridge state in diagnostics.
+
+New permission: declarativeNetRequestWithHostAccess, scoped by host_permissions to https://chatgpt.com/* only.
+Status: PENDING / NOT DONE until real Orion/iOS16 test.
