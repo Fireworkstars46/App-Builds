@@ -1,0 +1,53 @@
+PASS - manifest identifies Version 1.0 Build 17 manifest 1.0.16
+PASS - URL.canParse compatibility behavior preserved
+PASS - Object.groupBy compatibility behavior preserved
+PASS - Map.groupBy compatibility behavior preserved
+PASS - diagnostic has no heavy observer/polling/click architecture
+PASS - diagnostic creates no on-page UI
+PASS - page-world probe does not read page text or input values
+PASS - CSP-invalid new Function syntax probes removed
+PASS - API feature matrix still includes targeted modern capabilities
+PASS - feature matrix remains diagnostic-only and defines no missing APIs
+PASS - early matrix captured before setting resolution
+PASS - 8-second matrix and early-vs-late comparison are produced
+PASS - all feature values are normalized to strict booleans
+PASS - comparison exposes canonical missing-at-8-seconds list
+PASS - OFF resolution removes listeners and clears early matrix/error buffer
+PASS - resource timing remains one-time API read
+PASS - early-vs-late comparison detects capability becoming supported during startup
+PASS - diagnostics OFF saves no report
+PASS - resource URL secrets and long IDs are redacted
+PASS - popup identifies Build 17 and default remains OFF
+PASS - Copy Missing Features Only copies compact 8-second result through production popup handler
+PASS - Copy Missing Features Only fallback selects compact result on older clipboard path
+PASS - version/build strings consistent across release docs
+PASS - Build 17 polyfill contains evidence-selected compatibility shims
+PASS - Build 17 scanner is limited to same-origin public /cdn/assets JS and credentials omitted
+PASS - Build 17 scanner has bounded asset count/size/timeout and sequential yield
+PASS - Build 17 scanner never persists static asset source text
+PASS - Build 17 scans only APIs still missing at 8 seconds
+PASS - Build 17 asset scan reports only filenames/hit metadata
+PASS - Build 17 popup adds Copy Asset Scan Only
+PASS - Build 17 context classifier covers the 10 Build 14 hit APIs
+PASS - Build 17 classifier persists only aggregate metadata, never source snippets
+PASS - Build 17 classifier distinguishes direct/guard/optional/fallback/definition and RegExp-v forms
+PASS - Build 17 production classifier recognizes representative direct, guard, definition, optional, and RegExp-v contexts
+PASS - Build 17 popup adds Copy Context Classifier Only
+PASS - Copy Asset Scan Only copies only the production asset-scan section
+PASS - Copy Context Classifier Only copies only classifier section
+PASS - Build 17 Set.union returns this values then new other values in order
+PASS - Build 17 Set.intersection returns common values
+PASS - Build 17 Set methods accept set-like values with size/has/keys
+PASS - Build 17 Uint8Array Base64 default round-trip works
+PASS - Build 17 Uint8Array Base64 URL-safe and omit-padding options work
+PASS - Build 17 Uint8Array Base64 rejects invalid alphabet input
+PASS - Build 17 ArrayBuffer.transfer preserves bytes and requested size
+PASS - Build 17 ArrayBuffer.transfer detaches source when transferable structuredClone works
+PASS - Build 17 Popover fallbacks install show/hide/toggle without DOM mutation requirements
+PASS - Build 17 intentionally leaves Navigation API, URLPattern, scheduler.postTask, and RegExp-v rewrite untouched
+PASS - Build 17 RegExp.escape handles leading alphanumeric and regexp syntax
+PASS - Build 17 RegExp.escape escapes whitespace and punctuators safely
+PASS - Build 17 RegExp.escape output matches the original string literally
+PASS - Build 17 startViewTransition fallback installs on Document prototype
+PASS - Build 17 startViewTransition fallback exposes expected promises and skipTransition
+TOTAL: 52 PASS / 0 FAIL
