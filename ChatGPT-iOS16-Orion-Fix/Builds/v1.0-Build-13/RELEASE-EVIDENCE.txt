@@ -1,0 +1,8 @@
+ChatGPT iOS 16 Orion Fix — Release Evidence
+Version 1.0 | Build 13
+
+Build 13 is a corrective diagnostic release for the Build 12 boolean-normalization defect.
+Static audit and Safe Self-Test results are packaged with the release.
+The compatibility polyfill is unchanged from Build 12.
+Real Orion/iOS 16.6 validation is still required; release status is PENDING / NOT DONE until the user returns a Build 13 compact feature result.
+Exact ZIP permanent GitHub binary archival remains INCOMPLETE unless separately byte-verified.
