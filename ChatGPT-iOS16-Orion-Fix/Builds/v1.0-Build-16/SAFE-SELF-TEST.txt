@@ -1,0 +1,48 @@
+PASS - manifest identifies Version 1.0 Build 16 manifest 1.0.15
+PASS - URL.canParse compatibility behavior preserved
+PASS - Object.groupBy compatibility behavior preserved
+PASS - Map.groupBy compatibility behavior preserved
+PASS - diagnostic has no heavy observer/polling/click architecture
+PASS - diagnostic creates no on-page UI
+PASS - page-world probe does not read page text or input values
+PASS - CSP-invalid new Function syntax probes removed
+PASS - API feature matrix still includes targeted modern capabilities
+PASS - feature matrix remains diagnostic-only and defines no missing APIs
+PASS - early matrix captured before setting resolution
+PASS - 8-second matrix and early-vs-late comparison are produced
+PASS - all feature values are normalized to strict booleans
+PASS - comparison exposes canonical missing-at-8-seconds list
+PASS - OFF resolution removes listeners and clears early matrix/error buffer
+PASS - resource timing remains one-time API read
+PASS - early-vs-late comparison detects capability becoming supported during startup
+PASS - diagnostics OFF saves no report
+PASS - resource URL secrets and long IDs are redacted
+PASS - popup identifies Build 16 and default remains OFF
+PASS - Copy Missing Features Only copies compact 8-second result through production popup handler
+PASS - Copy Missing Features Only fallback selects compact result on older clipboard path
+PASS - version/build strings consistent across release docs
+PASS - Build 16 polyfill contains evidence-selected compatibility shims
+PASS - Build 16 scanner is limited to same-origin public /cdn/assets JS and credentials omitted
+PASS - Build 16 scanner has bounded asset count/size/timeout and sequential yield
+PASS - Build 16 scanner never persists static asset source text
+PASS - Build 16 scans only APIs still missing at 8 seconds
+PASS - Build 16 asset scan reports only filenames/hit metadata
+PASS - Build 16 popup adds Copy Asset Scan Only
+PASS - Build 16 context classifier covers the 10 Build 14 hit APIs
+PASS - Build 16 classifier persists only aggregate metadata, never source snippets
+PASS - Build 16 classifier distinguishes direct/guard/optional/fallback/definition and RegExp-v forms
+PASS - Build 16 production classifier recognizes representative direct, guard, definition, optional, and RegExp-v contexts
+PASS - Build 16 popup adds Copy Context Classifier Only
+PASS - Copy Asset Scan Only copies only the production asset-scan section
+PASS - Copy Context Classifier Only copies only classifier section
+PASS - Build 16 Set.union returns this values then new other values in order
+PASS - Build 16 Set.intersection returns common values
+PASS - Build 16 Set methods accept set-like values with size/has/keys
+PASS - Build 16 Uint8Array Base64 default round-trip works
+PASS - Build 16 Uint8Array Base64 URL-safe and omit-padding options work
+PASS - Build 16 Uint8Array Base64 rejects invalid alphabet input
+PASS - Build 16 ArrayBuffer.transfer preserves bytes and requested size
+PASS - Build 16 ArrayBuffer.transfer detaches source when transferable structuredClone works
+PASS - Build 16 Popover fallbacks install show/hide/toggle without DOM mutation requirements
+PASS - Build 16 intentionally does not add guarded/fallback candidate shims
+TOTAL: 47 PASS / 0 FAIL
