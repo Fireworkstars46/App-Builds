@@ -1,0 +1,87 @@
+, regexpVCompat, ensureReplacementCsp, replacementCsp: REPLACEMENT_CSP }
+       });
+     } catch (_) {
+-      window.__chatgptIOS16ModuleCompatTestHooks = { transformRegExpVLiterals, rewriteModuleSpecifiers, regexpVCompat };
++      window.__chatgptIOS16ModuleCompatTestHooks = { transformRegExpVLiterals, rewriteModuleSpecifiers, regexpVCompat, ensureReplacementCsp, replacementCsp: REPLACEMENT_CSP };
+     }
+     status.active = false;
+     status.fallbackReason = "selftest-mode";
+--- Build18/main-probe.js
++++ Build19/main-probe.js
+@@ -2,7 +2,7 @@
+   "use strict";
+ 
+   const VERSION = "1.0";
+-  const BUILD = 18;
++  const BUILD = 19;
+   const ENABLE_ATTR = "data-chatgpt-ios16-lightdiag";
+   const RESOLVE_EVENT = "chatgpt-ios16-lightdiag-resolved";
+   const REPORT_EVENT = "chatgpt-ios16-lightdiag-main-report";
+@@ -664,6 +664,8 @@
+             active: Boolean(value.active),
+             regexpVNative: Boolean(value.regexpVNative),
+             importMapSupported: Boolean(value.importMapSupported),
++            cspHeaderRuleExpected: Boolean(value.cspHeaderRuleExpected),
++            replacementCspInstalled: Boolean(value.replacementCspInstalled),
+             intercepted: Boolean(value.intercepted),
+             replayed: Boolean(value.replayed),
+             modulePreloads: Number(value.modulePreloads) || 0,
+--- Build18/light-diagnostic.js
++++ Build19/light-diagnostic.js
+@@ -2,7 +2,7 @@
+   "use strict";
+ 
+   const VERSION = "1.0";
+-  const BUILD = 18;
++  const BUILD = 19;
+   const ENABLE_KEY = "diagnosticsEnabled";
+   const REPORT_KEY = "lightDiagnosticReport";
+   const ENABLE_ATTR = "data-chatgpt-ios16-lightdiag";
+@@ -155,13 +155,15 @@
+ 
+         const mc = s.moduleCompat || null;
+         lines.push("");
+-        lines.push("Build 18 module compatibility bridge:");
++        lines.push("Build 19 module compatibility bridge:");
+         if (!mc) {
+           lines.push("- unavailable");
+         } else {
+           lines.push("- active: " + mc.active);
+           lines.push("- native RegExp v: " + mc.regexpVNative);
+           lines.push("- native import maps: " + mc.importMapSupported);
++          lines.push("- CSP header-removal rule expected: " + mc.cspHeaderRuleExpected);
++          lines.push("- replacement CSP installed: " + mc.replacementCspInstalled);
+           lines.push("- bootstrap intercepted: " + mc.intercepted);
+           lines.push("- bootstrap replayed: " + mc.replayed);
+           lines.push("- modulepreload assets: " + mc.modulePreloads);
+@@ -212,7 +214,7 @@
+ 
+         lines.push("");
+         lines.push("Detailed browser feature comparison:");
+-        lines.push("- every Build 18 feature value is normalized to strict true/false before comparison");
++        lines.push("- every Build 19 feature value is normalized to strict true/false before comparison");
+         lines.push("- syntax probes remain removed because ChatGPT CSP blocks eval/new Function");
+         featureSummary("Early matrix (document_start):", fmEarly);
+         featureSummary("8-second matrix (after ChatGPT startup attempt):", fmLate);
+@@ -310,7 +312,7 @@
+ 
+       lines.push("");
+       lines.push("Privacy: no message text, typed text, cookies, local/session storage contents, request bodies, clipboard contents, placeholders, labels, or page text are collected.");
+-      lines.push("Performance: diagnostics use no MutationObserver, PerformanceObserver, DOM polling, click tracking, or on-page diagnostic UI; resource timing is read once at the 8-second snapshot. The Build 18 compatibility bridge uses one short-lived startup MutationObserver only to intercept the deferred module bootstrap, disconnects it at DOMContentLoaded, and scans same-origin public modulepreload assets one at a time before replay.");
++      lines.push("Performance: diagnostics use no MutationObserver, PerformanceObserver, DOM polling, click tracking, or on-page diagnostic UI; resource timing is read once at the 8-second snapshot. The Build 19 compatibility bridge uses one short-lived startup MutationObserver only to intercept the deferred module bootstrap, disconnects it at DOMContentLoaded, and scans same-origin public modulepreload assets one at a time before replay.");
+       return lines.join("\n");
+     }
+ 
+--- Build18/popup.html
++++ Build19/popup.html
+@@ -20,10 +20,10 @@
+ <body>
+   <h1>ChatGPT iOS 16 Fix</h1>
+   <div class="row">
+-    <label class="label" for="diagnostics">Light Diagnostics (Build 18)</label>
++    <label class="label" for="diagnostics">Light Diagnostics (Build 19)</label>
+     <input id="diagnostics" type="checkbox">
+   </div>
+-  <div class="hint">Default OFF. When ON, reload ChatGPT once. Build 18 adds the second targeted compatibility layer: RegExp.escape and a no-animation View Transition fallback, while preserving the Build 16 fixes. Diagnostics remain optional and default OFF; when enabled they keep the corrected feature matrix and public-asset scan without saving bundle source, page text, or chat text.</div>
++  <div class="hint">Default OFF. When ON, reload ChatGPT once. Build 19 adds the second targeted compatibility layer: RegExp.escape and a no-animation View Transition fallback, while preserving the Build 16 fixes. Diagnostics remain optional and default OFF; when enabled they keep the corrected feature matrix and public-asset scan without saving bundle source, page text, or chat text.</div>
+   <div id="status" role
