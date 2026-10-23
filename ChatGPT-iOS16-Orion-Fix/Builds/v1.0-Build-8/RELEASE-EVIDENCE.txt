@@ -1,0 +1,11 @@
+ChatGPT iOS 16 Orion Fix — Release Evidence
+Version 1.0 | Build 8
+
+- Latest MASTER_RULES.md re-read immediately before Build 8 work.
+- Compatibility polyfill.js SHA-256 matches Build 7 exactly.
+- popup.js SHA-256 matches Build 7 exactly.
+- Build 8 change is diagnostic-only: inline no-src SCRIPT/MODULE error capture, CSP violation capture, extra React hydration markers, and inline/external module counts.
+- Static audit: PASS (see STATIC-AUDIT.txt).
+- Safe Self-Test: PASS (see SAFE-SELF-TEST.txt).
+- Real-device test: PENDING / NOT TESTED.
+- Permanent exact binary ZIP archive: INCOMPLETE; source/text/audit archive is preserved separately.
