@@ -1,0 +1,9 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 9
+
+Changes from Build 8:
+- Attaches the tiny page-world error/CSP/unhandled-rejection listeners immediately at document_start, before the asynchronous extension storage lookup can finish.
+- Buffers only sanitized technical failure metadata in memory during that short startup window.
+- If diagnostics resolve OFF, immediately removes those listeners, clears the buffer, and saves nothing.
+- If diagnostics resolve ON, preserves any early bootstrap/module failure in the normal saved report.
+- Keeps Build 8 compatibility polyfills and lightweight one-time snapshot behavior unchanged.
