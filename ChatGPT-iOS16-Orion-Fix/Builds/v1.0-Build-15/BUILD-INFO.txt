@@ -1,0 +1,5 @@
+ChatGPT iOS 16 Orion Fix
+Version 1.0 | Build 15
+Status: PENDING / NOT DONE until real Orion iOS 16.6 classifier result is reviewed.
+
+Purpose: Preserve the Build 13/14 compatibility and diagnostics, and classify the 10 missing-API bundle hits into direct use, guards, optional access, fallback-style use, definitions/polyfills, RegExp-v constructor/literal candidates, or unclassified token hits.
