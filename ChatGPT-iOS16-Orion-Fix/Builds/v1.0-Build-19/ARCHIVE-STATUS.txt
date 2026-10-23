@@ -1,0 +1,6 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 19
+
+GitHub archive status:
+- Runtime/release source text and verification records are archived or reconstructable from archived chunks.
+- Exact binary ZIP bytes are NOT archived by the GitHub connector; ZIP-SHA256.txt records the locally verified release ZIP hash.
+- Build 19 remains PENDING / NOT DONE until real Orion iOS 16.6 hydration succeeds.
