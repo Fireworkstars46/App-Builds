@@ -1,0 +1,148 @@
+tResults
+      }
+    };
+  }
+
+  function makeSnapshot() {
+    const root = query("#root");
+    const composer = query("#prompt-textarea, textarea, [contenteditable='true']");
+    const send = query("[data-testid='send-button'], button[aria-label='Send prompt'], button[aria-label='Send message']");
+    const sidebar = query("button[aria-label*='sidebar' i], button[aria-label*='menu' i]");
+    const lateFeatureMatrix = buildFeatureMatrix("8-second snapshot after ChatGPT startup attempt");
+    const featureComparison = compareFeatureMatrices(earlyFeatureMatrix, lateFeatureMatrix);
+
+    return {
+      captured: new Date().toISOString(),
+      browser: {
+        userAgent: clip(navigator.userAgent || "", 320),
+        platform: clip(navigator.platform || "", 80),
+        vendor: clip(navigator.vendor || "", 80)
+      },
+      document: {
+        readyState: document.readyState || "unknown",
+        bodyPresent: Boolean(document.body),
+        root: elementState(root),
+        composer: elementState(composer),
+        send: elementState(send),
+        sidebar: elementState(sidebar),
+        buttonCount: count("button"),
+        scriptCount: count("script"),
+        externalScriptCount: count("script[src]"),
+        moduleScriptCount: count("script[type='module']"),
+        inlineModuleScriptCount: count("script[type='module']:not([src])"),
+        externalModuleScriptCount: count("script[type='module'][src]"),
+        modulePreloadCount: count("link[rel='modulepreload']"),
+        preloadScriptCount: count("link[rel='preload'][as='script']"),
+        stylesheetCount: count("link[rel='stylesheet']")
+      },
+      resources: resourceSummary(),
+      navigation: navigationSummary(),
+      featureMatrixEarly: earlyFeatureMatrix,
+      featureMatrixLate: lateFeatureMatrix,
+      featureComparison,
+      errors: errors.slice()
+    };
+  }
+
+  function addError(kind, message, source) {
+    errors.push({
+      time: new Date().toISOString(),
+      kind: clip(kind, 40),
+      message: safeMessage(message || ""),
+      source: sanitizeUrl(source || "")
+    });
+    if (errors.length > MAX_ERRORS) errors.splice(0, errors.length - MAX_ERRORS);
+  }
+
+  function onEarlyError(event) {
+    if (event && event.target && event.target !== window) {
+      const target = event.target;
+      const tag = String(target && target.tagName ? target.tagName : "resource").toUpperCase();
+      const url = target && (target.src || target.href) ? (target.src || target.href) : "";
+      if (url) {
+        addError("resource-error", tag, url);
+      } else if (tag === "SCRIPT") {
+        let type = "classic";
+        try {
+          const rawType = target.getAttribute && target.getAttribute("type");
+          if (rawType) type = clip(rawType, 40);
+        } catch (_) {}
+        addError("inline-script-error", "inline " + type + " script failed", "");
+      } else {
+        addError("resource-error", tag + " failed without URL", "");
+      }
+      return;
+    }
+    addError("javascript-error", event && event.message ? event.message : "JavaScript error", event && event.filename ? event.filename : "");
+  }
+
+  function onEarlyCsp(event) {
+    const directive = event && (event.effectiveDirective || event.violatedDirective) ?
+      (event.effectiveDirective || event.violatedDirective) : "CSP";
+    const blocked = event && event.blockedURI ? sanitizeUrl(event.blockedURI) : "";
+    addError("csp-violation", clip(directive, 80) + (blocked ? " blocked " + blocked : ""), "");
+  }
+
+  function onEarlyRejection(event) {
+    const reason = event ? event.reason : null;
+    let message = "Promise rejected";
+    if (reason && typeof reason === "object") message = reason.message || reason.name || message;
+    else if (typeof reason === "string") message = reason;
+    addError("unhandled-rejection", message, "");
+  }
+
+  function attachEarlyCapture() {
+    window.addEventListener("error", onEarlyError, true);
+    document.addEventListener("securitypolicyviolation", onEarlyCsp, true);
+    window.addEventListener("unhandledrejection", onEarlyRejection, true);
+  }
+
+  function detachEarlyCapture() {
+    window.removeEventListener("error", onEarlyError, true);
+    document.removeEventListener("securitypolicyviolation", onEarlyCsp, true);
+    window.removeEventListener("unhandledrejection", onEarlyRejection, true);
+  }
+
+  function start() {
+    if (started || !diagnosticsEnabled) return;
+    started = true;
+    try { if (document.documentElement) document.documentElement.removeAttribute(ENABLE_ATTR); } catch (_) {}
+    emit("started", {
+      readyState: document.readyState || "unknown",
+      earlyBufferedErrorCount: errors.length,
+      earlyFeatureCount: earlyFeatureMatrix && earlyFeatureMatrix.features ? Object.keys(earlyFeatureMatrix.features).length : 0
+    });
+    setTimeout(() => {
+      const snapshot = makeSnapshot();
+      emit("snapshot", snapshot);
+      const targets = snapshot && snapshot.featureComparison && Array.isArray(snapshot.featureComparison.missingAtLate) ?
+        snapshot.featureComparison.missingAtLate.slice() : [];
+      scanLoadedPublicAssets(targets).then(
+        (result) => emit("asset-scan", result),
+        () => emit("asset-scan", {
+          captured: new Date().toISOString(),
+          scope: "same-origin public ChatGPT /cdn/assets/*.js loaded by this page; fetch credentials omitted",
+          note: "Asset scan failed before completion.",
+          targetFeatureCount: targets.length,
+          discoveredAssets: 0,
+          fetchedAssets: 0,
+          failedAssets: 0,
+          skippedLargeAssets: 0,
+          matchedFeatureCount: 0,
+          hits: [],
+          noHits: targets
+        })
+      );
+    }, SNAPSHOT_DELAY_MS);
+  }
+
+  function resolveSetting() {
+    if (settingResolved) return;
+    settingResolved = true;
+    try {
+      diagnosticsEnabled = Boolean(document.documentElement && document.documentElement.getAttribute(ENABLE_ATTR) === "1");
+    } catch (_) {
+      diagnosticsEnabled = false;
+    }
+
+    if (diag
