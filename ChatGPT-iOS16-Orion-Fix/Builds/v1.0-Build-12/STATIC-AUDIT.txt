@@ -1,0 +1,39 @@
+ChatGPT iOS 16 Orion Fix — Static Audit
+Version 1.0 | Build 12
+
+1. PASS - Manifest JSON parses
+2. PASS - Manifest version is 1.0.11
+3. PASS - MAIN-world polyfill remains document_start
+4. PASS - MAIN-world diagnostic probe remains document_start
+5. PASS - Only storage permission requested
+6. PASS - Compatibility polyfill has URL.canParse
+7. PASS - Compatibility polyfill has Object.groupBy
+8. PASS - Compatibility polyfill has Map.groupBy
+9. PASS - Compatibility polyfill unchanged from Build 11
+10. PASS - Build 12 removes new Function probes
+11. PASS - Build 12 removes syntax result labels
+12. PASS - Early API feature matrix remains at document_start
+13. PASS - Late API feature matrix runs at 8-second snapshot
+14. PASS - Feature comparison tracks becameSupported
+15. PASS - Feature comparison tracks stillMissing
+16. PASS - Feature comparison tracks becameMissing
+17. PASS - No MutationObserver construction
+18. PASS - No PerformanceObserver construction
+19. PASS - No interval polling
+20. PASS - No click tracking listener
+21. PASS - No on-page diagnostic UI creation
+22. PASS - No page text reads
+23. PASS - No input value reads
+24. PASS - No placeholder reads
+25. PASS - CSP sample content is not read
+26. PASS - Diagnostics OFF path clears early errors
+27. PASS - Diagnostics OFF path clears early matrix
+28. PASS - Popup identifies Build 12
+29. PASS - Popup keeps Copy Missing Features Only
+30. PASS - Popup copies Browser feature comparison section
+31. PASS - Popup default setting remains OFF
+32. PASS - Release docs identify Build 12
+33. PASS - Privacy statement remains present
+34. PASS - Performance statement remains present
+
+TOTAL: 34 PASS / 0 FAIL
