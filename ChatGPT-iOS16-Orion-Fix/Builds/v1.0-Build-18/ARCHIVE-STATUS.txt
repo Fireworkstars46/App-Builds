@@ -1,0 +1,7 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 18
+
+GitHub text/source archive: PARTIAL but the complete new runtime module-compat.js is archived as exact numbered UTF-8 chunks with reconstruction SHA-256, together with manifest, source hashes, tests, audit, and release evidence.
+The full Build 17 -> Build 18 delta is retained in the downloadable ZIP/local verified package but is not fully uploaded through this connector.
+Exact binary ZIP archive on GitHub: INCOMPLETE / NOT independently byte-verified because this connector does not upload the local ZIP bytes directly.
+Local verified ZIP SHA-256 is recorded in ZIP-SHA256.txt.
+Status: PENDING / NOT DONE pending real Orion iOS 16.6 test.
