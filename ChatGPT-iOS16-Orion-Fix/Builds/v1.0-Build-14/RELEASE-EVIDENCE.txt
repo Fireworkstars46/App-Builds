@@ -1,0 +1,10 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 14 Release Evidence
+
+- Build 14 changes diagnostic behavior, so Build number legitimately increments.
+- Compatibility polyfill is intended to remain byte-identical to Build 13.
+- Asset scan is limited to same-origin /cdn/assets/*.js URLs observed in PerformanceResourceTiming.
+- fetch() uses credentials:"omit".
+- Static JS source is kept only in a local variable during each scan and is not persisted or reported.
+- Report stores only feature names, hit counts, confidence labels, sanitized asset filenames, and scan counts.
+- Real iPhone/Orion runtime test: NOT TESTED at packaging time.
+- Build status: PENDING / NOT DONE.
