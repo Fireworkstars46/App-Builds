@@ -1,0 +1,25 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 15
+Chunked runtime-source archive index
+
+Large runtime UTF-8 files are split only for GitHub connector upload limits.
+Reconstruct each original by concatenating its parts in numeric order with NO separators.
+The reconstructed file must match the SHA-256 shown below.
+
+main-probe.js  SHA256=1cb8d6c14ad1cd33bb584ef44e7fad43b05d4d0fd0b1887f2566bd4df3d9a778  parts=7
+  main-probe.js.part01  SHA256=bc6d487973e6d6ad1fb166e767c43b52b0190b8a8f39fcb8ed93869b8bb6ad1e  chars=6000
+  main-probe.js.part02  SHA256=9e096e86e22b72fab23f8fbbc16b116d62b213b3eedc74daa29cf48d4bd1281b  chars=6000
+  main-probe.js.part03  SHA256=6b9975eb51af7e430cbad1d23c2f8bdde87dc35698041b0da295ac8979ac5da2  chars=6000
+  main-probe.js.part04  SHA256=648b816d7d17d984626e242ab1098dd45b4dc13c1a8375eab1969803fa54a1f1  chars=6000
+  main-probe.js.part05  SHA256=9ac2c5e1ec61288d526aa059fa688a0b874d8494e8c1752ad4f34298e26cc2c9  chars=6000
+  main-probe.js.part06  SHA256=6434536ce32dd7cf41a095291d4b83c749ee7263c4c7ff2d9c4be454a578b253  chars=6000
+  main-probe.js.part07  SHA256=c5477d444f5e2313a22588b23f5f3302e71d7421193e0b9d9aa3d454f1446d59  chars=1051
+
+light-diagnostic.js  SHA256=73ee77fa688aead73220803ee6cf35d03d4d94d9d4b79a907dd10a1cf702c579  parts=4
+  light-diagnostic.js.part01  SHA256=0a89269ca9e7a7303dfd99aff2913cf84147971831076b3ed534a63f1afe6c57  chars=6000
+  light-diagnostic.js.part02  SHA256=0dc9451fc710844969ab52d07ac60131d9f7e5815b973a99c80b40ab78f39366  chars=6000
+  light-diagnostic.js.part03  SHA256=e951d3705b4dd0466a02e14006cad3261560768f9968515b4544767cbf8d4b0c  chars=6000
+  light-diagnostic.js.part04  SHA256=a8df1d6394bb93603e2697b39c9194450e379141bbcc5c22b0a06dffeaf6c950  chars=1042
+
+Non-runtime records:
+- selftest.js exact SHA-256 is recorded in SOURCE-SHA256.txt; Safe Self-Test output is archived separately.
+- SOURCE-DELTA-FROM-BUILD14.txt exact SHA-256 is recorded in the local release package; the full runtime source above is authoritative for reconstruction.
