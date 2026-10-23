@@ -1,0 +1,6 @@
+ChatGPT iOS 16 Orion Fix — Archive Status
+Version 1.0 | Build 10
+
+Source/text/audit artifacts are archived to GitHub under ChatGPT-iOS16-Orion-Fix/Builds/v1.0-Build-10/.
+The exact binary ZIP is not permanently archived through the available GitHub connector, so binary archive status remains INCOMPLETE.
+Release status remains PENDING / NOT DONE until real-device testing.
