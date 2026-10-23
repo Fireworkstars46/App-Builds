@@ -1,0 +1,140 @@
+feature, source) {
+    const rules = ASSET_CONTEXT_RULES[feature] || {};
+    return {
+      direct: sourceHasAnyRegex(source, rules.direct),
+      guard: sourceHasAnyRegex(source, rules.guard),
+      optional: sourceHasAnyRegex(source, rules.optional),
+      fallback: sourceHasAnyRegex(source, rules.fallback),
+      definition: sourceHasAnyRegex(source, rules.definition),
+      regexpVConstructor: sourceHasAnyRegex(source, rules.regexpVConstructor),
+      regexpVLiteral: sourceHasAnyRegex(source, rules.regexpVLiteral)
+    };
+  }
+
+  function makeContextEntry(feature, confidence) {
+    return {
+      feature,
+      confidence: confidence || "heuristic",
+      tokenAssets: 0,
+      directAssets: [],
+      guardAssets: [],
+      optionalAssets: [],
+      fallbackAssets: [],
+      definitionAssets: [],
+      regexpVConstructorAssets: [],
+      regexpVLiteralCandidateAssets: [],
+      unclassifiedAssets: []
+    };
+  }
+
+  function pushUniqueLimited(list, value) {
+    if (!Array.isArray(list) || !value || list.indexOf(value) !== -1 || list.length >= 8) return;
+    list.push(value);
+  }
+
+  function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function fetchAssetText(url) {
+    const controller = typeof AbortController === "function" ? new AbortController() : null;
+    let timer = null;
+    try {
+      if (controller) timer = setTimeout(() => controller.abort(), ASSET_SCAN_TIMEOUT_MS);
+      const response = await fetch(url, {
+        credentials: "omit",
+        cache: "force-cache",
+        redirect: "error",
+        referrerPolicy: "no-referrer",
+        signal: controller ? controller.signal : undefined
+      });
+      if (!response || !response.ok) return { ok: false, reason: "http" };
+      const lengthHeader = response.headers && response.headers.get ? response.headers.get("content-length") : null;
+      const contentLength = lengthHeader ? Number(lengthHeader) : 0;
+      if (Number.isFinite(contentLength) && contentLength > ASSET_SCAN_MAX_BYTES) {
+        return { ok: false, reason: "too-large" };
+      }
+      const text = await response.text();
+      if (text.length > ASSET_SCAN_MAX_BYTES) return { ok: false, reason: "too-large" };
+      return { ok: true, text };
+    } catch (_) {
+      return { ok: false, reason: "fetch-failed" };
+    } finally {
+      if (timer != null) clearTimeout(timer);
+    }
+  }
+
+  async function scanLoadedPublicAssets(targetFeatures) {
+    const targets = Array.isArray(targetFeatures) ? targetFeatures.filter((name) => ASSET_API_PATTERNS[name]) : [];
+    const urls = collectChatGptAssetUrls();
+    const hitMap = {};
+    const contextMap = {};
+    for (const name of targets) {
+      const confidence = ASSET_API_PATTERNS[name].confidence || "heuristic";
+      hitMap[name] = { feature: name, confidence, assetHits: 0, assets: [] };
+      if (ASSET_CONTEXT_RULES[name]) contextMap[name] = makeContextEntry(name, confidence);
+    }
+
+    let fetchedAssets = 0;
+    let failedAssets = 0;
+    let skippedLargeAssets = 0;
+
+    for (const url of urls) {
+      const result = await fetchAssetText(url);
+      if (!result.ok) {
+        if (result.reason === "too-large") skippedLargeAssets += 1;
+        else failedAssets += 1;
+        await delay(ASSET_SCAN_YIELD_MS);
+        continue;
+      }
+      fetchedAssets += 1;
+      const source = result.text;
+      const fileName = assetFileName(url);
+      for (const name of targets) {
+        if (sourceMatchesPattern(source, ASSET_API_PATTERNS[name])) {
+          hitMap[name].assetHits += 1;
+          if (hitMap[name].assets.length < 8) hitMap[name].assets.push(fileName);
+          if (contextMap[name]) {
+            const entry = contextMap[name];
+            const classified = classifyFeatureSource(name, source);
+            entry.tokenAssets += 1;
+            if (classified.direct) pushUniqueLimited(entry.directAssets, fileName);
+            if (classified.guard) pushUniqueLimited(entry.guardAssets, fileName);
+            if (classified.optional) pushUniqueLimited(entry.optionalAssets, fileName);
+            if (classified.fallback) pushUniqueLimited(entry.fallbackAssets, fileName);
+            if (classified.definition) pushUniqueLimited(entry.definitionAssets, fileName);
+            if (classified.regexpVConstructor) pushUniqueLimited(entry.regexpVConstructorAssets, fileName);
+            if (classified.regexpVLiteral) pushUniqueLimited(entry.regexpVLiteralCandidateAssets, fileName);
+            if (!classified.direct && !classified.guard && !classified.optional && !classified.fallback && !classified.definition &&
+                !classified.regexpVConstructor && !classified.regexpVLiteral) {
+              pushUniqueLimited(entry.unclassifiedAssets, fileName);
+            }
+          }
+        }
+      }
+      // Drop the source before yielding to reduce peak memory pressure on older iPhones.
+      await delay(ASSET_SCAN_YIELD_MS);
+    }
+
+    const hits = targets.map((name) => hitMap[name]).filter((item) => item.assetHits > 0);
+    const noHits = targets.filter((name) => hitMap[name].assetHits === 0);
+    const contextResults = hits
+      .map((item) => contextMap[item.feature])
+      .filter(Boolean);
+
+    return {
+      captured: new Date().toISOString(),
+      scope: "same-origin public ChatGPT /cdn/assets/*.js loaded by this page; fetch credentials omitted",
+      note: "Source-token hits are evidence of bundle references, not proof of execution. No-hit can miss minified or indirect access.",
+      targetFeatureCount: targets.length,
+      discoveredAssets: urls.length,
+      fetchedAssets,
+      failedAssets,
+      skippedLargeAssets,
+      matchedFeatureCount: hits.length,
+      hits,
+      noHits,
+      contextClassifier: {
+        note: "Asset-level context classification only; categories can overlap. No source snippets are stored. Direct/guard classifications are lexical evidence, not proof of execution.",
+        classifiedFeatureCount: contextResults.length,
+        results: contex
