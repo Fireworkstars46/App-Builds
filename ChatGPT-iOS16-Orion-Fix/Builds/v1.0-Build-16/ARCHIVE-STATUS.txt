@@ -1,0 +1,9 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 16
+
+GitHub archive status:
+- Exact Build 16 changed/reconstruction source is archived as normal files plus numbered chunks with SHA-256 reconstruction metadata.
+- Build 15 remains the reconstruction base for files not changed in Build 16; SOURCE-DELTA-FROM-BUILD15.txt records the exact source delta.
+- Local release ZIP SHA-256: 6f9708d5b870832b232b6bba0ccbf4d5372b6f9385aaee66588026ddf53b4994
+- Exact binary ZIP bytes are NOT archived through the GitHub connector and binary coverage is therefore INCOMPLETE.
+
+Status: PENDING / NOT DONE pending real-device compatibility test.
