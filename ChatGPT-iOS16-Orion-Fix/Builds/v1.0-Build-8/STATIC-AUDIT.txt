@@ -1,0 +1,39 @@
+ChatGPT iOS 16 Orion Fix — STATIC AUDIT
+Version 1.0 | Build 8
+
+PASS - Manifest parses as MV3
+PASS - Manifest version is 1.0.7
+PASS - Storage permission remains present
+PASS - Polyfill remains MAIN world document_start
+PASS - Main probe remains MAIN world document_start
+PASS - Light diagnostic remains isolated document_start
+PASS - Build 8 markers in main probe
+PASS - Build 8 markers in light diagnostic
+PASS - Popup labels Build 8 and not Build 7
+PASS - Diagnostics default OFF path preserved
+PASS - No MutationObserver construction
+PASS - No PerformanceObserver construction
+PASS - No polling setInterval
+PASS - No click tracking
+PASS - No on-page shadow UI
+PASS - No on-page appendChild UI
+PASS - No page textContent read
+PASS - No page innerText read
+PASS - No page input value read
+PASS - No placeholder read
+PASS - Inline script failure capture present
+PASS - Inline module type captured without code content
+PASS - CSP violation capture present
+PASS - CSP sample content not read
+PASS - React container marker check present
+PASS - React listeners marker check present
+PASS - React handles marker check present
+PASS - React listening marker check present
+PASS - Inline module count present
+PASS - External module count present
+PASS - Resource timing still one-time getEntriesByType
+PASS - Query strings removed from resource URLs
+PASS - Polyfill file unchanged from Build 7
+PASS - Popup JS unchanged from Build 7
+
+TOTAL: 34 PASS / 0 FAIL
