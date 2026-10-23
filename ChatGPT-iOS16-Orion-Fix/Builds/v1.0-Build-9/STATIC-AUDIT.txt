@@ -1,0 +1,36 @@
+ChatGPT iOS 16 Orion Fix — Static Audit
+Version 1.0 | Build 9
+
+PASS - manifest parses as MV3
+PASS - manifest version is 1.0.8
+PASS - storage is only declared permission
+PASS - polyfill runs MAIN at document_start
+PASS - main probe runs MAIN at document_start
+PASS - isolated diagnostic runs at document_start
+PASS - polyfill byte-identical to Build 8
+PASS - popup.js byte-identical to Build 8
+PASS - Build 9 popup label present
+PASS - main probe Build 9 constant
+PASS - light diagnostic Build 9 constant
+PASS - early error capture attaches immediately
+PASS - setting resolution event exists
+PASS - OFF removes error listener
+PASS - OFF removes CSP listener
+PASS - OFF removes rejection listener
+PASS - OFF clears memory buffer
+PASS - no MutationObserver construction
+PASS - no PerformanceObserver construction
+PASS - no setInterval polling
+PASS - no click tracking
+PASS - no on-page element creation
+PASS - no page textContent read
+PASS - no page innerText read
+PASS - no page input value read
+PASS - no placeholder read
+PASS - CSP sample not read
+PASS - resource timing one-time read present
+PASS - diagnostics storage defaults OFF
+PASS - privacy statement present
+PASS - Build docs all Version 1.0 Build 9
+
+TOTAL: 31 PASS / 0 FAIL
