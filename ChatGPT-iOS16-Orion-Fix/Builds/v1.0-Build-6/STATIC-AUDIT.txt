@@ -1,0 +1,32 @@
+ChatGPT iOS 16 Orion Fix — Static / Release Audit
+Version 1.0 | Build 6
+
+PASS 1 - manifest.json parses as valid JSON.
+PASS 2 - manifest version remains 3.
+PASS 3 - extension identity/name preserved.
+PASS 4 - package version advanced to 1.0.5 for Build 6.
+PASS 5 - compatibility polyfill is byte-for-byte unchanged from Build 5.
+PASS 6 - polyfill SHA-256 preserved: 79b2814539dbb14a885cff1661e194ef213fbfefb1d4f4bbf0ad09029ca6d4be
+PASS 7 - URL.canParse fallback remains present.
+PASS 8 - Object.groupBy fallback remains present.
+PASS 9 - Map.groupBy fallback remains present.
+PASS 10 - polyfill.js JavaScript syntax check passes.
+PASS 11 - light-diagnostic.js JavaScript syntax check passes.
+PASS 12 - popup.js JavaScript syntax check passes.
+PASS 13 - selftest.js JavaScript syntax check passes.
+PASS 14 - diagnostics default remains OFF.
+PASS 15 - lightweight diagnostic is scoped only to chatgpt.com.
+PASS 16 - no MutationObserver production path in light-diagnostic.js.
+PASS 17 - no PerformanceObserver production path in light-diagnostic.js.
+PASS 18 - no click-tracking production path in light-diagnostic.js.
+PASS 19 - no on-page diagnostic UI creation path in light-diagnostic.js.
+PASS 20 - no DOM polling loop/timer; only one 8-second snapshot timer.
+PASS 21 - report is stored in extension-owned storage rather than rendered over ChatGPT.
+PASS 22 - popup can refresh/copy/clear the saved report.
+PASS 23 - privacy boundary excludes message text, typed text, cookies, page text, request bodies, and clipboard contents.
+PASS 24 - error/resource URLs strip query/fragment data and redact long identifiers.
+PASS 25 - release documentation identifies Version 1.0 Build 6 consistently.
+
+Static/release audit total: 25 PASS / 0 FAIL.
+
+Real iOS/Orion behavior remains PENDING and is not claimed as tested.
