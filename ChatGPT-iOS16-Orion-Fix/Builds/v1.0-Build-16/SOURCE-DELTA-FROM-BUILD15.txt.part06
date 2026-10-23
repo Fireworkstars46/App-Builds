@@ -1,0 +1,24 @@
+rray.fromBase64(s,{alphabet:'base64url'});return s==='Love_you'&&Array.from(b).join(',')==='46,139,222,255,42,46'})()`,c);
++});
++check('Build 16 Uint8Array Base64 rejects invalid alphabet input',()=>{
++  const c=compatibilityContext();
++  return vm.runInContext(`(()=>{try{Uint8Array.fromBase64('%%%');return false}catch(e){return e instanceof SyntaxError}})()`,c);
++});
++check('Build 16 ArrayBuffer.transfer preserves bytes and requested size',()=>{
++  const c=compatibilityContext();
++  return vm.runInContext(`(()=>{let a=new ArrayBuffer(4);new Uint8Array(a).set([1,2,3,4]);const b=a.transfer(6);const v=Array.from(new Uint8Array(b));return b.byteLength===6&&v.join(',')==='1,2,3,4,0,0'})()`,c);
++});
++check('Build 16 ArrayBuffer.transfer detaches source when transferable structuredClone works',()=>{
++  const c=compatibilityContext();
++  return vm.runInContext(`(()=>{let a=new ArrayBuffer(2);new Uint8Array(a).set([7,8]);const b=a.transfer();return b.byteLength===2&&a.byteLength===0&&new Uint8Array(b)[1]===8})()`,c);
++});
++check('Build 16 Popover fallbacks install show/hide/toggle without DOM mutation requirements',()=>{
++  const c=compatibilityContext();
++  return vm.runInContext(`(()=>{const e=new HTMLElement();return typeof e.showPopover==='function'&&typeof e.hidePopover==='function'&&typeof e.togglePopover==='function'&&e.showPopover()===undefined&&e.togglePopover(false)===false&&e.togglePopover(true)===true})()`,c);
++});
++check('Build 16 intentionally does not add guarded/fallback candidate shims',()=>{
++  const s=read('polyfill.js');
++  return !s.includes('RegExp.escape')&&!s.includes('startViewTransition')&&!s.includes('URLPattern')&&!s.includes('navigation =')&&!s.includes('scheduler.postTask');
++});
++
+ console.log('TOTAL: '+pass+' PASS / '+fail+' FAIL'); process.exit(fail?1:0);
