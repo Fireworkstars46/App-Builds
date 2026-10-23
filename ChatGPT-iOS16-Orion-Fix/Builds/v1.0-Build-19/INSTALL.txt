@@ -1,0 +1,9 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 19
+
+1. Disable older Builds 1–18.
+2. Install this ZIP in Orion.
+3. Enable only Build 19.
+4. Grant website/network-rule access for chatgpt.com if Orion asks.
+5. Keep Light Diagnostics OFF for the first test.
+6. Fully reload https://chatgpt.com and test sidebar, typing, Send button, and sending.
+7. If still broken, enable diagnostics, reload once, and copy the Build 19 module compatibility bridge section plus page-world errors.
