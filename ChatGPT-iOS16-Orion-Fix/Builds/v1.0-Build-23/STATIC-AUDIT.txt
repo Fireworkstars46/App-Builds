@@ -1,0 +1,46 @@
+PASS - Manifest version 1.0.22
+PASS - Manifest V3 preserved
+PASS - Permissions limited to storage + webRequest + webRequestBlocking
+PASS - Host permission limited to chatgpt.com
+PASS - Background service worker present
+PASS - Asset compatibility script runs only on chatgpt.com
+PASS - No declarativeNetRequest rules
+PASS - No Build 18/19 module bridge packaged
+PASS - No CSP response-header interception
+PASS - No response-body filter usage
+PASS - Asset redirect listener exact ChatGPT CDN scope
+PASS - Background validates exact same-origin CDN JS path
+PASS - Background accepts only JavaScript data URLs
+PASS - Background patch count bounded to 12
+PASS - Background encoded patch size bounded
+PASS - Asset learner fetches credentials omitted
+PASS - Asset learner fetch uses same-origin performance asset list
+PASS - Asset learner count bounded
+PASS - Asset learner source size bounded
+PASS - Asset learner fetch timeout bounded
+PASS - Asset learner yields sequentially
+PASS - RegExp-v lexical scanner present
+PASS - Known v-only semantics guarded
+PASS - Safe v-to-u compile check present
+PASS - Unsafe v-only literal uses never-match parser-safe fallback
+PASS - Patched modules absolutize imports
+PASS - Patched modules preserve import.meta.url
+PASS - Automatic reload count capped at two
+PASS - Project-owned reload key only
+PASS - Persistent learner status contains no source field
+PASS - Diagnostic report contains no source snippets
+PASS - No chat/page text reads in new asset learner
+PASS - No cookies/clipboard/request bodies in new asset learner
+PASS - No heavy observer or interval added
+PASS - UA rewrite remains chatgpt-only
+PASS - UA rewrite changes User-Agent only
+PASS - Main diagnostics still default-resolved OFF by isolated script
+PASS - No new Function/eval syntax probes
+PASS - No on-page diagnostic UI
+PASS - Popup identifies Build 23
+PASS - Polyfill keeps original targeted shims
+PASS - Navigation API still not faked
+PASS - URLPattern still not faked
+PASS - scheduler.postTask still not faked
+PASS - Version/build docs identify Build 23
+TOTAL: 45 PASS / 0 FAIL
