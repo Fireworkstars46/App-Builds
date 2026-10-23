@@ -1,0 +1,13 @@
+ChatGPT iOS 16 Orion Fix — Version 1.0 Build 14
+
+1. Disable Builds 1-13.
+2. Install the Build 14 ZIP itself in Orion.
+3. Enable only Build 14.
+4. Open the extension popup and turn Light Diagnostics (Build 14) ON.
+5. Reload ChatGPT once.
+6. Wait about 15 seconds.
+7. Open the popup, tap Refresh Report.
+8. Tap Copy Asset Scan Only and paste the result into ChatGPT.
+9. If it says the asset scan is pending, wait a few seconds, Refresh Report again, then copy it.
+
+Do not clear ChatGPT cookies/cache for this test.
