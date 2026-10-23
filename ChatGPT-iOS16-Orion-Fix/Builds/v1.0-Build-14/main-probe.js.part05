@@ -1,0 +1,87 @@
+    if (reason && typeof reason === "object") message = reason.message || reason.name || message;
+    else if (typeof reason === "string") message = reason;
+    addError("unhandled-rejection", message, "");
+  }
+
+  function attachEarlyCapture() {
+    window.addEventListener("error", onEarlyError, true);
+    document.addEventListener("securitypolicyviolation", onEarlyCsp, true);
+    window.addEventListener("unhandledrejection", onEarlyRejection, true);
+  }
+
+  function detachEarlyCapture() {
+    window.removeEventListener("error", onEarlyError, true);
+    document.removeEventListener("securitypolicyviolation", onEarlyCsp, true);
+    window.removeEventListener("unhandledrejection", onEarlyRejection, true);
+  }
+
+  function start() {
+    if (started || !diagnosticsEnabled) return;
+    started = true;
+    try { if (document.documentElement) document.documentElement.removeAttribute(ENABLE_ATTR); } catch (_) {}
+    emit("started", {
+      readyState: document.readyState || "unknown",
+      earlyBufferedErrorCount: errors.length,
+      earlyFeatureCount: earlyFeatureMatrix && earlyFeatureMatrix.features ? Object.keys(earlyFeatureMatrix.features).length : 0
+    });
+    setTimeout(() => {
+      const snapshot = makeSnapshot();
+      emit("snapshot", snapshot);
+      const targets = snapshot && snapshot.featureComparison && Array.isArray(snapshot.featureComparison.missingAtLate) ?
+        snapshot.featureComparison.missingAtLate.slice() : [];
+      scanLoadedPublicAssets(targets).then(
+        (result) => emit("asset-scan", result),
+        () => emit("asset-scan", {
+          captured: new Date().toISOString(),
+          scope: "same-origin public ChatGPT /cdn/assets/*.js loaded by this page; fetch credentials omitted",
+          note: "Asset scan failed before completion.",
+          targetFeatureCount: targets.length,
+          discoveredAssets: 0,
+          fetchedAssets: 0,
+          failedAssets: 0,
+          skippedLargeAssets: 0,
+          matchedFeatureCount: 0,
+          hits: [],
+          noHits: targets
+        })
+      );
+    }, SNAPSHOT_DELAY_MS);
+  }
+
+  function resolveSetting() {
+    if (settingResolved) return;
+    settingResolved = true;
+    try {
+      diagnosticsEnabled = Boolean(document.documentElement && document.documentElement.getAttribute(ENABLE_ATTR) === "1");
+    } catch (_) {
+      diagnosticsEnabled = false;
+    }
+
+    if (diagnosticsEnabled) {
+      start();
+    } else {
+      detachEarlyCapture();
+      errors.splice(0, errors.length);
+      earlyFeatureMatrix = null;
+      try { if (document.documentElement) document.documentElement.removeAttribute(ENABLE_ATTR); } catch (_) {}
+    }
+  }
+
+  // Attach immediately at document_start, before the isolated-world storage lookup can finish.
+  // If diagnostics are OFF, the isolated-world script resolves the setting to OFF,
+  // these listeners are removed, and the small in-memory buffer is cleared without persistence.
+  attachEarlyCapture();
+  document.addEventListener(RESOLVE_EVENT, resolveSetting, { once: true });
+
+  function checkResolvedAttribute() {
+    try {
+      if (!document.documentElement) return;
+      const value = document.documentElement.getAttribute(ENABLE_ATTR);
+      if (value === "1" || value === "0") resolveSetting();
+    } catch (_) {}
+  }
+
+  checkResolvedAttribute();
+  if (!document.documentElement) document.addEventListener("DOMContentLoaded", checkResolvedAttribute, { once: true });
+
+})();
