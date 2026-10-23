@@ -1,0 +1,176 @@
+        if (name.indexOf("__reactEvents$") === 0) result.events = true;
+        if (name.indexOf("__reactContainer$") === 0) result.container = true;
+        if (name.indexOf("__reactListeners$") === 0) result.listeners = true;
+        if (name.indexOf("__reactHandles$") === 0) result.handles = true;
+        if (name.indexOf("_reactListening") === 0) result.listening = true;
+      }
+      result.markerCount = Number(result.fiber) + Number(result.props) + Number(result.events) +
+        Number(result.container) + Number(result.listeners) + Number(result.handles) + Number(result.listening);
+    } catch (_) {}
+    return result;
+  }
+
+  function getAttributeState(element, name) {
+    if (!element || typeof element.getAttribute !== "function") return "unavailable";
+    try {
+      const value = element.getAttribute(name);
+      return value == null ? "absent" : clip(value, 40);
+    } catch (_) {
+      return "unavailable";
+    }
+  }
+
+  function elementState(element) {
+    if (!element) return { present: false };
+    const state = {
+      present: true,
+      tag: clip(element.tagName || "unknown", 20),
+      react: reactMarkers(element),
+      disabled: Boolean(element.disabled),
+      ariaDisabled: getAttributeState(element, "aria-disabled"),
+      contentEditable: getAttributeState(element, "contenteditable"),
+      directOnClick: false
+    };
+    try { state.directOnClick = typeof element.onclick === "function"; } catch (_) {}
+    return state;
+  }
+
+  function query(selector) {
+    try { return document.querySelector ? document.querySelector(selector) : null; }
+    catch (_) { return null; }
+  }
+
+  function count(selector) {
+    try { return document.querySelectorAll ? document.querySelectorAll(selector).length : -1; }
+    catch (_) { return -1; }
+  }
+
+  function resourceSummary() {
+    const summary = {
+      supported: false,
+      total: 0,
+      jsLike: 0,
+      byInitiator: {},
+      samples: []
+    };
+    try {
+      if (!window.performance || typeof window.performance.getEntriesByType !== "function") return summary;
+      const entries = window.performance.getEntriesByType("resource") || [];
+      summary.supported = true;
+      summary.total = entries.length;
+      for (const entry of entries) {
+        const type = clip(entry.initiatorType || "unknown", 30);
+        summary.byInitiator[type] = (summary.byInitiator[type] || 0) + 1;
+        const url = sanitizeUrl(entry.name || "");
+        const jsLike = type === "script" || /\.m?js(?:$|[?#])/i.test(String(entry.name || ""));
+        if (jsLike) summary.jsLike += 1;
+        if (summary.samples.length < 20 && (jsLike || type === "link" || type === "fetch" || type === "xmlhttprequest")) {
+          summary.samples.push({
+            initiator: type,
+            url,
+            durationMs: Number.isFinite(Number(entry.duration)) ? Math.round(Number(entry.duration)) : -1
+          });
+        }
+      }
+    } catch (_) {}
+    return summary;
+  }
+
+  function navigationSummary() {
+    const result = { supported: false };
+    try {
+      if (!window.performance || typeof window.performance.getEntriesByType !== "function") return result;
+      const nav = (window.performance.getEntriesByType("navigation") || [])[0];
+      if (!nav) return result;
+      result.supported = true;
+      for (const key of ["domInteractive", "domContentLoadedEventEnd", "loadEventEnd"]) {
+        const value = Number(nav[key]);
+        result[key + "Ms"] = Number.isFinite(value) ? Math.round(value) : -1;
+      }
+    } catch (_) {}
+    return result;
+  }
+
+  function compareFeatureMatrices(early, late) {
+    const earlyFeatures = early && early.features ? early.features : {};
+    const lateFeatures = late && late.features ? late.features : {};
+    const names = Array.from(new Set(Object.keys(earlyFeatures).concat(Object.keys(lateFeatures)))).sort();
+    const becameSupported = [];
+    const stillMissing = [];
+    const becameMissing = [];
+    const missingAtLate = [];
+    for (const name of names) {
+      const earlyOk = earlyFeatures[name] === true;
+      const lateOk = lateFeatures[name] === true;
+      if (!lateOk) missingAtLate.push(name);
+      if (!earlyOk && lateOk) becameSupported.push(name);
+      else if (!earlyOk && !lateOk) stillMissing.push(name);
+      else if (earlyOk && !lateOk) becameMissing.push(name);
+    }
+    return {
+      checked: names.length,
+      becameSupported,
+      stillMissing,
+      becameMissing,
+      missingAtLate
+    };
+  }
+
+
+  function assetFileName(urlValue) {
+    try {
+      const parsed = new URL(urlValue, window.location.origin);
+      const parts = parsed.pathname.split("/");
+      return clip(redactPath(parts[parts.length - 1] || "unknown.js"), 140);
+    } catch (_) {
+      return "unknown.js";
+    }
+  }
+
+  function collectChatGptAssetUrls() {
+    const urls = [];
+    const seen = new Set();
+    try {
+      if (!window.performance || typeof window.performance.getEntriesByType !== "function") return urls;
+      const entries = window.performance.getEntriesByType("resource") || [];
+      for (const entry of entries) {
+        if (urls.length >= ASSET_SCAN_LIMIT) break;
+        try {
+          const parsed = new URL(String(entry && entry.name ? entry.name : ""), window.location.origin);
+          if (parsed.origin !== window.location.origin) continue;
+          if (!/^\/cdn\/assets\/[^/?#]+\.m?js$/i.test(parsed.pathname)) continue;
+          const clean = parsed.origin + parsed.pathname;
+          if (seen.has(clean)) continue;
+          seen.add(clean);
+          urls.push(clean);
+        } catch (_) {}
+      }
+    } catch (_) {}
+    return urls;
+  }
+
+  function sourceMatchesPattern(source, pattern) {
+    try {
+      const strings = pattern && Array.isArray(pattern.strings) ? pattern.strings : [];
+      for (const token of strings) {
+        if (token && source.indexOf(token) !== -1) return true;
+      }
+      const regexes = pattern && Array.isArray(pattern.regex) ? pattern.regex : [];
+      for (const raw of regexes) {
+        try {
+          if (new RegExp(raw, "m").test(source)) return true;
+        } catch (_) {}
+      }
+    } catch (_) {}
+    return false;
+  }
+
+  function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async function fetchAssetText(url) {
+    const controller = typeof AbortController === "function" ? new AbortController() : null;
+    let timer = null;
+    try {
+      if (controller) timer = setTimeout(() => controller.abort(), ASSET_SCAN_TIMEOUT_MS);
