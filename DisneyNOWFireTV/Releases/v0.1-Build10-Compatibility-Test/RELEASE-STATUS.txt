@@ -1,0 +1,15 @@
+DisneyNOW Fire TV Hybrid TV Shell
+Version 0.1 Build 10
+Status: NOT DONE - COMPATIBILITY TEST
+
+Build 10 is a targeted follow-up to the Build 9 physical debug report. The report showed repeated DisneyNOW HLS manifest detection while the WebView playback attempt failed, but no native-player attempt had been captured. Build 10 keeps the existing user-triggered Media3 path and adds privacy-safe visibility into the HLS/DASH -> native-player handoff.
+
+New diagnostics include native-handoff readiness/attempt/player-create/prepare counters, a handoff-stage state machine, manifest host/type/age, safe session-context presence indicators, post-manifest non-GET host/method/content-type category counters, and Media3 error code plus exception class chain only. No cookies, tokens, request bodies, full protected-media/license URLs, DRM keys, or typed text are exported. WebView remote debugging remains disabled.
+
+The Menu item now shows whether Try Native Player is waiting for a detected stream or ready with HLS/DASH. The first detected HLS/DASH stream per page can show a one-time hint directing the user to Menu > Try Native Player after WebView playback failure. Native playback remains user-triggered; Build 10 does not automatically hijack playback.
+
+Package ID: com.fireworkstars46.disneynowfiretv
+Android versionCode: 10
+Signing: exact established permanent update identity; certificate SHA-256 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838.
+CI verification: PASS. Static/release audit 194 PASS / 0 FAIL; lint 0 errors / 13 warnings; compile/unit tests/package/version and APK v1/v2/v3 signer checks passed.
+Physical Fire TV checks still required: install over Build 9, reproduce WebView playback failure, confirm detected-stream hint/menu readiness, invoke Try Native Player, observe playback/error behavior, export the Build 10 debug report, and verify responsiveness/provider auth/zoom/fallback behavior.
