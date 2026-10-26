@@ -25,7 +25,9 @@ PART_ORDER = [
     'part02.b64',
     'part03a.b64',
     'part03b.b64',
-    'part03c.b64',
+    'part03c1.b64',
+    'part03c2.b64',
+    'part03c3.b64',
     'part03d.b64',
     'part04.b64',
 ]
@@ -35,7 +37,9 @@ EXPECTED_PARTS = {
     'part02.b64': (9697, '6ac29e516bc1d6f76599bdf03918c448bff3e97c6fc7196adf3703998c02a9eb'),
     'part03a.b64': (3000, '7ffe3f06fe273632707a44741eb86c06cc39681492d84fb8522c168692f474b2'),
     'part03b.b64': (3000, '6320dd7d95786a25666b1669df88941f6c3ae0eb384e6d6926cea677a19f6385'),
-    'part03c.b64': (3000, '3880ed5d6997012d5be34bead44d72c129c597de68a5ca5d03118b6cd2c7436d'),
+    'part03c1.b64': (1000, 'b0fbc17688dbb31485ebc2bf63c9c9956aa1c491f8bef8520ece82063e52e284'),
+    'part03c2.b64': (1000, '70dc4179ade5d5feeb568504670bd394804b8e5c85a6d0ed783bde44637b8641'),
+    'part03c3.b64': (1000, '4d4ce840a23984873cfd650e94ea520711f79318332d979e79af316786908bbd'),
     'part03d.b64': (697, 'feefd8a6dde8aede55642241efa930699b0e99efa3da5d44acdaece1be0b5a07'),
     'part04.b64': (9696, '98489f8f7767edb6653898347a462919c63e7c330873989db9d8ce875be6dea7'),
 }
