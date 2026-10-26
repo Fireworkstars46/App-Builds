@@ -19,6 +19,14 @@ BUILD13 = {
 }
 
 PATCH_ZIP_SHA256 = '8d9d2b49d6748724a612cefa0a1390ab8b807bb04a1452195d1e366b15cf99d3'
+PATCH_PARTS = [
+    'part00.b64',
+    'part01a.b64',
+    'part01b.b64',
+    'part02.b64',
+    'part03.b64',
+    'part04.b64',
+]
 
 
 def sha_bytes(data: bytes) -> str:
@@ -48,10 +56,10 @@ def main() -> None:
     verify(root, BASE11, 'Build 11 baseline')
 
     parts_dir = Path(__file__).resolve().parent / 'patch_parts'
-    parts = sorted(parts_dir.glob('part*.b64'))
-    expected_names = [f'part{i:02d}.b64' for i in range(5)]
-    if [p.name for p in parts] != expected_names:
-        raise SystemExit('Build 13 patch payload must contain exactly part00.b64 through part04.b64')
+    parts = [parts_dir / name for name in PATCH_PARTS]
+    missing = [p.name for p in parts if not p.is_file()]
+    if missing:
+        raise SystemExit('Build 13 patch payload missing parts: ' + ', '.join(missing))
     encoded = ''.join(p.read_text(encoding='ascii') for p in parts)
     try:
         payload = base64.b64decode(encoded, validate=True)
