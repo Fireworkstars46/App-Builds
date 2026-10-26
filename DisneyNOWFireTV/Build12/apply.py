@@ -47,14 +47,11 @@ def main() -> None:
     root = Path(args.source).resolve()
     verify(root, BASE11, 'Build 11 baseline')
 
-    parts_dir = Path(__file__).resolve().parent / 'patch_parts'
-    parts = sorted(parts_dir.glob('part*.b64'))
-    expected_names = [f'part{i:02d}.b64' for i in range(5)]
-    if [p.name for p in parts] != expected_names:
-        raise SystemExit('Build 12 patch payload must contain exactly part00.b64 through part04.b64')
-    encoded = ''.join(p.read_text(encoding='ascii') for p in parts)
+    payload_path = Path(__file__).resolve().parent / 'patch.b64'
+    if not payload_path.is_file():
+        raise SystemExit('Build 12 patch.b64 is missing')
     try:
-        payload = base64.b64decode(encoded, validate=True)
+        payload = base64.b64decode(payload_path.read_text(encoding='ascii'), validate=True)
     except Exception as exc:
         raise SystemExit(f'Build 12 patch base64 decode failed: {exc}')
     if sha_bytes(payload) != PATCH_ZIP_SHA256:
