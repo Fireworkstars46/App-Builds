@@ -1,0 +1,15 @@
+DisneyNOW Fire TV Hybrid TV Shell
+Version 0.1 Build 9
+Status: NOT DONE - COMPATIBILITY TEST
+
+Build 9 adds an optional privacy-safe Debug Mode to diagnose the Fire TV lag/playback problem without changing the Build 8 architecture.
+Debug Mode defaults OFF. When enabled it records bounded app-owned diagnostics for page/load timing, WebView/main-frame errors, Media3 errors/state, media/DRM candidate counts, D-pad dispatch timing, navigation mode, performance mode, zoom, fullscreen state, Java heap use, and current main-frame host only.
+Debug Snapshot shows current diagnostics. Export Debug Report writes the snapshot plus the last 200 privacy-safe app log lines to the app-owned debug folder. Debug counters can be reset from the menu.
+Privacy boundary: no passwords, cookies, Authorization headers, provider tokens, full protected media/license URLs, query strings, device serials, or typed text are intentionally exported. WebView remote debugging remains disabled.
+Build 8 native TV navigation, Performance Mode, whole-WebView zoom, experimental Media3 HLS/DASH/Widevine path, compatibility navigation modes, settings/data/cookies, and Silk fallback are preserved.
+
+Package ID: com.fireworkstars46.disneynowfiretv
+Android versionCode: 9
+Signing: exact established permanent update identity; certificate SHA-256 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838.
+CI verification: PASS. Static/release audit 179 PASS / 0 FAIL; lint 0 errors / 13 warnings; compile/unit tests/package/version and APK v2/v3 signer checks passed.
+Physical Fire TV checks still required: lag/responsiveness, playback error, provider login, whole-page zoom, Media3/Widevine behavior, Debug Mode runtime usefulness, exported report capture, and Silk fallback.

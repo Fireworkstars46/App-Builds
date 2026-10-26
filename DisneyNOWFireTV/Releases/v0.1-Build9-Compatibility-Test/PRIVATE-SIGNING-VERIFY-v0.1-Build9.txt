@@ -1,0 +1,10 @@
+DisneyNOW Fire TV v0.1 Build 9 private signing verification
+Public source commit: fb8466b1e5ccc3011ae8a79e704fa83b70d9343a
+PASS - Build 9 reconstruction hash chain passed
+PASS - static audit 179 PASS / 0 FAIL verified
+PASS - compile/lint/unit-test/assembleRelease passed
+PASS - recovered established keystore fingerprint matched expected permanent identity
+PASS - apksigner v2/v3 verification passed
+PASS - package com.fireworkstars46.disneynowfiretv verified
+PASS - versionCode 9 / versionName 0.1 verified
+Physical Fire TV behavior/playback/debug report usefulness: NOT TESTED
