@@ -7,69 +7,69 @@ This project does **not** bundle Disney video, Disney artwork, Disney credential
 ## Current build
 
 - Version: **0.1**
-- Build: **10**
-- Android versionCode: **10**
+- Build: **11**
+- Android versionCode: **11**
 - Package ID: `com.fireworkstars46.disneynowfiretv`
-- Status: **NOT DONE - COMPATIBILITY TEST** until Build 10 is physically verified on the user's Fire TV Stick.
+- Status: **NOT DONE - COMPATIBILITY TEST** until Build 11 is physically verified on the user's Fire TV Stick.
 - Permanent signer certificate SHA-256: `2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838`
 
 Downloader/raw APK:
-`https://raw.githubusercontent.com/Fireworkstars46/App-Builds/main/DisneyNOWFireTV/Releases/v0.1-Build10-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build10-Permanent-Signed.apk`
+`https://raw.githubusercontent.com/Fireworkstars46/App-Builds/main/DisneyNOWFireTV/Releases/v0.1-Build11-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build11-Permanent-Signed.apk`
 
-Install Build 10 directly over Build 9. **Do not uninstall first** if existing cookies/settings/login state should be preserved.
+Install Build 11 directly over Build 10. **Do not uninstall first** if existing cookies/settings/login state should be preserved.
 
 ## Current architecture
 
-Build 8 changed the app from a cursor-first WebView experiment toward a hybrid TV shell after real Fire TV testing showed persistent lag, playback errors, and incomplete CSS-only page zoom. The default is low-overhead Native TV Navigation, with Cursor Navigation and Legacy JS Focus Navigation retained as compatibility modes. Performance Mode is available, Page Zoom supports the established custom 0-500 range using WebView-level scaling, and Silk remains available as a playback fallback.
+Build 8 changed the app from a cursor-first WebView experiment toward a hybrid TV shell after real Fire TV testing showed persistent lag, playback errors, and incomplete CSS-only page zoom. Native TV Navigation, Cursor Navigation, and Legacy JS Focus Navigation remain available; Performance Mode, the established 0-500 Page Zoom range, and Silk fallback are preserved.
 
-Build 8 also added an experimental AndroidX Media3 1.8.1 HLS/DASH player path. It may use legitimate media-manifest and probable DRM-license request information observed from the authenticated DisneyNOW session. It does not extract DRM keys, bypass DRM, fabricate entitlement/license responses, or copy Disney proprietary player/authentication code.
+Build 8 also introduced an experimental AndroidX Media3 1.8.1 HLS/DASH player path using only legitimate media/session information observed from the authenticated DisneyNOW WebView session. It does not extract DRM keys, bypass DRM, fabricate entitlement/license responses, or copy proprietary Disney player/authentication code.
 
 ## Build 9 Debug Mode
 
-Build 9 added optional privacy-safe diagnostics while preserving the Build 8 architecture. Debug Mode defaults **OFF** so normal use does not incur its extra instrumentation work.
+Build 9 added optional privacy-safe diagnostics. Debug Mode defaults **OFF** and production behavior is designed to work without it.
 
-When enabled, Debug Mode can collect bounded app-owned diagnostic information useful for the Fire TV lag/playback problem, including page/load timing, WebView/main-frame errors, Media3 state/errors, media/DRM candidate counts, D-pad dispatch timing, active navigation/performance/zoom/fullscreen state, Java heap use, and current main-frame host only.
+When enabled, Debug Mode records bounded app-owned diagnostics for page/load timing, WebView/main-frame errors, Media3 state/errors, media/DRM candidate counts, D-pad dispatch timing, navigation/performance/zoom/fullscreen state, Java heap use, and safe host/type/state information. The menu provides **Debug Snapshot**, **Export Debug Report**, and **Reset Debug Counters**.
 
-The app menu includes **Debug Snapshot**, **Export Debug Report**, and **Reset Debug Counters**. Export Debug Report writes the snapshot plus up to the last 200 privacy-safe app log lines to the app-owned debug folder.
+The diagnostic path is intentionally designed not to export passwords, cookies, Authorization headers, provider tokens, full protected media/license URLs, query strings, device serials, request bodies, or typed text. WebView remote debugging remains disabled.
 
-The debug report is intentionally designed not to export passwords, cookies, Authorization headers, provider tokens, full protected media/license URLs, query strings, device serials, or typed text. WebView remote debugging remains disabled.
+## Build 10 handoff findings
 
-## Build 10 native handoff diagnostics
+Build 10 added targeted handoff diagnostics after the first physical Build 9 report showed DisneyNOW HLS manifests during the failed WebView playback attempt. Physical Build 10 testing confirmed repeated HLS-ready events but showed **0 native-player attempts**, because the native player still depended on a manual **Try Native Player** menu step. The user reported that this was not better and made the app more confusing.
 
-Build 10 is a targeted response to the first real Build 9 debug report. That report confirmed that DisneyNOW HLS manifests were being observed during the failed WebView playback attempt, while no native-player attempt had yet been captured.
+## Build 11 automatic native handoff/fallback
 
-Build 10 preserves the user-triggered Media3 design and adds visibility into the HLS/DASH -> native-player handoff:
+Build 11 removes that normal-use manual handoff step.
 
-- the **Try Native Player** menu item reports whether it is waiting for a stream or ready with detected HLS/DASH;
-- the first HLS/DASH detection per page can show a one-time hint directing the user to **Menu > Try Native Player** after the WebView playback failure;
-- debug counters track handoff-ready events, native-player attempts, player creation, and prepare calls;
-- a handoff-stage state tracks the path from manifest detection through player creation/configuration/prepare/play/state/error;
-- safe session-context indicators record only header counts/presence and cookie availability, never values;
-- post-manifest non-GET traffic is classified by safe host/method/content-type category to help identify a license/DRM handoff without recording request bodies or full protected URLs;
-- Media3 failures record error codes and exception class chains only, not sensitive exception messages.
+- When a legitimate HLS media manifest is observed, the app automatically schedules one native Media3 attempt for that page after the manifest burst settles.
+- Repeated manifest observations are debounced so the attempt waits briefly for the stream candidate to stabilize instead of firing for every request.
+- The normal app menu no longer contains the Build 10 **Try Native Player** control.
+- If Media3 reports a setup/player error, the app automatically stops the native attempt and restores the WebView path.
+- If native playback does not begin within the bounded startup watchdog, the app automatically falls back to the WebView path.
+- The automatic production behavior does not depend on Debug Mode; Debug Mode only adds safe scheduling/attempt/start/fallback evidence.
+- Existing settings, cookies/login state, package identity, navigation modes, Performance Mode, zoom behavior, diagnostics, and Silk fallback are preserved.
 
-Native playback remains explicitly user-triggered; Build 10 does not automatically hijack playback. No DRM keys, DRM bypass, fabricated entitlement/license/token responses, or proprietary Disney code are used.
+No DRM keys, DRM bypass, fabricated entitlement/license/token responses, or proprietary Disney code are used.
 
 ## Fire TV controls
 
-- D-pad: native TV/WebView focus by default; compatibility cursor mode remains selectable.
-- Center/Select: activate the currently focused control or compatibility cursor target.
+- D-pad: native TV/WebView focus or compatibility cursor mode according to the saved navigation setting.
+- Center/Select: activate the focused control or compatibility cursor target.
 - Back: web back; exits fullscreen/native player first when applicable.
 - Menu (three-lines button): opens app controls/settings/debug tools.
 
 ## Verification and release status
 
-Build 10 source is reconstructed from the permanent historical chain and hash-verified Build 10 patch inputs. Public and private CI both independently reconstructed the exact source. Verification passed:
+Build 11 source is reconstructed from the permanent historical chain and hash-verified Build 11 patch inputs. Public and private CI independently reconstructed the exact source. Verification passed:
 
-- static/release audit: **194 PASS / 0 FAIL**;
+- static/release audit: **207 PASS / 0 FAIL**;
 - Android compile + unit tests: **PASS**;
 - lint: **0 errors / 13 warnings**;
-- package/version identity: `com.fireworkstars46.disneynowfiretv`, versionCode **10**, versionName **0.1**;
+- package/version identity: `com.fireworkstars46.disneynowfiretv`, versionCode **11**, versionName **0.1**;
 - permanent signer fingerprint: exact established identity;
 - APK signing verification: **v1/v2/v3 PASS**;
 - public permanent release archive: verified present.
 
 Signed APK SHA-256:
-`247b15f776104b5113aa3a26ffdcfad34f37f2d57fc3470895403d5c2c2e7d3c`
+`279a6d1d4a2aaab3c7fbf32cfa44c8f384c82524d93669064768d6f7a8f2c29f`
 
-Physical Fire TV behavior remains environment-dependent and is not claimed by CI. Required real-device checks include installing over Build 9, reproducing the WebView playback failure, confirming the detected-stream hint/menu readiness, invoking **Try Native Player**, observing playback/error behavior, exporting the Build 10 debug report, and checking responsiveness/provider auth/zoom/fallback behavior.
+Physical Fire TV behavior remains environment-dependent and is not claimed by CI. Required real-device checks include installing Build 11 over Build 10, starting a DisneyNOW video normally, observing whether automatic native playback succeeds or automatically falls back, exporting a Build 11 debug report, and checking provider login, responsiveness, zoom, and Silk fallback behavior.
