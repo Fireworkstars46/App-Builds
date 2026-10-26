@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - 'DisneyNOWFireTV/Build12/apply.py'
-      - 'DisneyNOWFireTV/Build12/patch.zip'
+      - 'DisneyNOWFireTV/Build12/patch_parts/**'
       - '.github/workflows/disneynow-fire-tv-build12-unsigned.yml'
   workflow_dispatch:
 
