@@ -1,0 +1,121 @@
+name: DisneyNOW Fire TV Build 9 - Publish verified signed APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/disneynow-fire-tv-build9-publish.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Download and verify exact signed Build 9 artifact bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build9-Compatibility-Test'
+          test ! -e "$dir"
+          mkdir -p "$dir" /tmp/build9-signed
+          curl --fail --location --retry 2 --output /tmp/build9-signed.zip 'https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-e068-822f-9a77-e4b17eabadcf/raw?se=2026-10-26T08%3A18%3A46Z&sp=r&sv=2026-02-06&sr=b&scid=ea9a7032-789c-52ce-ab21-97beb8851fe1&skoid=bbd22fc4-f881-4ea4-b2f3-c12033cf6a8b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-25T23%3A53%3A52Z&ske=2026-10-26T23%3A53%3A52Z&sks=b&skv=2026-02-06&sig=%2Bx88FZMHnCxly%2BNlApknII4aeOEmj0XdS1%2BqASYr2DU%3D'
+          echo 'bb22efac6ebfe2376c9cfb257409ce286365e86c0bd875cf92002536249cecac  /tmp/build9-signed.zip' | sha256sum -c -
+          unzip -t /tmp/build9-signed.zip >/dev/null
+          unzip -q /tmp/build9-signed.zip -d /tmp/build9-signed
+          cp /tmp/build9-signed/DisneyNOW-Fire-TV-v0.1-Build9-Permanent-Signed.apk "$dir/"
+          cp /tmp/build9-signed/DisneyNOW-Fire-TV-v0.1-Build9-Source.zip "$dir/"
+          cp /tmp/build9-signed/STATIC-AUDIT-v0.1-Build9.txt "$dir/"
+          cp /tmp/build9-signed/LINT-v0.1-Build9.txt "$dir/"
+          cp /tmp/build9-signed/LINT-v0.1-Build9.html "$dir/"
+          cp /tmp/build9-signed/APKSIGNER-VERIFY-v0.1-Build9.txt "$dir/"
+          cp /tmp/build9-signed/BADGING-v0.1-Build9.txt "$dir/"
+          cp /tmp/build9-signed/VERIFY-v0.1-Build9.txt "$dir/PRIVATE-SIGNING-VERIFY-v0.1-Build9.txt"
+          apk="$dir/DisneyNOW-Fire-TV-v0.1-Build9-Permanent-Signed.apk"
+          echo '630e6e4fc5230603ce46d6e317c1f7891028c3e14a77468652dd1376105e77c6  '"$apk" | sha256sum -c -
+          echo 'ed16f95bad4a9debcc2376870222aea21052ba9e00a6cb78818fec6b421a7955  '"$dir/DisneyNOW-Fire-TV-v0.1-Build9-Source.zip" | sha256sum -c -
+          echo '7dbf3c033ad4b47d96340e4b2bac5c038b45a514eeef42e45431c942595ed75a  '"$dir/STATIC-AUDIT-v0.1-Build9.txt" | sha256sum -c -
+          echo '19567aadf9efa407c9f320f4e0417bb0200d367a865db491102a2da6673076c5  '"$dir/LINT-v0.1-Build9.txt" | sha256sum -c -
+          echo 'c606bc4da84b96eb1e0570b0cd9dccd2654c8da3c6a1c5d16627412496669301  '"$dir/LINT-v0.1-Build9.html" | sha256sum -c -
+          grep -q 'STATIC TOTAL: PASS=179 FAIL=0' "$dir/STATIC-AUDIT-v0.1-Build9.txt"
+          grep -q 'RESULT: PASS' "$dir/STATIC-AUDIT-v0.1-Build9.txt"
+          grep -q '^0 errors, 13 warnings$' "$dir/LINT-v0.1-Build9.txt"
+          grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true' "$dir/APKSIGNER-VERIFY-v0.1-Build9.txt"
+          grep -q 'Verified using v3 scheme (APK Signature Scheme v3): true' "$dir/APKSIGNER-VERIFY-v0.1-Build9.txt"
+          grep -Eqi 'certificate SHA-256 digest: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838' "$dir/APKSIGNER-VERIFY-v0.1-Build9.txt"
+          grep -q "package: name='com.fireworkstars46.disneynowfiretv'" "$dir/BADGING-v0.1-Build9.txt"
+          grep -q "versionCode='9'" "$dir/BADGING-v0.1-Build9.txt"
+          grep -q "versionName='0.1'" "$dir/BADGING-v0.1-Build9.txt"
+
+      - name: Write Build 9 release evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build9-Compatibility-Test'
+          cat > "$dir/BUILD-METADATA.txt" <<'TXT'
+          Project: DisneyNOW Fire TV Hybrid TV Shell
+          Version: 0.1
+          Build: 9
+          Android versionCode: 9
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Public source commit: fb8466b1e5ccc3011ae8a79e704fa83b70d9343a
+          Public unsigned CI run: 40289806467
+          Public unsigned artifact ID: 12635324615
+          Public unsigned artifact digest: sha256:372d0a7fae6d188b1c517c1979e7f4deff69afe365342dbaab34f683777a2561
+          Private permanent-signing CI run: 40290332587
+          Private signed artifact ID: 12636061313
+          Private signed artifact digest: sha256:bb22efac6ebfe2376c9cfb257409ce286365e86c0bd875cf92002536249cecac
+          Signed APK SHA-256: 630e6e4fc5230603ce46d6e317c1f7891028c3e14a77468652dd1376105e77c6
+          Source ZIP SHA-256: ed16f95bad4a9debcc2376870222aea21052ba9e00a6cb78818fec6b421a7955
+          Permanent signer certificate SHA-256: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838
+          CI static/release audit: 179 PASS / 0 FAIL
+          Lint: 0 errors / 13 warnings
+          Signing backup gate: PASS.
+          Publication status: NOT DONE - COMPATIBILITY TEST pending physical Fire TV testing.
+          TXT
+          cat > "$dir/RELEASE-STATUS.txt" <<'TXT'
+          DisneyNOW Fire TV Hybrid TV Shell
+          Version 0.1 Build 9
+          Status: NOT DONE - COMPATIBILITY TEST
+
+          Build 9 adds an optional privacy-safe Debug Mode to diagnose the Fire TV lag/playback problem without changing the Build 8 architecture.
+          Debug Mode defaults OFF. When enabled it records bounded app-owned diagnostics for page/load timing, WebView/main-frame errors, Media3 errors/state, media/DRM candidate counts, D-pad dispatch timing, navigation mode, performance mode, zoom, fullscreen state, Java heap use, and current main-frame host only.
+          Debug Snapshot shows current diagnostics. Export Debug Report writes the snapshot plus the last 200 privacy-safe app log lines to the app-owned debug folder. Debug counters can be reset from the menu.
+          Privacy boundary: no passwords, cookies, Authorization headers, provider tokens, full protected media/license URLs, query strings, device serials, or typed text are intentionally exported. WebView remote debugging remains disabled.
+          Build 8 native TV navigation, Performance Mode, whole-WebView zoom, experimental Media3 HLS/DASH/Widevine path, compatibility navigation modes, settings/data/cookies, and Silk fallback are preserved.
+
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Android versionCode: 9
+          Signing: exact established permanent update identity; certificate SHA-256 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838.
+          CI verification: PASS. Static/release audit 179 PASS / 0 FAIL; lint 0 errors / 13 warnings; compile/unit tests/package/version and APK v2/v3 signer checks passed.
+          Physical Fire TV checks still required: lag/responsiveness, playback error, provider login, whole-page zoom, Media3/Widevine behavior, Debug Mode runtime usefulness, exported report capture, and Silk fallback.
+          TXT
+          (cd "$dir" && sha256sum \
+            DisneyNOW-Fire-TV-v0.1-Build9-Permanent-Signed.apk \
+            DisneyNOW-Fire-TV-v0.1-Build9-Source.zip \
+            STATIC-AUDIT-v0.1-Build9.txt \
+            LINT-v0.1-Build9.txt \
+            LINT-v0.1-Build9.html \
+            APKSIGNER-VERIFY-v0.1-Build9.txt \
+            BADGING-v0.1-Build9.txt \
+            PRIVATE-SIGNING-VERIFY-v0.1-Build9.txt \
+            BUILD-METADATA.txt \
+            RELEASE-STATUS.txt > SHA256SUMS.txt)
+
+      - name: Commit verified Build 9 release archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build9-Compatibility-Test'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dir/"
+          git commit -m 'Publish verified DisneyNOW Fire TV v0.1 Build 9 APK'
+          git push origin HEAD:main
