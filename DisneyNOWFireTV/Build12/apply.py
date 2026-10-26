@@ -19,6 +19,13 @@ BUILD12 = {
 }
 
 PATCH_ZIP_SHA256 = '77273d6dd0eb6a6cc28a7e14c078b2141fcf4bf3856c24d093c5dda966125b98'
+EXPECTED_PARTS = {
+    'part00.b64': (9697, '54bf02462776fc52d6f1f1d2ad1c637eec3761c6afeceae96447aa6ef436be79'),
+    'part01.b64': (9697, 'df3f58c49cefae426d287e19dddd829cf2e0e55b468c8c7a9ee5121aee843f1e'),
+    'part02.b64': (9697, '6ac29e516bc1d6f76599bdf03918c448bff3e97c6fc7196adf3703998c02a9eb'),
+    'part03.b64': (9697, '7cab2d8bd3b056f48ba443170f1b52dc3fc75d1916611a4ddf32835e3af57260'),
+    'part04.b64': (9696, '98489f8f7767edb6653898347a462919c63e7c330873989db9d8ce875be6dea7'),
+}
 
 
 def sha_bytes(data: bytes) -> str:
@@ -52,13 +59,26 @@ def main() -> None:
     expected_names = [f'part{i:02d}.b64' for i in range(5)]
     if [p.name for p in parts] != expected_names:
         raise SystemExit('Build 12 patch payload must contain exactly part00.b64 through part04.b64')
+    part_failures = []
+    for p in parts:
+        data = p.read_bytes()
+        expected_len, expected_sha = EXPECTED_PARTS[p.name]
+        got_sha = sha_bytes(data)
+        print(f'Build 12 patch part {p.name}: bytes={len(data)} sha256={got_sha}')
+        if len(data) != expected_len or got_sha != expected_sha:
+            part_failures.append(f'{p.name}: expected bytes={expected_len} sha256={expected_sha}; got bytes={len(data)} sha256={got_sha}')
+    if part_failures:
+        raise SystemExit('Build 12 patch part verification failed:\n' + '\n'.join(part_failures))
+
     encoded = ''.join(p.read_text(encoding='ascii') for p in parts)
     try:
         payload = base64.b64decode(encoded, validate=True)
     except Exception as exc:
         raise SystemExit(f'Build 12 patch base64 decode failed: {exc}')
-    if sha_bytes(payload) != PATCH_ZIP_SHA256:
-        raise SystemExit('Build 12 patch ZIP SHA-256 mismatch')
+    payload_sha = sha_bytes(payload)
+    print(f'Build 12 reconstructed patch ZIP: bytes={len(payload)} sha256={payload_sha}')
+    if payload_sha != PATCH_ZIP_SHA256:
+        raise SystemExit(f'Build 12 patch ZIP SHA-256 mismatch: expected {PATCH_ZIP_SHA256}, got {payload_sha}')
 
     expected_paths = set(BUILD12)
     with zipfile.ZipFile(io.BytesIO(payload), 'r') as zf:
