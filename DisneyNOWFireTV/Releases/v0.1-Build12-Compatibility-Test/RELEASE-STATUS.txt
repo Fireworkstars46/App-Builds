@@ -1,0 +1,17 @@
+DisneyNOW Fire TV Hybrid TV Shell
+Version 0.1 Build 12
+Status: NOT DONE - COMPATIBILITY TEST
+
+Build 12 is the corrective stability release after the Build 11 physical Fire TV regression. The Build 11 report proved the experimental Media3 path could reach READY/isPlaying=true but the app/process later restarted without a captured Java/Media3 error.
+
+Build 12 disables automatic native Media3 launch and keeps the native-player path out of normal use. The manual Try Native Player action remains omitted. DisneyNOW media-manifest observation and privacy-safe diagnostics remain available, but normal playback is not automatically redirected into Media3.
+
+Build 12 adds persistent privacy-safe crash/restart breadcrumbs. A session-active marker and bounded stage/breadcrumb data are stored in project-owned SharedPreferences so the next launch can report whether the previous session ended without a clean onDestroy and what privacy-safe stage/breadcrumb was last persisted. A privacy-safe uncaught-exception handler stores exception class/cause-chain information only and forwards to Android's previous/default handler. No exception message, cookie, Authorization header, provider token, full protected media/license URL, request body, typed text, or DRM key is intentionally stored.
+
+The previous-session unclean marker is a diagnostic indicator, not proof of a Java crash: Android/Fire OS can kill a process without delivering a Java exception or onDestroy callback.
+
+Build 12 preserves package ID, app data/settings/cookies/login path, navigation modes, Performance Mode, zoom, Silk fallback, Media3 dependency, debug reporting, and the established permanent signer. It does not bypass DRM, extract keys, fabricate entitlement/license/token responses, or copy Disney proprietary code.
+
+Verification: public and private CI independently reconstructed the exact source. Static/release audit 217 PASS / 0 FAIL; lint 0 errors / 13 warnings; compile/unit tests/package/version checks passed; permanent signer fingerprint matched; APK v1/v2/v3 verification passed.
+
+Physical Fire TV stability/crash-restart breadcrumb behavior and real playback behavior remain NOT TESTED by CI. Build 12 is not claimed DONE until physically tested.

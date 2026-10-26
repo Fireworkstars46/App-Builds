@@ -1,0 +1,10 @@
+DisneyNOW Fire TV v0.1 Build 12 private signing verification
+Public source commit: 24557d2581f41d593164ef560929c917b464f883
+PASS - Build 12 reconstruction hash chain passed
+PASS - static audit 217 PASS / 0 FAIL verified
+PASS - compile/lint/unit-test/assembleRelease passed
+PASS - recovered established keystore fingerprint matched expected permanent identity
+PASS - apksigner v1/v2/v3 verification passed
+PASS - package com.fireworkstars46.disneynowfiretv verified
+PASS - versionCode 12 / versionName 0.1 verified
+Physical Fire TV stability/crash-restart breadcrumb/playback behavior: NOT TESTED
