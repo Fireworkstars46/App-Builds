@@ -1,0 +1,164 @@
+name: Build DisneyNOW Fire TV Build 11 unsigned release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'DisneyNOWFireTV/Build11/apply.py'
+      - 'DisneyNOWFireTV/Build11/patch_parts/**'
+      - '.github/workflows/disneynow-fire-tv-build11-unsigned.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build11-unsigned:
+    runs-on: ubuntu-latest
+    env:
+      BUILD11_SOURCE_ZIP: /tmp/DisneyNOW-Fire-TV-v0.1-Build11-Source.zip
+      PROJECT_DIR: _build11/DisneyNOWFireTV/Source
+      STAGE_DIR: _stage_build11
+
+    steps:
+      - name: Check out App-Builds
+        uses: actions/checkout@v7
+
+      - name: Reconstruct verified Build 10 chain and apply Build 11 automatic handoff/fallback
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _build11 "$STAGE_DIR"
+          mkdir -p _build11/DisneyNOWFireTV "$STAGE_DIR"
+          python3 DisneyNOWFireTV/SourceSeed/reconstruct.py --output "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build2/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build4/reconstruct_build3.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build4/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build5/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build6/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build7/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build8/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build9/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build10/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build11/apply.py --source "$PROJECT_DIR"
+          MAIN="$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
+          GRADLE="$PROJECT_DIR/app/build.gradle"
+          grep -q 'versionCode 11' "$GRADLE"
+          grep -q "buildConfigField 'int', 'APP_BUILD', '11'" "$GRADLE"
+          grep -q 'scheduleAutomaticNativePlayback' "$MAIN"
+          grep -q 'AUTO_NATIVE_HANDOFF_DELAY_MS' "$MAIN"
+          grep -q 'AUTO_NATIVE_FALLBACK_TIMEOUT_MS' "$MAIN"
+          grep -q 'fallbackToWebPlayback' "$MAIN"
+          grep -q 'autoNativeAttemptedForPage' "$MAIN"
+          if grep -q 'Try Native Player:' "$MAIN"; then
+            echo 'Manual Try Native Player menu unexpectedly present' >&2
+            exit 1
+          fi
+          grep -q 'WebView.setWebContentsDebuggingEnabled(false)' "$MAIN"
+          if grep -q 'WebView.setWebContentsDebuggingEnabled(true)' "$MAIN"; then
+            echo 'Unsafe WebView remote debugging enabled' >&2
+            exit 1
+          fi
+          cp MASTER_RULES.md _build11/MASTER_RULES.md
+          (cd _build11 && zip -X -qr "$BUILD11_SOURCE_ZIP" MASTER_RULES.md DisneyNOWFireTV/Source)
+          test -s "$BUILD11_SOURCE_ZIP"
+          unzip -t "$BUILD11_SOURCE_ZIP" >/dev/null
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools'
+          log-accepted-android-sdk-licenses: 'false'
+
+      - name: Install Android platform and build tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+
+      - name: Set up Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Run Build 11 static/release audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 "$PROJECT_DIR/tools/static_audit.py"
+          grep -q 'STATIC TOTAL: PASS=207 FAIL=0' "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build11.txt"
+          grep -q 'RESULT: PASS' "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build11.txt"
+
+      - name: Compile, lint, unit-test, and produce unsigned release APK
+        shell: bash
+        working-directory: _build11/DisneyNOWFireTV/Source
+        run: |
+          set -euo pipefail
+          gradle --no-daemon clean lintDebug testDebugUnitTest assembleRelease
+
+      - name: Verify unsigned APK identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$PROJECT_DIR/app/build/outputs/apk/release/app-release-unsigned.apk"
+          test -s "$APK"
+          AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          BADGING="$($AAPT dump badging "$APK" | head -n 1)"
+          echo "$BADGING"
+          echo "$BADGING" | grep -q "name='com.fireworkstars46.disneynowfiretv'"
+          echo "$BADGING" | grep -q "versionCode='11'"
+          echo "$BADGING" | grep -q "versionName='0.1'"
+
+      - name: Stage unsigned Build 11 signing input and reports
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$PROJECT_DIR/app/build/outputs/apk/release/app-release-unsigned.apk"
+          ZIPALIGN="$ANDROID_HOME/build-tools/35.0.0/zipalign"
+          APKSIGNER_JAR="$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar"
+          cp "$APK" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build11-UNSIGNED.apk"
+          "$ZIPALIGN" -f -p 4 "$APK" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build11-ALIGNED-UNSIGNED.apk"
+          "$ZIPALIGN" -c -p 4 "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build11-ALIGNED-UNSIGNED.apk"
+          test -s "$APKSIGNER_JAR"
+          cp "$APKSIGNER_JAR" "$STAGE_DIR/apksigner.jar"
+          cp "$BUILD11_SOURCE_ZIP" "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build11-Source.zip"
+          cp "$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build11.txt" "$STAGE_DIR/STATIC-AUDIT-v0.1-Build11.txt"
+          cp "$PROJECT_DIR/build/reports/lint-results-debug.txt" "$STAGE_DIR/LINT-v0.1-Build11.txt"
+          cp "$PROJECT_DIR/build/reports/lint-results-debug.html" "$STAGE_DIR/LINT-v0.1-Build11.html"
+          MASTER_SHA="$(sha256sum MASTER_RULES.md | awk '{print $1}')"
+          SOURCE_SHA="$(sha256sum "$BUILD11_SOURCE_ZIP" | awk '{print $1}')"
+          UNSIGNED_SHA="$(sha256sum "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build11-UNSIGNED.apk" | awk '{print $1}')"
+          ALIGNED_SHA="$(sha256sum "$STAGE_DIR/DisneyNOW-Fire-TV-v0.1-Build11-ALIGNED-UNSIGNED.apk" | awk '{print $1}')"
+          cat > "$STAGE_DIR/BUILD-METADATA-UNSIGNED.txt" <<META
+          Project: DisneyNOW Fire TV Hybrid TV Shell
+          Version: 0.1
+          Build: 11
+          Android versionCode: 11
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Source commit: $GITHUB_SHA
+          MASTER_RULES SHA-256: $MASTER_SHA
+          Source ZIP SHA-256: $SOURCE_SHA
+          Unsigned APK SHA-256: $UNSIGNED_SHA
+          Zipaligned unsigned APK SHA-256: $ALIGNED_SHA
+          Source reconstruction: Build 1 SourceSeed -> Build 2 -> Build 3 metadata -> Build 4 -> Build 5 -> Build 6 -> Build 7 -> Build 8 native TV/Media3 -> Build 9 privacy-safe Debug Mode -> Build 10 handoff diagnostics -> Build 11 automatic native handoff/fallback.
+          Build environment: GitHub Actions ubuntu-latest, Java 17, Gradle 8.7, Android SDK 35 / build-tools 35.0.0
+          Media3 line: 1.8.1, preserving project minSdk 22.
+          Signing status: UNSIGNED; the aligned input must be signed privately with the preserved permanent release key.
+          WebView remote debugging: disabled. Debug report excludes secrets/full protected-media URLs/request bodies.
+          Physical Fire TV automatic handoff/playback/fallback, provider auth, responsiveness, and report usefulness: NOT TESTED by CI.
+          META
+          (cd "$STAGE_DIR" && sha256sum * > SHA256SUMS-UNSIGNED.txt)
+
+      - name: Upload unsigned Build 11 signing input
+        uses: actions/upload-artifact@v4
+        with:
+          name: DisneyNOW-Fire-TV-v0.1-Build11-UNSIGNED
+          path: _stage_build11/
+          if-no-files-found: error
+          retention-days: 90
