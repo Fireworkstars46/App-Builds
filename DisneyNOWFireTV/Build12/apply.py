@@ -19,11 +19,24 @@ BUILD12 = {
 }
 
 PATCH_ZIP_SHA256 = '77273d6dd0eb6a6cc28a7e14c078b2141fcf4bf3856c24d093c5dda966125b98'
+PART_ORDER = [
+    'part00.b64',
+    'part01.b64',
+    'part02.b64',
+    'part03a.b64',
+    'part03b.b64',
+    'part03c.b64',
+    'part03d.b64',
+    'part04.b64',
+]
 EXPECTED_PARTS = {
     'part00.b64': (9697, '54bf02462776fc52d6f1f1d2ad1c637eec3761c6afeceae96447aa6ef436be79'),
     'part01.b64': (9697, 'df3f58c49cefae426d287e19dddd829cf2e0e55b468c8c7a9ee5121aee843f1e'),
     'part02.b64': (9697, '6ac29e516bc1d6f76599bdf03918c448bff3e97c6fc7196adf3703998c02a9eb'),
-    'part03.b64': (9697, '7cab2d8bd3b056f48ba443170f1b52dc3fc75d1916611a4ddf32835e3af57260'),
+    'part03a.b64': (3000, '7ffe3f06fe273632707a44741eb86c06cc39681492d84fb8522c168692f474b2'),
+    'part03b.b64': (3000, '6320dd7d95786a25666b1669df88941f6c3ae0eb384e6d6926cea677a19f6385'),
+    'part03c.b64': (3000, '3880ed5d6997012d5be34bead44d72c129c597de68a5ca5d03118b6cd2c7436d'),
+    'part03d.b64': (697, 'feefd8a6dde8aede55642241efa930699b0e99efa3da5d44acdaece1be0b5a07'),
     'part04.b64': (9696, '98489f8f7767edb6653898347a462919c63e7c330873989db9d8ce875be6dea7'),
 }
 
@@ -55,10 +68,11 @@ def main() -> None:
     verify(root, BASE11, 'Build 11 baseline')
 
     parts_dir = Path(__file__).resolve().parent / 'patch_parts'
-    parts = sorted(parts_dir.glob('part*.b64'))
-    expected_names = [f'part{i:02d}.b64' for i in range(5)]
-    if [p.name for p in parts] != expected_names:
-        raise SystemExit('Build 12 patch payload must contain exactly part00.b64 through part04.b64')
+    parts = [parts_dir / name for name in PART_ORDER]
+    missing = [p.name for p in parts if not p.is_file()]
+    if missing:
+        raise SystemExit('Build 12 patch payload is missing required parts: ' + ', '.join(missing))
+
     part_failures = []
     for p in parts:
         data = p.read_bytes()
