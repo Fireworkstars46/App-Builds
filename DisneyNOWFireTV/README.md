@@ -2,21 +2,21 @@
 
 Unofficial personal-use Fire TV compatibility project for `https://disneynow.com/`.
 
-This project does **not** bundle Disney video, Disney artwork, Disney credentials, provider tokens, DRM keys, or DRM-bypass logic. It preserves Disney's normal authentication/entitlement path and only attempts native playback when legitimate media/DRM request information has been observed from the authenticated session.
+This project does **not** bundle Disney video, Disney artwork, Disney credentials, provider tokens, DRM keys, or DRM-bypass logic. It preserves Disney's normal authentication/entitlement path and only uses legitimate media/session information observed from the authenticated DisneyNOW session.
 
 ## Current build
 
 - Version: **0.1**
-- Build: **11**
-- Android versionCode: **11**
+- Build: **12**
+- Android versionCode: **12**
 - Package ID: `com.fireworkstars46.disneynowfiretv`
-- Status: **NOT DONE - COMPATIBILITY TEST** until Build 11 is physically verified on the user's Fire TV Stick.
+- Status: **NOT DONE - COMPATIBILITY TEST** until Build 12 is physically verified on the user's Fire TV Stick.
 - Permanent signer certificate SHA-256: `2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838`
 
 Downloader/raw APK:
-`https://raw.githubusercontent.com/Fireworkstars46/App-Builds/main/DisneyNOWFireTV/Releases/v0.1-Build11-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build11-Permanent-Signed.apk`
+`https://raw.githubusercontent.com/Fireworkstars46/App-Builds/main/DisneyNOWFireTV/Releases/v0.1-Build12-Compatibility-Test/DisneyNOW-Fire-TV-v0.1-Build12-Permanent-Signed.apk`
 
-Install Build 11 directly over Build 10. **Do not uninstall first** if existing cookies/settings/login state should be preserved.
+Install Build 12 directly over Build 11. **Do not uninstall first** if existing cookies/settings/login state should be preserved.
 
 ## Current architecture
 
@@ -24,31 +24,32 @@ Build 8 changed the app from a cursor-first WebView experiment toward a hybrid T
 
 Build 8 also introduced an experimental AndroidX Media3 1.8.1 HLS/DASH player path using only legitimate media/session information observed from the authenticated DisneyNOW WebView session. It does not extract DRM keys, bypass DRM, fabricate entitlement/license responses, or copy proprietary Disney player/authentication code.
 
-## Build 9 Debug Mode
+## Debug/diagnostic history
 
-Build 9 added optional privacy-safe diagnostics. Debug Mode defaults **OFF** and production behavior is designed to work without it.
+Build 9 added optional privacy-safe diagnostics. Build 10 added detailed HLS/DASH -> native-player handoff diagnostics after physical testing showed DisneyNOW HLS manifests even when WebView playback failed.
 
-When enabled, Debug Mode records bounded app-owned diagnostics for page/load timing, WebView/main-frame errors, Media3 state/errors, media/DRM candidate counts, D-pad dispatch timing, navigation/performance/zoom/fullscreen state, Java heap use, and safe host/type/state information. The menu provides **Debug Snapshot**, **Export Debug Report**, and **Reset Debug Counters**.
+Physical Build 10 testing showed the app could observe the DisneyNOW HLS stream but the manual **Try Native Player** workflow was confusing and still required user intervention.
 
-The diagnostic path is intentionally designed not to export passwords, cookies, Authorization headers, provider tokens, full protected media/license URLs, query strings, device serials, request bodies, or typed text. WebView remote debugging remains disabled.
+Build 11 therefore tried automatic native Media3 handoff/fallback. The Build 11 physical debug report proved that Media3 could progress through player creation, HLS configuration, buffering, `READY`, and `isPlaying=true`. However, the user also observed glitchy/finicky behavior followed by an app/process restart. The report did not contain a Java/Media3 error immediately before that restart, so Build 11's automatic native path is treated as a regression and remains NOT DONE.
 
-## Build 10 handoff findings
+## Build 12 corrective stability behavior
 
-Build 10 added targeted handoff diagnostics after the first physical Build 9 report showed DisneyNOW HLS manifests during the failed WebView playback attempt. Physical Build 10 testing confirmed repeated HLS-ready events but showed **0 native-player attempts**, because the native player still depended on a manual **Try Native Player** menu step. The user reported that this was not better and made the app more confusing.
+Build 12 removes the Build 11 automatic native-player takeover from normal use.
 
-## Build 11 automatic native handoff/fallback
+- Automatic native Media3 launch is disabled.
+- The Build 10 manual **Try Native Player** menu control remains omitted.
+- DisneyNOW media-manifest observation remains available for diagnostics without automatically starting Media3.
+- Existing package identity, app data, settings, cookies/login state, navigation modes, Performance Mode, zoom, diagnostics, Media3 dependency, and Silk fallback are preserved.
 
-Build 11 removes that normal-use manual handoff step.
+Build 12 also adds persistent privacy-safe crash/restart breadcrumbs:
 
-- When a legitimate HLS media manifest is observed, the app automatically schedules one native Media3 attempt for that page after the manifest burst settles.
-- Repeated manifest observations are debounced so the attempt waits briefly for the stream candidate to stabilize instead of firing for every request.
-- The normal app menu no longer contains the Build 10 **Try Native Player** control.
-- If Media3 reports a setup/player error, the app automatically stops the native attempt and restores the WebView path.
-- If native playback does not begin within the bounded startup watchdog, the app automatically falls back to the WebView path.
-- The automatic production behavior does not depend on Debug Mode; Debug Mode only adds safe scheduling/attempt/start/fallback evidence.
-- Existing settings, cookies/login state, package identity, navigation modes, Performance Mode, zoom behavior, diagnostics, and Silk fallback are preserved.
+- a project-owned session-active marker survives process death/restart;
+- the next launch can report whether the previous session ended without a clean `onDestroy`;
+- a bounded privacy-safe stage/breadcrumb is persisted so the next report can show what app/player stage was active before the restart;
+- a privacy-safe uncaught-exception handler records exception class/cause-chain information only, then forwards to Android's prior/default handler;
+- no exception message, cookie, Authorization header, provider token, full protected media/license URL, request body, typed text, or DRM key is intentionally stored.
 
-No DRM keys, DRM bypass, fabricated entitlement/license/token responses, or proprietary Disney code are used.
+The unclean-session marker is diagnostic evidence, **not proof of a Java crash**, because Android/Fire OS can terminate a process without delivering a Java exception or `onDestroy` callback.
 
 ## Fire TV controls
 
@@ -59,17 +60,17 @@ No DRM keys, DRM bypass, fabricated entitlement/license/token responses, or prop
 
 ## Verification and release status
 
-Build 11 source is reconstructed from the permanent historical chain and hash-verified Build 11 patch inputs. Public and private CI independently reconstructed the exact source. Verification passed:
+Build 12 source is reconstructed from the permanent historical chain and hash-verified patch inputs. Public and private CI independently reconstructed the exact source. Verification passed:
 
-- static/release audit: **207 PASS / 0 FAIL**;
+- static/release audit: **217 PASS / 0 FAIL**;
 - Android compile + unit tests: **PASS**;
 - lint: **0 errors / 13 warnings**;
-- package/version identity: `com.fireworkstars46.disneynowfiretv`, versionCode **11**, versionName **0.1**;
+- package/version identity: `com.fireworkstars46.disneynowfiretv`, versionCode **12**, versionName **0.1**;
 - permanent signer fingerprint: exact established identity;
 - APK signing verification: **v1/v2/v3 PASS**;
-- public permanent release archive: verified present.
+- public permanent release archive: verified present and retrievable.
 
 Signed APK SHA-256:
-`279a6d1d4a2aaab3c7fbf32cfa44c8f384c82524d93669064768d6f7a8f2c29f`
+`bf65901db9d28018ff21b21f6ad0b2bb62519a503dd08a6adeebf7f9cf67bf75`
 
-Physical Fire TV behavior remains environment-dependent and is not claimed by CI. Required real-device checks include installing Build 11 over Build 10, starting a DisneyNOW video normally, observing whether automatic native playback succeeds or automatically falls back, exporting a Build 11 debug report, and checking provider login, responsiveness, zoom, and Silk fallback behavior.
+Physical Fire TV behavior remains environment-dependent and is not claimed by CI. Required Build 12 real-device checks are stability/responsiveness, provider/login state preservation, normal DisneyNOW playback behavior without automatic Media3 takeover, persistent previous-session crash/restart breadcrumb reporting if another restart occurs, zoom, and Silk fallback.
