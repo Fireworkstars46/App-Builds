@@ -1,0 +1,127 @@
+name: DisneyNOW Fire TV Build 12 - Publish verified signed APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/disneynow-fire-tv-build12-publish.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Download and verify exact signed Build 12 artifact bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build12-Compatibility-Test'
+          test ! -e "$dir"
+          mkdir -p "$dir" /tmp/build12-signed
+          curl --fail --location --retry 2 --output /tmp/build12-signed.zip 'https://sdmntprwestus.oaiusercontent.com/files/00000000-c708-8230-803f-811544fba46b/raw?se=2026-10-26T12%3A47%3A20Z&sp=r&sv=2026-02-06&sr=b&scid=a4374669-7aed-58fb-bc7a-b756cb4c80e5&skoid=bbd22fc4-f881-4ea4-b2f3-c12033cf6a8b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-25T23%3A40%3A23Z&ske=2026-10-26T23%3A40%3A23Z&sks=b&skv=2026-02-06&sig=u6avEIFHKYUhE0gCCD1U4FNAzpE51aF2A9E%2BFQXXTFE%3D'
+          echo 'ab6c69322cba07cf79cda4ae207d896da6fd6499bc3508c251cd97361e179aaa  /tmp/build12-signed.zip' | sha256sum -c -
+          unzip -t /tmp/build12-signed.zip >/dev/null
+          unzip -q /tmp/build12-signed.zip -d /tmp/build12-signed
+          cp /tmp/build12-signed/DisneyNOW-Fire-TV-v0.1-Build12-Permanent-Signed.apk "$dir/"
+          cp /tmp/build12-signed/DisneyNOW-Fire-TV-v0.1-Build12-Source.zip "$dir/"
+          cp /tmp/build12-signed/STATIC-AUDIT-v0.1-Build12.txt "$dir/"
+          cp /tmp/build12-signed/LINT-v0.1-Build12.txt "$dir/"
+          cp /tmp/build12-signed/LINT-v0.1-Build12.html "$dir/"
+          cp /tmp/build12-signed/APKSIGNER-VERIFY-v0.1-Build12.txt "$dir/"
+          cp /tmp/build12-signed/BADGING-v0.1-Build12.txt "$dir/"
+          cp /tmp/build12-signed/VERIFY-v0.1-Build12.txt "$dir/PRIVATE-SIGNING-VERIFY-v0.1-Build12.txt"
+          apk="$dir/DisneyNOW-Fire-TV-v0.1-Build12-Permanent-Signed.apk"
+          echo 'bf65901db9d28018ff21b21f6ad0b2bb62519a503dd08a6adeebf7f9cf67bf75  '"$apk" | sha256sum -c -
+          echo '503726ec94f7de1dffb3b1d7c52c9fc4cea13b1911ead52e846bcd1ab8665215  '"$dir/DisneyNOW-Fire-TV-v0.1-Build12-Source.zip" | sha256sum -c -
+          echo '3f2ea0f54c07960f9f76eeaf106fe5699c202f08728fb8bc0ab439b94b8c1049  '"$dir/STATIC-AUDIT-v0.1-Build12.txt" | sha256sum -c -
+          echo 'e3662dd27cfb076b3e0a5315617b0fea382560a1823963b4e54c6ae24bef358b  '"$dir/LINT-v0.1-Build12.txt" | sha256sum -c -
+          echo '0926457c3e54eafe09e9ec31ef0755b23fc07e29785a5166dbb8544c3559b8e3  '"$dir/LINT-v0.1-Build12.html" | sha256sum -c -
+          echo '49c4eafa4cec0af62ee61d23ce1bd879c0bc2203b0aac646cb52024d6b84e500  '"$dir/APKSIGNER-VERIFY-v0.1-Build12.txt" | sha256sum -c -
+          echo '48908702dbfb2776cd4a37040afc6b03feb90b5b5be16b9764bb3ffc90fe08cc  '"$dir/BADGING-v0.1-Build12.txt" | sha256sum -c -
+          echo '6bc0f2bd575413253c6f499004fb975926f76baf7ebeea58c6666b299581564c  '"$dir/PRIVATE-SIGNING-VERIFY-v0.1-Build12.txt" | sha256sum -c -
+          grep -q 'STATIC TOTAL: PASS=217 FAIL=0' "$dir/STATIC-AUDIT-v0.1-Build12.txt"
+          grep -q 'RESULT: PASS' "$dir/STATIC-AUDIT-v0.1-Build12.txt"
+          grep -q '^0 errors, 13 warnings$' "$dir/LINT-v0.1-Build12.txt"
+          grep -q 'Verified using v1 scheme (JAR signing): true' "$dir/APKSIGNER-VERIFY-v0.1-Build12.txt"
+          grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true' "$dir/APKSIGNER-VERIFY-v0.1-Build12.txt"
+          grep -q 'Verified using v3 scheme (APK Signature Scheme v3): true' "$dir/APKSIGNER-VERIFY-v0.1-Build12.txt"
+          grep -Eqi 'certificate SHA-256 digest: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838' "$dir/APKSIGNER-VERIFY-v0.1-Build12.txt"
+          grep -q "package: name='com.fireworkstars46.disneynowfiretv'" "$dir/BADGING-v0.1-Build12.txt"
+          grep -q "versionCode='12'" "$dir/BADGING-v0.1-Build12.txt"
+          grep -q "versionName='0.1'" "$dir/BADGING-v0.1-Build12.txt"
+
+      - name: Write Build 12 release evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build12-Compatibility-Test'
+          cat > "$dir/BUILD-METADATA.txt" <<'TXT'
+          Project: DisneyNOW Fire TV Hybrid TV Shell
+          Version: 0.1
+          Build: 12
+          Android versionCode: 12
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Public source commit: 24557d2581f41d593164ef560929c917b464f883
+          Public unsigned CI run: 40324071335
+          Public unsigned artifact ID: 12650193760
+          Public unsigned artifact digest: sha256:8b7c2ab4efa78a1c612d35b7ddf9fef56d425a893887b54bee4c623d8e76ba4a
+          Private permanent-signing CI run: 40324312421
+          Private signed artifact ID: 12649614941
+          Private signed artifact digest: sha256:ab6c69322cba07cf79cda4ae207d896da6fd6499bc3508c251cd97361e179aaa
+          Signed APK SHA-256: bf65901db9d28018ff21b21f6ad0b2bb62519a503dd08a6adeebf7f9cf67bf75
+          Source ZIP SHA-256: 503726ec94f7de1dffb3b1d7c52c9fc4cea13b1911ead52e846bcd1ab8665215
+          Permanent signer certificate SHA-256: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838
+          CI static/release audit: 217 PASS / 0 FAIL
+          Lint: 0 errors / 13 warnings
+          Signing backup/recovery gate: PASS.
+          Publication status: NOT DONE - COMPATIBILITY TEST pending physical Fire TV testing.
+          TXT
+          cat > "$dir/RELEASE-STATUS.txt" <<'TXT'
+          DisneyNOW Fire TV Hybrid TV Shell
+          Version 0.1 Build 12
+          Status: NOT DONE - COMPATIBILITY TEST
+
+          Build 12 is the corrective stability release after the Build 11 physical Fire TV regression. The Build 11 report proved the experimental Media3 path could reach READY/isPlaying=true but the app/process later restarted without a captured Java/Media3 error.
+
+          Build 12 disables automatic native Media3 launch and keeps the native-player path out of normal use. The manual Try Native Player action remains omitted. DisneyNOW media-manifest observation and privacy-safe diagnostics remain available, but normal playback is not automatically redirected into Media3.
+
+          Build 12 adds persistent privacy-safe crash/restart breadcrumbs. A session-active marker and bounded stage/breadcrumb data are stored in project-owned SharedPreferences so the next launch can report whether the previous session ended without a clean onDestroy and what privacy-safe stage/breadcrumb was last persisted. A privacy-safe uncaught-exception handler stores exception class/cause-chain information only and forwards to Android's previous/default handler. No exception message, cookie, Authorization header, provider token, full protected media/license URL, request body, typed text, or DRM key is intentionally stored.
+
+          The previous-session unclean marker is a diagnostic indicator, not proof of a Java crash: Android/Fire OS can kill a process without delivering a Java exception or onDestroy callback.
+
+          Build 12 preserves package ID, app data/settings/cookies/login path, navigation modes, Performance Mode, zoom, Silk fallback, Media3 dependency, debug reporting, and the established permanent signer. It does not bypass DRM, extract keys, fabricate entitlement/license/token responses, or copy Disney proprietary code.
+
+          Verification: public and private CI independently reconstructed the exact source. Static/release audit 217 PASS / 0 FAIL; lint 0 errors / 13 warnings; compile/unit tests/package/version checks passed; permanent signer fingerprint matched; APK v1/v2/v3 verification passed.
+
+          Physical Fire TV stability/crash-restart breadcrumb behavior and real playback behavior remain NOT TESTED by CI. Build 12 is not claimed DONE until physically tested.
+          TXT
+          (cd "$dir" && sha256sum \
+            DisneyNOW-Fire-TV-v0.1-Build12-Permanent-Signed.apk \
+            DisneyNOW-Fire-TV-v0.1-Build12-Source.zip \
+            STATIC-AUDIT-v0.1-Build12.txt \
+            LINT-v0.1-Build12.txt \
+            LINT-v0.1-Build12.html \
+            APKSIGNER-VERIFY-v0.1-Build12.txt \
+            BADGING-v0.1-Build12.txt \
+            PRIVATE-SIGNING-VERIFY-v0.1-Build12.txt \
+            BUILD-METADATA.txt \
+            RELEASE-STATUS.txt > SHA256SUMS.txt)
+
+      - name: Commit verified Build 12 release archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build12-Compatibility-Test'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dir/"
+          git commit -m 'Publish verified DisneyNOW Fire TV v0.1 Build 12 APK'
+          git push origin HEAD:main
