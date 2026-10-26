@@ -10,13 +10,16 @@ BASE11 = {
     'tools/static_audit.py': '36d4e2cb8ee1ba501b7fb485d0447a820618ad80b28f9dbfb44749131f80b08b',
 }
 
-BUILD13 = {
+PATCH13 = {
     'app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java': '2ace504d804fb354263c83e576c78910f2360e3f83ee25dd090260302190e055',
     'app/build.gradle': '03997107cdec224b322613b7efc98a93abe7972a12f898895fc437e89e5b7d27',
     'BUILD_INFO.md': '5df4ee811a42c92b83e0ca55d24098c6d43fd2d30b23275bd70f6c9836b17b74',
     'README.md': '1c99c15d377cd9d26cf5527f3169b07b4fb23087cd1323a6667b823e6c3c1d0e',
     'tools/static_audit.py': 'b12c3fb75f2579993154435a066c41abe5f23886d4a7907f0e3107cda3489a6c',
 }
+
+BUILD13 = dict(PATCH13)
+BUILD13['tools/static_audit.py'] = 'ed284d72750df93bf96fa50e17b0e3197ab57c7c58c6cee7686e3b2987a8fbf7'
 
 PATCH_ZIP_SHA256 = '8d9d2b49d6748724a612cefa0a1390ab8b807bb04a1452195d1e366b15cf99d3'
 PATCH_PARTS = [
@@ -68,20 +71,31 @@ def main() -> None:
     if sha_bytes(payload) != PATCH_ZIP_SHA256:
         raise SystemExit('Build 13 patch ZIP SHA-256 mismatch')
 
-    expected_paths = set(BUILD13)
+    expected_paths = set(PATCH13)
     with zipfile.ZipFile(io.BytesIO(payload), 'r') as zf:
         names = set(zf.namelist())
         if names != expected_paths:
             raise SystemExit(f'Build 13 patch ZIP contains unexpected/missing entries: {sorted(names ^ expected_paths)}')
         for rel in sorted(expected_paths):
             data = zf.read(rel)
-            if sha_bytes(data) != BUILD13[rel]:
+            if sha_bytes(data) != PATCH13[rel]:
                 raise SystemExit(f'Build 13 payload entry hash mismatch: {rel}')
             out = (root / rel).resolve()
             if root not in out.parents:
                 raise SystemExit(f'Unsafe Build 13 patch path: {rel}')
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_bytes(data)
+
+    audit_path = root / 'tools/static_audit.py'
+    audit_text = audit_path.read_text(encoding='utf-8')
+    old1 = "add('Version code incremented to 12', re.search(r'versionCode\\s+13\\b', gradle) is not None, '13')"
+    new1 = "add('Version code incremented to 13', re.search(r'versionCode\\s+13\\b', gradle) is not None, '13')"
+    old2 = "add('BuildConfig build number is 13', \"buildConfigField 'int', 'APP_BUILD', '13'\" in gradle, '12')"
+    new2 = "add('BuildConfig build number is 13', \"buildConfigField 'int', 'APP_BUILD', '13'\" in gradle, '13')"
+    if audit_text.count(old1) != 1 or audit_text.count(old2) != 1:
+        raise SystemExit('Build 13 audit evidence-label correction precondition failed')
+    audit_text = audit_text.replace(old1, new1).replace(old2, new2)
+    audit_path.write_text(audit_text, encoding='utf-8')
 
     verify(root, BUILD13, 'Build 13 result')
     print('Build 13 stability rollback/crash-stage patch applied and verified.')
