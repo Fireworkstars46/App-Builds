@@ -1,0 +1,10 @@
+DisneyNOW Fire TV v0.1 Build 11 private signing verification
+Public source commit: b97cddbf0309cf83594a202ef6f8b27eaf9d8f4b
+PASS - Build 11 reconstruction hash chain passed
+PASS - static audit 207 PASS / 0 FAIL verified
+PASS - compile/lint/unit-test/assembleRelease passed
+PASS - recovered established keystore fingerprint matched expected permanent identity
+PASS - apksigner v1/v2/v3 verification passed
+PASS - package com.fireworkstars46.disneynowfiretv verified
+PASS - versionCode 11 / versionName 0.1 verified
+Physical Fire TV automatic native handoff/playback/fallback/debug report usefulness: NOT TESTED

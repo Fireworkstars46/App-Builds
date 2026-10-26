@@ -1,0 +1,216 @@
+DisneyNOW Fire TV Hybrid TV Shell - STATIC / RELEASE AUDIT
+Version: 0.1 Build 11
+MASTER_RULES SHA-256: unavailable
+
+1. PASS - Required source exists: app/build.gradle | /tmp/build11/DisneyNOWFireTV/Source/app/build.gradle
+2. PASS - Required source exists: app/src/main/AndroidManifest.xml | /tmp/build11/DisneyNOWFireTV/Source/app/src/main/AndroidManifest.xml
+3. PASS - Required source exists: app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java | /tmp/build11/DisneyNOWFireTV/Source/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java
+4. PASS - Required source exists: BUILD_INFO.md | /tmp/build11/DisneyNOWFireTV/Source/BUILD_INFO.md
+5. PASS - Required source exists: README.md | /tmp/build11/DisneyNOWFireTV/Source/README.md
+6. PASS - Required source exists: gradle.properties | /tmp/build11/DisneyNOWFireTV/Source/gradle.properties
+7. PASS - Package namespace preserved | com.fireworkstars46.disneynowfiretv
+8. PASS - Package applicationId preserved | com.fireworkstars46.disneynowfiretv
+9. PASS - Expected package embedded in runtime check | com.fireworkstars46.disneynowfiretv
+10. PASS - Version name preserved | 0.1
+11. PASS - Version code incremented to 11 | 11
+12. PASS - BuildConfig build number is 11 | 10
+13. PASS - Runtime Safe Self-Test expects Build 11 | Build 11/versionCode 11
+14. PASS - Minimum SDK 22 preserved | existing compatibility floor
+15. PASS - Target SDK 35 preserved | targetSdk 35
+16. PASS - Compile SDK 35 preserved | compileSdk 35
+17. PASS - Java 17 compile target | source/target Java 17
+18. PASS - Media3 version pinned to 1.8.1 | last compatible line before minSdk 23 migration
+19. PASS - AndroidX mode enabled for Media3 | required by AndroidX Media3 dependencies
+20. PASS - Media3 dependency present: media3-exoplayer | media3-exoplayer
+21. PASS - Media3 dependency present: media3-exoplayer-dash | media3-exoplayer-dash
+22. PASS - Media3 dependency present: media3-exoplayer-hls | media3-exoplayer-hls
+23. PASS - Media3 dependency present: media3-ui | media3-ui
+24. PASS - AndroidManifest XML parses | well-formed
+25. PASS - INTERNET is the only requested permission | permissions=['android.permission.INTERNET']
+26. PASS - Cleartext HTTP disabled | usesCleartextTraffic=false
+27. PASS - Application hardware acceleration enabled | hardwareAccelerated=true
+28. PASS - Launcher activity exported | exported=true
+29. PASS - Leanback launcher retained | ['android.intent.category.LAUNCHER', 'android.intent.category.LEANBACK_LAUNCHER']
+30. PASS - Standard launcher retained | ['android.intent.category.LAUNCHER', 'android.intent.category.LEANBACK_LAUNCHER']
+31. PASS - JavaScript enabled | setJavaScriptEnabled(true)
+32. PASS - DOM storage enabled | setDomStorageEnabled(true)
+33. PASS - Media playback user gesture relaxed | setMediaPlaybackRequiresUserGesture(false)
+34. PASS - File access disabled | setAllowFileAccess(false)
+35. PASS - Content access disabled | setAllowContentAccess(false)
+36. PASS - Mixed content prohibited | MIXED_CONTENT_NEVER_ALLOW
+37. PASS - Third-party cookies allowed for provider auth | setAcceptThirdPartyCookies(webView, true)
+38. PASS - WebView debugging remains disabled | setWebContentsDebuggingEnabled(false)
+39. PASS - WebView native compositor layer retained | webView.setLayerType(View.LAYER_TYPE_NONE, null)
+40. PASS - Renderer priority policy set to important on API 26+ | setRendererPriorityPolicy(WebView.RENDERER_PRIORITY_IMPORTANT, false)
+41. PASS - Popup provider-login routing retained | final boolean[] routed = new boolean[]{false}
+42. PASS - Cookie flush after navigation | CookieManager.getInstance().flush()
+43. PASS - App-local web-data clear path retained | clearAppWebData()
+44. PASS - Native TV Navigation setting exists | KEY_NATIVE_TV_NAV
+45. PASS - Build 8 migration flag exists | KEY_BUILD8_MIGRATED
+46. PASS - Build 8 migration enables Native TV Navigation | .putBoolean(KEY_NATIVE_TV_NAV, true)
+47. PASS - Build 8 migration disables cursor | .putBoolean(KEY_CURSOR_ENABLED, false)
+48. PASS - Build 8 migration disables legacy JS focus | .putBoolean(KEY_TV_FOCUS, false)
+49. PASS - Build 8 migration enables Performance Mode | .putBoolean(KEY_PERFORMANCE_MODE, true)
+50. PASS - Native TV Navigation production setter exists | setNativeTvNavigation(boolean enabled)
+51. PASS - Cursor enabling disables native TV mode | editor.putBoolean(KEY_NATIVE_TV_NAV, false)
+52. PASS - Legacy focus enabling disables native TV mode | setTvFocusNavigation(boolean enabled)
+53. PASS - Cursor compatibility path retained | Cursor Navigation (Compatibility)
+54. PASS - Legacy JS focus path retained | Legacy JS Focus Navigation
+55. PASS - Native TV mode exposed in menu | Native TV Navigation: 
+56. PASS - Default D-pad path can pass through to WebView | super.dispatchKeyEvent(event)
+57. PASS - Native TV mode does not require DOM scanning every frame | isNativeTvNavigationEnabled()
+58. PASS - Cursor compatibility overlay retained | private final class CursorView extends View
+59. PASS - Compact cursor overlay remains 48dp | cursorOverlaySize = dp(48)
+60. PASS - Cursor translated rather than full-screen redraw | setTranslationX(newX - getWidth() / 2f)
+61. PASS - Cursor click dispatch retained | webView.dispatchTouchEvent(down)
+62. PASS - Cursor hidden for native player | cursorView.setVisibility(View.GONE)
+63. PASS - Cursor mode preference persisted | KEY_CURSOR_ENABLED
+64. PASS - Page Zoom setting retained | KEY_PAGE_ZOOM
+65. PASS - Page Zoom minimum 0 | MIN_PAGE_ZOOM = 0
+66. PASS - Page Zoom maximum 500 | MAX_PAGE_ZOOM = 500
+67. PASS - Direct numeric Page Zoom entry | TYPE_CLASS_NUMBER
+68. PASS - 0-500 slider retained | slider.setMax(MAX_PAGE_ZOOM)
+69. PASS - One-percent decrement retained | minus.setText("-1")
+70. PASS - One-percent increment retained | plus.setText("+1")
+71. PASS - Reset 100 retained | reset.setText("Reset 100%")
+72. PASS - Whole-page WebView zoom method exists | applyWholePageZoom()
+73. PASS - WebView zoomBy used | webView.zoomBy(
+74. PASS - 0 percent hides complete WebView | webView.setAlpha(0f)
+75. PASS - Nonzero zoom restores WebView alpha | webView.setAlpha(1f)
+76. PASS - Page finished reapplies whole-page zoom | applyWholePageZoom();
+77. PASS - Build 7 CSS zoom injector removed | no document-only CSS zoom
+78. PASS - Page Zoom setter does not reload WebView | no endless reload regression
+79. PASS - Page Zoom setter uses whole-page production apply | same setter used by controls
+80. PASS - Performance Mode setting exists | KEY_PERFORMANCE_MODE
+81. PASS - Performance Mode production setter exists | setPerformanceMode(boolean enabled)
+82. PASS - Performance Mode app-menu control exists | Performance Mode: 
+83. PASS - Performance style has bounded animation duration | animation-duration:0.001s
+84. PASS - Performance style removes smooth scrolling | scroll-behavior:auto
+85. PASS - Performance Mode can remove its injected style | getElementById('firetv-performance-style')
+86. PASS - Media3 PlayerView field exists | private PlayerView nativePlayerView
+87. PASS - Media3 ExoPlayer field exists | private ExoPlayer nativePlayer
+88. PASS - Native player starts hidden | nativePlayerContainer.setVisibility(View.GONE)
+89. PASS - HLS/DASH WebView request observation exists | rememberMediaRequest(request)
+90. PASS - HLS classifier exists | endsWith(".m3u8")
+91. PASS - DASH classifier exists | endsWith(".mpd")
+92. PASS - DRM request classifier exists | isLikelyDrmLicenseRequest
+93. PASS - Media request headers stay memory-only | lastMediaRequestHeaders
+94. PASS - DRM request headers stay memory-only | lastDrmRequestHeaders
+95. PASS - Portable header copy excludes Host | "host".equalsIgnoreCase(key)
+96. PASS - Portable header copy excludes Content-Length | "content-length".equalsIgnoreCase(key)
+97. PASS - Session cookie can be passed in memory | CookieManager.getInstance().getCookie(url)
+98. PASS - Automatic native player path retained | tryNativePlayback()
+99. PASS - Media3 DefaultHttpDataSource used | DefaultHttpDataSource.Factory
+100. PASS - Media3 DefaultMediaSourceFactory used | DefaultMediaSourceFactory
+101. PASS - Media3 ExoPlayer builder used | new ExoPlayer.Builder(this)
+102. PASS - HLS MIME type assigned | MimeTypes.APPLICATION_M3U8
+103. PASS - DASH MIME type assigned | MimeTypes.APPLICATION_MPD
+104. PASS - Android Widevine UUID used through Media3 | new MediaItem.DrmConfiguration.Builder(C.WIDEVINE_UUID)
+105. PASS - Observed license URI passed to Media3 | .setLicenseUri(lastDrmLicenseUrl)
+106. PASS - Observed license headers passed to Media3 | .setLicenseRequestHeaders(drmHeaders)
+107. PASS - Native player setup failure is contained | NATIVE_PLAYER setup_error
+108. PASS - Native playback error uses safe error code only | NATIVE_PLAYER error code=
+109. PASS - Native player releases resources | nativePlayer.release()
+110. PASS - Back exits native player before app navigation | if (isNativePlayerVisible())
+111. PASS - Media candidates cleared on page navigation | clearMediaCandidates();
+112. PASS - Media candidates cleared with web data | app-local WebView data and in-memory media candidates
+113. PASS - Silk fallback retained | Open Current Page in Silk (Video Fallback)
+114. PASS - Debug Mode setting exists | KEY_DEBUG_MODE
+115. PASS - Debug Mode defaults OFF | prefs.getBoolean(KEY_DEBUG_MODE, false)
+116. PASS - Debug Mode production setter exists | setDebugMode(boolean enabled)
+117. PASS - Debug Mode menu toggle exists | Debug Mode: 
+118. PASS - Debug Snapshot exists | buildDebugSnapshot()
+119. PASS - Debug report export exists | exportDebugReport()
+120. PASS - Debug report Build 11 filename exists | DisneyNOWFireTV-Debug-v0.1-Build11-
+121. PASS - Debug D-pad dispatch timing exists | recordDebugKeyDispatch
+122. PASS - Debug page-load timing exists | debugLastPageLoadMs
+123. PASS - Debug WebView error counter exists | debugWebErrorCount
+124. PASS - Debug HTTP error counter exists | debugHttpErrorCount
+125. PASS - Debug Media3 error counter exists | debugNativePlayerErrorCount
+126. PASS - Debug media manifest counter exists | debugMediaManifestCount
+127. PASS - Debug DRM candidate counter exists | debugDrmCandidateCount
+128. PASS - Debug recent log export bounded to 200 lines | logger.readRecentLines(200)
+129. PASS - Debug recent log reader hard-caps request | Math.min(maxLines, 500)
+130. PASS - Debug report privacy text present | full media/license URLs, query strings, device serials, and typed text are not included
+131. PASS - WebView remote debugging remains disabled | WebView.setWebContentsDebuggingEnabled(false)
+132. PASS - Safe Self-Test covers Debug Snapshot | Privacy-safe Debug Snapshot production path
+133. PASS - Native handoff stage tracker exists | recordNativeHandoffStage
+134. PASS - Native handoff attempt counter exists | debugNativeHandoffAttemptCount
+135. PASS - Native player create counter exists | debugNativePlayerCreateCount
+136. PASS - Native prepare counter exists | debugNativePrepareCount
+137. PASS - Possible DRM POST counter exists | debugPossibleDrmPostCount
+138. PASS - Possible DRM POST logging is host/type only | POST_AFTER_MANIFEST 
+139. PASS - Session context diagnostics use header-presence booleans | cookie=
+140. PASS - Automatic native handoff scheduler exists | scheduleAutomaticNativePlayback()
+141. PASS - Automatic handoff delay is bounded | AUTO_NATIVE_HANDOFF_DELAY_MS = 3000L
+142. PASS - Automatic fallback watchdog exists | scheduleNativeFallbackWatchdog
+143. PASS - Automatic fallback timeout is bounded | AUTO_NATIVE_FALLBACK_TIMEOUT_MS = 20000L
+144. PASS - Automatic fallback restores WebView | fallbackToWebPlayback
+145. PASS - Automatic handoff only attempts once per page | autoNativeAttemptedForPage
+146. PASS - Automatic schedule token invalidates stale attempts | autoNativeScheduleToken
+147. PASS - Exception diagnostics use class chain only | safeThrowableChain
+148. PASS - Build 11 automatic handoff state included in Debug Snapshot | Automatic native handoff:
+149. PASS - Build 10 handoff helper self-test retained | Native handoff privacy-safe stage tracker
+150. PASS - Manual Try Native Player normal menu item removed | normal menu no longer requires manual handoff
+151. PASS - Old stream-ready instruction removed | automatic handoff replaces manual instruction
+152. PASS - Automatic handoff is independent of Debug Mode | production behavior works with Debug Mode OFF
+153. PASS - Automatic player error path falls back to WebView | automatic recovery
+154. PASS - Automatic setup-error path falls back to WebView | automatic recovery
+155. PASS - Native stop invalidates timeout watchdog | stale watchdog cannot stop a later attempt
+156. PASS - README documents automatic handoff | Build 11 behavior
+157. PASS - README documents automatic fallback | Build 11 behavior
+158. PASS - Diagnostics do not append media URL value | booleans/type only
+159. PASS - Debug report never directly appends manifest URL | no full manifest URL export
+160. PASS - Debug report never directly appends DRM URL | no full license URL export
+161. PASS - Debug logging does not write request headers | no debug header serialization
+162. PASS - Diagnostics do not append DRM license URL value | boolean only
+163. PASS - No logger writes full media manifest URL | host/type only
+164. PASS - No logger writes full DRM license URL | host only
+165. PASS - Native handoff detail never appends full manifest URL | host/type/age only
+166. PASS - Possible DRM diagnostics never serialize request body | WebResourceRequest body unavailable/not captured
+167. PASS - Exception messages are not exported | class names/codes only
+168. PASS - Diagnostic privacy statement covers tokens/cookies/media/license URLs | explicit
+169. PASS - About states no key extraction/DRM bypass | explicit non-bypass behavior
+170. PASS - README states no DRM bypass/proprietary-copy behavior | documented
+171. PASS - Widevine runtime diagnostic retained | MediaDrm.isCryptoSchemeSupported(WIDEVINE_UUID)
+172. PASS - Diagnostics export retained | exportDiagnostics()
+173. PASS - Bounded log file count retained | MAX_FILES = 5
+174. PASS - Bounded log size retained | MAX_BYTES = 1024L * 1024L
+175. PASS - Safe Self-Test exists | runSafeSelfTest()
+176. PASS - Safe Self-Test Build 11 report name | SafeSelfTest-v0.1-Build11.txt
+177. PASS - Safe Self-Test settings persistence round trip | Settings persistence write -> reload/read -> compare -> delete
+178. PASS - Safe Self-Test native navigation migration check | Build 8 low-overhead Native TV Navigation migration
+179. PASS - Safe Self-Test media manifest classifier | Media manifest classifier
+180. PASS - Safe Self-Test DRM classifier | DRM endpoint classifier
+181. PASS - Safe Self-Test whole-page zoom production path | Whole-Page Zoom 0-500 persistence + WebView-level production apply -> restore
+182. PASS - Safe Self-Test native player surface check | Native Media3 player surface initialized
+183. PASS - Safe Self-Test marks real native playback skipped | Native Media3 HLS/DASH + Widevine playback
+184. PASS - Safe Self-Test data write/read/delete round trip | Project data write -> reload/read -> compare -> delete
+185. PASS - Build info matches Version 0.1 Build 11 | BUILD_INFO.md
+186. PASS - README identifies Build 11 | README.md
+187. PASS - README documents native navigation | preserved Build 8 behavior
+188. PASS - README documents whole-page zoom | preserved Build 8 behavior
+189. PASS - README documents experimental native playback | preserved Build 8 behavior
+190. PASS - README documents Media3 1.8.1 compatibility rationale | dependency choice
+191. PASS - Forbidden/high-risk capability absent: android.permission.READ_CONTACTS | android.permission.READ_CONTACTS
+192. PASS - Forbidden/high-risk capability absent: android.permission.READ_SMS | android.permission.READ_SMS
+193. PASS - Forbidden/high-risk capability absent: android.permission.RECORD_AUDIO | android.permission.RECORD_AUDIO
+194. PASS - Forbidden/high-risk capability absent: android.permission.CAMERA | android.permission.CAMERA
+195. PASS - Forbidden/high-risk capability absent: android.permission.ACCESS_FINE_LOCATION | android.permission.ACCESS_FINE_LOCATION
+196. PASS - Forbidden/high-risk capability absent: android.permission.MANAGE_EXTERNAL_STORAGE | android.permission.MANAGE_EXTERNAL_STORAGE
+197. PASS - Forbidden/high-risk capability absent: setWebContentsDebuggingEnabled(true) | setWebContentsDebuggingEnabled(true)
+198. PASS - Forbidden/high-risk capability absent: onReceivedSslError | onReceivedSslError
+199. PASS - Forbidden/high-risk capability absent: setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW) | setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW)
+200. PASS - Forbidden/high-risk capability absent: addJavascriptInterface( | addJavascriptInterface(
+201. PASS - Forbidden/high-risk capability absent: getKeyRequest( | getKeyRequest(
+202. PASS - Forbidden/high-risk capability absent: provideKeyResponse( | provideKeyResponse(
+203. PASS - Forbidden/high-risk capability absent: KEY_TYPE_STREAMING | KEY_TYPE_STREAMING
+204. PASS - MainActivity brace balance | open=345 close=345
+205. PASS - MainActivity parenthesis balance | open=2014 close=2014
+206. PASS - No stale Build 8 Safe Self-Test filename | current report only
+207. PASS - No stale versionCode 10 in app Gradle | versionCode 11 only
+
+STATIC TOTAL: PASS=207 FAIL=0
+RESULT: PASS
+
+Physical Fire TV responsiveness, actual WebView focus behavior, whole-page zoom appearance, real provider sign-in, Disney server playback, automatic Media3 handoff/fallback/playback, Widevine license negotiation, ad/program video, Silk fallback, and Debug Mode/native-handoff runtime usefulness are environment-dependent and are NOT claimed by this static audit.

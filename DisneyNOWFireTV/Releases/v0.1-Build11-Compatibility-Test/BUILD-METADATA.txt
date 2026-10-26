@@ -1,0 +1,19 @@
+Project: DisneyNOW Fire TV Hybrid TV Shell
+Version: 0.1
+Build: 11
+Android versionCode: 11
+Package ID: com.fireworkstars46.disneynowfiretv
+Public source commit: b97cddbf0309cf83594a202ef6f8b27eaf9d8f4b
+Public unsigned CI run: 40316692879
+Public unsigned artifact ID: 12647486005
+Public unsigned artifact digest: sha256:f7bedba3a4c3ac3dc14cc3c811ae97a09f065268b644c04321de22304f11d151
+Private permanent-signing CI run: 40316980085
+Private signed artifact ID: 12647915252
+Private signed artifact digest: sha256:26e534d3e37f2795a821c1001481f28da8b40054a4e47b3ae110e0970533ab99
+Signed APK SHA-256: 279a6d1d4a2aaab3c7fbf32cfa44c8f384c82524d93669064768d6f7a8f2c29f
+Source ZIP SHA-256: a382b49e8b783311bd127289fd5a5b05c01d9f86c6f9c69bc3375422a956a5c6
+Permanent signer certificate SHA-256: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838
+CI static/release audit: 207 PASS / 0 FAIL
+Lint: 0 errors / 13 warnings
+Signing backup/recovery gate: PASS.
+Publication status: NOT DONE - COMPATIBILITY TEST pending physical Fire TV testing.

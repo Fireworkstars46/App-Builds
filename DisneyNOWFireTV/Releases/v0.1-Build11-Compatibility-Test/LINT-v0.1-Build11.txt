@@ -1,0 +1,120 @@
+/tmp/build11/DisneyNOWFireTV/Source/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java:1708: Warning: Consider using WebViewCompat.getCurrentWebViewPackage instead which will support more devices. [WebViewApiAvailability]
+            PackageInfo info = WebView.getCurrentWebViewPackage();
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/build11/DisneyNOWFireTV/Source/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java:1918: Warning: Consider using WebViewCompat.getCurrentWebViewPackage instead which will support more devices. [WebViewApiAvailability]
+            PackageInfo packageInfo = WebView.getCurrentWebViewPackage();
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "WebViewApiAvailability":
+   The androidx.webkit library is a static library you can add to your Android
+   application allowing you to use new APIs on older platform versions,
+   targeting more devices.
+
+   https://developer.android.com/reference/androidx/webkit/package-summary
+
+/tmp/build11/DisneyNOWFireTV/Source/app/build.gradle:12: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
+        targetSdk 35
+        ~~~~~~~~~~~~
+
+   Explanation for issues of type "OldTargetApi":
+   When your application runs on a version of Android that is more recent than
+   your targetSdkVersion specifies that it has been tested with, various
+   compatibility modes kick in. This ensures that your application continues
+   to work, but it may look out of place. For example, if the targetSdkVersion
+   is less than 14, your app may get an option button in the UI.
+
+   To fix this issue, set the targetSdkVersion to the highest available value.
+   Then test your app to make sure everything works correctly. You may want to
+   consult the compatibility notes to see what changes apply to each version
+   you are adding support for:
+   https://developer.android.com/reference/android/os/Build.VERSION_CODES.html
+   as well as follow this guide:
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.
+   html
+
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.html
+
+/tmp/build11/DisneyNOWFireTV/Source/app/src/main/AndroidManifest.xml:21: Warning: Attribute usesCleartextTraffic is only used in API level 23 and higher (current min is 22) [UnusedAttribute]
+        android:usesCleartextTraffic="false">
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UnusedAttribute":
+   This check finds attributes set in XML files that were introduced in a
+   version newer than the oldest version targeted by your application (with
+   the minSdkVersion attribute).
+
+   This is not an error; the application will simply ignore the attribute.
+   However, if the attribute is important to the appearance or functionality
+   of your application, you should consider finding an alternative way to
+   achieve the same result with only available attributes, and then you can
+   optionally create a copy of the layout in a layout-vNN folder which will be
+   used on API NN or higher where you can take advantage of the newer
+   attribute.
+
+   Note: This check does not only apply to attributes. For example, some tags
+   can be unused too, such as the new <tag> element in layouts introduced in
+   API 21.
+
+/tmp/build11/DisneyNOWFireTV/Source/app/build.gradle:40: Warning: A newer version of androidx.media3:media3-exoplayer than 1.8.1 is available: 1.11.1 [GradleDependency]
+    implementation "androidx.media3:media3-exoplayer:$media3_version"
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/build11/DisneyNOWFireTV/Source/app/build.gradle:41: Warning: A newer version of androidx.media3:media3-exoplayer-dash than 1.8.1 is available: 1.11.1 [GradleDependency]
+    implementation "androidx.media3:media3-exoplayer-dash:$media3_version"
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/build11/DisneyNOWFireTV/Source/app/build.gradle:42: Warning: A newer version of androidx.media3:media3-exoplayer-hls than 1.8.1 is available: 1.11.1 [GradleDependency]
+    implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/build11/DisneyNOWFireTV/Source/app/build.gradle:43: Warning: A newer version of androidx.media3:media3-ui than 1.8.1 is available: 1.11.1 [GradleDependency]
+    implementation "androidx.media3:media3-ui:$media3_version"
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "GradleDependency":
+   This detector looks for usages of libraries where the version you are using
+   is not the current stable release. Using older versions is fine, and there
+   are cases where you deliberately want to stick with an older version.
+   However, you may simply not be aware that a more recent version is
+   available, and that is what this lint check helps find.
+
+/tmp/build11/DisneyNOWFireTV/Source/app/src/main/AndroidManifest.xml:27: Warning: Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed. [DiscouragedApi]
+            android:screenOrientation="landscape">
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "DiscouragedApi":
+   Discouraged APIs are allowed and are not deprecated, but they may be unfit
+   for common use (e.g. due to slow performance or subtle behavior).
+
+/tmp/build11/DisneyNOWFireTV/Source/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java:233: Warning: Using setJavaScriptEnabled can introduce XSS vulnerabilities into your application, review carefully [SetJavaScriptEnabled]
+        settings.setJavaScriptEnabled(true);
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/build11/DisneyNOWFireTV/Source/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java:382: Warning: Using setJavaScriptEnabled can introduce XSS vulnerabilities into your application, review carefully [SetJavaScriptEnabled]
+            popupSettings.setJavaScriptEnabled(true);
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SetJavaScriptEnabled":
+   Your code should not invoke setJavaScriptEnabled if you are not sure that
+   your app really requires JavaScript support.
+
+   https://goo.gle/SetJavaScriptEnabled
+   https://developer.android.com/training/articles/security-tips
+
+/tmp/build11/DisneyNOWFireTV/Source/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java:1166: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        help.setText("Whole-Page Zoom: 0-500%. Uses WebView-level zoom so the complete rendered page scales together. 0% intentionally hides the page; Menu remains available to restore it. Changes apply without reloading.");
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/tmp/build11/DisneyNOWFireTV/Source/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java:1190: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        Button reset = new Button(this); reset.setText("Reset 100%");
+                                                       ~~~~~~~~~~~~
+
+   Explanation for issues of type "SetTextI18n":
+   When calling TextView#setText
+   * Never call Number#toString() to format numbers; it will not handle
+   fraction separators and locale-specific digits properly. Consider using
+   String#format with proper format specifications (%d or %f) instead.
+   * Do not pass a string literal (e.g. "Hello") to display text. Hardcoded
+   text can not be properly translated to other languages. Consider using
+   Android resource strings instead.
+   * Do not build messages by concatenating text chunks. Such messages can not
+   be properly translated.
+
+   https://developer.android.com/guide/topics/resources/localization.html
+
+0 errors, 13 warnings

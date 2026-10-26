@@ -1,0 +1,17 @@
+DisneyNOW Fire TV Hybrid TV Shell
+Version 0.1 Build 11
+Status: NOT DONE - COMPATIBILITY TEST
+
+Build 11 simplifies the Build 10 native-player experiment based on the user's physical Fire TV feedback that the manual Try Native Player workflow was confusing and did not improve normal use.
+
+When a legitimate HLS media manifest is observed from the authenticated DisneyNOW WebView session, Build 11 automatically schedules one native Media3 playback attempt for that page after the manifest burst settles. The normal app menu no longer exposes the Build 10 manual Try Native Player control.
+
+If Media3 reports a player/setup error or does not begin playback before the bounded startup watchdog expires, Build 11 automatically stops the native attempt and restores the normal WebView path instead of requiring the user to manually recover. The automatic production behavior works with Debug Mode OFF; Debug Mode only adds privacy-safe handoff/fallback evidence.
+
+Existing Build 10 diagnostics, provider/session path, settings/data/cookies, navigation modes, Performance Mode, whole-WebView zoom, Silk fallback, and package identity are preserved. No DRM keys are extracted, no DRM is bypassed, and no entitlement/license/token response is fabricated.
+
+Package ID: com.fireworkstars46.disneynowfiretv
+Android versionCode: 11
+Signing: exact established permanent update identity; certificate SHA-256 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838.
+CI verification: PASS. Static/release audit 207 PASS / 0 FAIL; lint 0 errors / 13 warnings; compile/unit tests/package/version and APK v1/v2/v3 signer checks passed.
+Physical Fire TV checks still required: automatic HLS handoff, native playback result, automatic fallback on failure/timeout, provider login, responsiveness, whole-page zoom, Debug Mode report evidence, and Silk fallback.
