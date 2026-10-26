@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import argparse, base64, hashlib, io, zipfile
+import argparse, hashlib, zipfile
 
 BASE11 = {
     'app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java': 'c06d83dd5d6b5d138ecb4c0fb7b59b78da62f9443ecdeb520744450de3987fd0',
@@ -11,14 +11,14 @@ BASE11 = {
 }
 
 BUILD12 = {
-    'app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java': '396a0f25411290b0518fd5ba946ed659d9044be165bd186d2220bd276e457f9e',
+    'app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java': 'cabdf3ac12c831dc15ad350be75f35387b8eb2195e2aa139077d26cbb0e896f1',
     'app/build.gradle': 'a07d3b4c3051412453615db5b353aa46d8ecc8180ef57064fc52e4100182ae3b',
-    'BUILD_INFO.md': '04c7fc874ca249b1086c5536a1cceffa9bbac83367094c65f0f8dc62e20b4316',
-    'README.md': '324a3932f1c7d54f344825b9a4e7bdc9fbd2e56b0e22dcad8d3e454852b68583',
-    'tools/static_audit.py': 'a8aec826583dbe60a84c1090a9bf530b4b1ec81616f757a78457d8f446e6e395',
+    'BUILD_INFO.md': '60aa05b3553f9bd4243103b4a00f5ff599aba5a47f718c7d526f1226f03549f0',
+    'README.md': 'adefbaf2c51099d6a07d6c411a2d7a4386772cdf06c8b1fe3e797d57851ae401',
+    'tools/static_audit.py': 'a89c1ba6e70250dc3024bd573717a187897a121c12e8ab95891a653812631281',
 }
 
-PATCH_ZIP_SHA256 = '58ed13643b5bbd3497bfaf0ae5c96afaa262834798c2fc8ec34343d847937317'
+PATCH_ZIP_SHA256 = '77273d6dd0eb6a6cc28a7e14c078b2141fcf4bf3856c24d093c5dda966125b98'
 
 
 def sha_bytes(data: bytes) -> str:
@@ -47,18 +47,14 @@ def main() -> None:
     root = Path(args.source).resolve()
     verify(root, BASE11, 'Build 11 baseline')
 
-    payload_path = Path(__file__).resolve().parent / 'patch.b64'
-    if not payload_path.is_file():
-        raise SystemExit('Build 12 patch.b64 is missing')
-    try:
-        payload = base64.b64decode(payload_path.read_text(encoding='ascii'), validate=True)
-    except Exception as exc:
-        raise SystemExit(f'Build 12 patch base64 decode failed: {exc}')
-    if sha_bytes(payload) != PATCH_ZIP_SHA256:
+    patch = Path(__file__).resolve().parent / 'patch.zip'
+    if not patch.is_file():
+        raise SystemExit('Build 12 patch.zip is missing')
+    if sha_file(patch) != PATCH_ZIP_SHA256:
         raise SystemExit('Build 12 patch ZIP SHA-256 mismatch')
 
     expected_paths = set(BUILD12)
-    with zipfile.ZipFile(io.BytesIO(payload), 'r') as zf:
+    with zipfile.ZipFile(patch, 'r') as zf:
         names = set(zf.namelist())
         if names != expected_paths:
             raise SystemExit(f'Build 12 patch ZIP contains unexpected/missing entries: {sorted(names ^ expected_paths)}')
@@ -73,7 +69,7 @@ def main() -> None:
             out.write_bytes(data)
 
     verify(root, BUILD12, 'Build 12 result')
-    print('Build 12 stability rollback/crash-stage patch applied and verified.')
+    print('Build 12 automatic-handoff regression fix and persistent crash-breadcrumb patch applied and verified.')
 
 
 if __name__ == '__main__':
