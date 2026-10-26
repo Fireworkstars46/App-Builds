@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import argparse, hashlib, zipfile
+import argparse, base64, hashlib, io, zipfile
 
 BASE11 = {
     'app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java': 'c06d83dd5d6b5d138ecb4c0fb7b59b78da62f9443ecdeb520744450de3987fd0',
@@ -47,14 +47,21 @@ def main() -> None:
     root = Path(args.source).resolve()
     verify(root, BASE11, 'Build 11 baseline')
 
-    patch = Path(__file__).resolve().parent / 'patch.zip'
-    if not patch.is_file():
-        raise SystemExit('Build 12 patch.zip is missing')
-    if sha_file(patch) != PATCH_ZIP_SHA256:
+    parts_dir = Path(__file__).resolve().parent / 'patch_parts'
+    parts = sorted(parts_dir.glob('part*.b64'))
+    expected_names = [f'part{i:02d}.b64' for i in range(5)]
+    if [p.name for p in parts] != expected_names:
+        raise SystemExit('Build 12 patch payload must contain exactly part00.b64 through part04.b64')
+    encoded = ''.join(p.read_text(encoding='ascii') for p in parts)
+    try:
+        payload = base64.b64decode(encoded, validate=True)
+    except Exception as exc:
+        raise SystemExit(f'Build 12 patch base64 decode failed: {exc}')
+    if sha_bytes(payload) != PATCH_ZIP_SHA256:
         raise SystemExit('Build 12 patch ZIP SHA-256 mismatch')
 
     expected_paths = set(BUILD12)
-    with zipfile.ZipFile(patch, 'r') as zf:
+    with zipfile.ZipFile(io.BytesIO(payload), 'r') as zf:
         names = set(zf.namelist())
         if names != expected_paths:
             raise SystemExit(f'Build 12 patch ZIP contains unexpected/missing entries: {sorted(names ^ expected_paths)}')
