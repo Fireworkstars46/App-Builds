@@ -1,0 +1,46 @@
+name: DisneyNOW Fire TV Build 9 source inspection
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/disneynow-fire-tv-build9-source-inspect.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reconstruct-build8-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out App-Builds
+        uses: actions/checkout@v7
+
+      - name: Reconstruct verified Build 8 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT_DIR="$RUNNER_TEMP/DisneyNOWFireTV/Source"
+          mkdir -p "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/SourceSeed/reconstruct.py --output "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build2/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build4/reconstruct_build3.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build4/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build5/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build6/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build7/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build8/apply.py --source "$PROJECT_DIR"
+          grep -q 'versionCode 8' "$PROJECT_DIR/app/build.gradle"
+          grep -q "buildConfigField 'int', 'APP_BUILD', '8'" "$PROJECT_DIR/app/build.gradle"
+          cp MASTER_RULES.md "$RUNNER_TEMP/DisneyNOWFireTV/MASTER_RULES.md"
+          (cd "$RUNNER_TEMP" && zip -X -qr DisneyNOW-Fire-TV-Build8-Source-for-Build9.zip DisneyNOWFireTV)
+          test -s "$RUNNER_TEMP/DisneyNOW-Fire-TV-Build8-Source-for-Build9.zip"
+
+      - name: Upload reconstructed Build 8 source for Build 9 work
+        uses: actions/upload-artifact@v4
+        with:
+          name: DisneyNOW-Fire-TV-Build8-Source-for-Build9
+          path: ${{ runner.temp }}/DisneyNOW-Fire-TV-Build8-Source-for-Build9.zip
+          if-no-files-found: error
+          retention-days: 7
