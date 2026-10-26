@@ -1,0 +1,122 @@
+name: DisneyNOW Fire TV Build 10 - Publish verified signed APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/disneynow-fire-tv-build10-publish.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Download and verify exact signed Build 10 artifact bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build10-Compatibility-Test'
+          test ! -e "$dir"
+          mkdir -p "$dir" /tmp/build10-signed
+          curl --fail --location --retry 2 --output /tmp/build10-signed.zip 'https://sdmntprbrazilsouth.oaiusercontent.com/files/00000000-0b8c-820e-bded-1fb62ff1ec2a/raw?se=2026-10-26T10%3A16%3A38Z&sp=r&sv=2026-02-06&sr=b&scid=a0b772ce-79fe-574f-b3cf-b5efad3f8e14&skoid=bbd22fc4-f881-4ea4-b2f3-c12033cf6a8b&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-25T23%3A50%3A10Z&ske=2026-10-26T23%3A50%3A10Z&sks=b&skv=2026-02-06&sig=oYkYQmUPcKNZlq40T/pAwuQkkOGsITO7GLcQcNoTkPs%3D'
+          echo '8099ee3316b675032c2916cb86dddba17810f63b17fae55207cfb2bc6298bc31  /tmp/build10-signed.zip' | sha256sum -c -
+          unzip -t /tmp/build10-signed.zip >/dev/null
+          unzip -q /tmp/build10-signed.zip -d /tmp/build10-signed
+          cp /tmp/build10-signed/DisneyNOW-Fire-TV-v0.1-Build10-Permanent-Signed.apk "$dir/"
+          cp /tmp/build10-signed/DisneyNOW-Fire-TV-v0.1-Build10-Source.zip "$dir/"
+          cp /tmp/build10-signed/STATIC-AUDIT-v0.1-Build10.txt "$dir/"
+          cp /tmp/build10-signed/LINT-v0.1-Build10.txt "$dir/"
+          cp /tmp/build10-signed/LINT-v0.1-Build10.html "$dir/"
+          cp /tmp/build10-signed/APKSIGNER-VERIFY-v0.1-Build10.txt "$dir/"
+          cp /tmp/build10-signed/BADGING-v0.1-Build10.txt "$dir/"
+          cp /tmp/build10-signed/VERIFY-v0.1-Build10.txt "$dir/PRIVATE-SIGNING-VERIFY-v0.1-Build10.txt"
+          apk="$dir/DisneyNOW-Fire-TV-v0.1-Build10-Permanent-Signed.apk"
+          echo '247b15f776104b5113aa3a26ffdcfad34f37f2d57fc3470895403d5c2c2e7d3c  '"$apk" | sha256sum -c -
+          echo '07a7c8c33aaffa1a43fa39e948cf292694b5086ac60d530472d61b52d48daa61  '"$dir/DisneyNOW-Fire-TV-v0.1-Build10-Source.zip" | sha256sum -c -
+          echo 'a69e4c31f4ca218c5b3e4acb68ea0ffe0f13011d429f6e7e54069dc1466f7602  '"$dir/STATIC-AUDIT-v0.1-Build10.txt" | sha256sum -c -
+          echo '9f6b23d2c10f0d8008075c7ea9fa0e90fe42ada80e48da8c09de4e0be60b3556  '"$dir/LINT-v0.1-Build10.txt" | sha256sum -c -
+          echo '90c9bc813c299b9b309a1d81f9c9a2a7fe7ac2ac6158a73a3b3aa4ae19c3c238  '"$dir/LINT-v0.1-Build10.html" | sha256sum -c -
+          grep -q 'STATIC TOTAL: PASS=194 FAIL=0' "$dir/STATIC-AUDIT-v0.1-Build10.txt"
+          grep -q 'RESULT: PASS' "$dir/STATIC-AUDIT-v0.1-Build10.txt"
+          grep -q '^0 errors, 13 warnings$' "$dir/LINT-v0.1-Build10.txt"
+          grep -q 'Verified using v1 scheme (JAR signing): true' "$dir/APKSIGNER-VERIFY-v0.1-Build10.txt"
+          grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true' "$dir/APKSIGNER-VERIFY-v0.1-Build10.txt"
+          grep -q 'Verified using v3 scheme (APK Signature Scheme v3): true' "$dir/APKSIGNER-VERIFY-v0.1-Build10.txt"
+          grep -Eqi 'certificate SHA-256 digest: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838' "$dir/APKSIGNER-VERIFY-v0.1-Build10.txt"
+          grep -q "package: name='com.fireworkstars46.disneynowfiretv'" "$dir/BADGING-v0.1-Build10.txt"
+          grep -q "versionCode='10'" "$dir/BADGING-v0.1-Build10.txt"
+          grep -q "versionName='0.1'" "$dir/BADGING-v0.1-Build10.txt"
+
+      - name: Write Build 10 release evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build10-Compatibility-Test'
+          cat > "$dir/BUILD-METADATA.txt" <<'TXT'
+          Project: DisneyNOW Fire TV Hybrid TV Shell
+          Version: 0.1
+          Build: 10
+          Android versionCode: 10
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Public source commit: 7296d3930eccd857da0610c619df553dcd4fbf37
+          Public unsigned CI run: 40304670985
+          Public unsigned artifact ID: 12642415030
+          Public unsigned artifact digest: sha256:9f853d208cd359fbddbd55c7ac26fc74ea1fc615d6be70bd8453f7ad77e0a410
+          Private permanent-signing CI run: 40304930207
+          Private signed artifact ID: 12642475511
+          Private signed artifact digest: sha256:8099ee3316b675032c2916cb86dddba17810f63b17fae55207cfb2bc6298bc31
+          Signed APK SHA-256: 247b15f776104b5113aa3a26ffdcfad34f37f2d57fc3470895403d5c2c2e7d3c
+          Source ZIP SHA-256: 07a7c8c33aaffa1a43fa39e948cf292694b5086ac60d530472d61b52d48daa61
+          Permanent signer certificate SHA-256: 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838
+          CI static/release audit: 194 PASS / 0 FAIL
+          Lint: 0 errors / 13 warnings
+          Signing backup/recovery gate: PASS.
+          Publication status: NOT DONE - COMPATIBILITY TEST pending physical Fire TV testing.
+          TXT
+          cat > "$dir/RELEASE-STATUS.txt" <<'TXT'
+          DisneyNOW Fire TV Hybrid TV Shell
+          Version 0.1 Build 10
+          Status: NOT DONE - COMPATIBILITY TEST
+
+          Build 10 is a targeted follow-up to the Build 9 physical debug report. The report showed repeated DisneyNOW HLS manifest detection while the WebView playback attempt failed, but no native-player attempt had been captured. Build 10 keeps the existing user-triggered Media3 path and adds privacy-safe visibility into the HLS/DASH -> native-player handoff.
+
+          New diagnostics include native-handoff readiness/attempt/player-create/prepare counters, a handoff-stage state machine, manifest host/type/age, safe session-context presence indicators, post-manifest non-GET host/method/content-type category counters, and Media3 error code plus exception class chain only. No cookies, tokens, request bodies, full protected-media/license URLs, DRM keys, or typed text are exported. WebView remote debugging remains disabled.
+
+          The Menu item now shows whether Try Native Player is waiting for a detected stream or ready with HLS/DASH. The first detected HLS/DASH stream per page can show a one-time hint directing the user to Menu > Try Native Player after WebView playback failure. Native playback remains user-triggered; Build 10 does not automatically hijack playback.
+
+          Package ID: com.fireworkstars46.disneynowfiretv
+          Android versionCode: 10
+          Signing: exact established permanent update identity; certificate SHA-256 2f4b3c694fc2865668d604fe5542f6cb183f1a1487908e873c98fca34c0fd838.
+          CI verification: PASS. Static/release audit 194 PASS / 0 FAIL; lint 0 errors / 13 warnings; compile/unit tests/package/version and APK v1/v2/v3 signer checks passed.
+          Physical Fire TV checks still required: install over Build 9, reproduce WebView playback failure, confirm detected-stream hint/menu readiness, invoke Try Native Player, observe playback/error behavior, export the Build 10 debug report, and verify responsiveness/provider auth/zoom/fallback behavior.
+          TXT
+          (cd "$dir" && sha256sum \
+            DisneyNOW-Fire-TV-v0.1-Build10-Permanent-Signed.apk \
+            DisneyNOW-Fire-TV-v0.1-Build10-Source.zip \
+            STATIC-AUDIT-v0.1-Build10.txt \
+            LINT-v0.1-Build10.txt \
+            LINT-v0.1-Build10.html \
+            APKSIGNER-VERIFY-v0.1-Build10.txt \
+            BADGING-v0.1-Build10.txt \
+            PRIVATE-SIGNING-VERIFY-v0.1-Build10.txt \
+            BUILD-METADATA.txt \
+            RELEASE-STATUS.txt > SHA256SUMS.txt)
+
+      - name: Commit verified Build 10 release archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='DisneyNOWFireTV/Releases/v0.1-Build10-Compatibility-Test'
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$dir/"
+          git commit -m 'Publish verified DisneyNOW Fire TV v0.1 Build 10 APK'
+          git push origin HEAD:main
