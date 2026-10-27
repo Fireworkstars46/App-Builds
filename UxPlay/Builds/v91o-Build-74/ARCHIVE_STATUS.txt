@@ -1,0 +1,28 @@
+UxPlay Quality Launcher Full — v91o Build 74
+Archive status: INCOMPLETE / PENDING
+
+Verified final local source package:
+- UxPlay_V91O_Build_74_Visible_Pin_Button.zip
+- SHA-256: 512002d0ffcd7568dade8f88f56a8464fe4a8790a3b1289a82b808d38098ec23
+- ZIP integrity test: PASS
+
+Archived to GitHub:
+- README / release notes: YES
+- Static audit report: YES
+- SHA-256 record: YES
+- Archive status record: YES
+
+Not yet permanently archived:
+- Exact source ZIP binary: NO. The available GitHub connector in this session supports text/content commits but does not expose a suitable direct local binary/release-asset upload action for preserving the exact ZIP bytes. This is therefore reported as INCOMPLETE rather than claiming archival success.
+- Compiled Windows installer: NOT BUILT / NOT AVAILABLE yet.
+
+Validation status:
+- Source static audit: PASS 30/30
+- Source ZIP integrity: PASS
+- Windows C# compile: NOT TESTED
+- Inno Setup installer build: NOT TESTED
+- Live iPhone/AirPlay Wi-Fi renderer: NOT TESTED
+- Native title-bar drag/minimize/maximize/close/edge resize: NOT TESTED in this environment
+- Visible one-click Pin/Unpin button: source/static PASS; real click/topmost behavior NOT TESTED
+
+Final status: NOT DONE / PENDING. Requires Windows build, live runtime validation, and permanent archival of the exact applicable release artifacts before DONE.
