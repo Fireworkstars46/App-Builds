@@ -1,0 +1,42 @@
+PASS - Build 76 identity
+PASS - Installer Build 76 identity
+PASS - Stable AppId
+PASS - Per-user install
+PASS - Main BAT targets Build 76
+PASS - Generic builder targets Build 76
+PASS - No inherited DONE evidence
+PASS - Native Wi-Fi sizable frame preserved
+PASS - Native Windows control box preserved
+PASS - Custom/fake title strip remains disabled
+PASS - Build 75 floating title-bar overlay removed
+PASS - Native non-client pin enabled
+PASS - Pin paints inside app-owned caption
+PASS - Pin click does not replace native drag hit-test
+PASS - Pin does not reserve or cover Windows buttons
+PASS - Caption minimum width protects drag/buttons
+PASS - Pin uses shared production setter
+PASS - Persistent host is primary pin target
+PASS - Pin state updates system menu + painted button
+PASS - Wi-Fi title-bar pin regression gate
+PASS - No native-titlebar injection in Build 76 build path
+PASS - Embedded renderer remains borderless child
+PASS - First-connect anti-flash polling preserved
+PASS - Atomic renderer attach preserved
+PASS - Wi-Fi native-window regression gate preserved
+PASS - Section-only test engine preserved
+PASS - Wi-Fi FPS control preserved
+PASS - Stable-mode FPS opt-in default OFF
+PASS - Firewall repair preserved
+PASS - Runtime self-repair preserved
+PASS - Direct USB manual phone wait preserved
+PASS - Direct USB keep-waiting preserved
+PASS - Build 76 Direct USB runtime names
+PASS - Direct USB runtime log identity advanced
+PASS - No File Explorer auto-open in main BAT
+PASS - One final pause in main BAT
+PASS - C# braces balanced - balance=0, min=0
+PASS - Python syntax
+
+TOTAL: 38/38 PASS
+
+Windows C# compile / Inno installer / live AirPlay / drag / native-caption pin / caption-button visibility: NOT TESTED in the ChatGPT environment.
