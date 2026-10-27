@@ -1,0 +1,107 @@
+PASS - Build 85 numeric identity
+PASS - Build 85 display identity
+PASS - Installer Build 85 version
+PASS - Installer Build 85 filename
+PASS - Stable AppId preserved
+PASS - Per-user install preserved
+PASS - Main BAT targets Build 85
+PASS - Main BAT success banner Build 85
+PASS - Main BAT installer filename Build 85
+PASS - Generic builder targets Build 85
+PASS - Build status is pending
+PASS - README states live validation pending
+PASS - No stale Build 84 installer output in current ISS
+PASS - No stale Build 84 installer output in main BAT
+PASS - Build 85 runtime names in launcher
+PASS - Build 85 runtime names in builder
+PASS - Backend final exit identity Build 85
+PASS - Prompt function exists
+PASS - Dedicated prompt Thread created
+PASS - Dedicated prompt thread is background
+PASS - Dedicated prompt thread named
+PASS - Dedicated prompt thread apartment is STA
+PASS - Dedicated prompt owns Application.Run loop
+PASS - No launcher Application.DoEvents in prompt
+PASS - No ShowDialog in prompt
+PASS - No MessageBox in prompt
+PASS - No DialogResult property race in prompt
+PASS - Single atomic prompt outcome reset
+PASS - OK atomically wins
+PASS - Cancel atomically wins
+PASS - Backend exit atomically wins
+PASS - OK closes on prompt UI thread
+PASS - Cancel closes on prompt UI thread
+PASS - Prompt X maps to cancel only if waiting
+PASS - Prompt stays visible above busy launcher
+PASS - Prompt is not in taskbar
+PASS - Prompt centers from captured owner bounds
+PASS - Prompt is clamped to working area
+PASS - Prompt OK gets initial focus
+PASS - Launcher waits without pumping its UI queue
+PASS - Prompt thread bounded join
+PASS - Prompt startup logged
+PASS - Prompt thread errors logged
+PASS - Prompt launch errors logged
+PASS - Backend-exit auto-close wording present
+PASS - Backend-exit result not acknowledged
+PASS - Only OK reaches acknowledgement save
+PASS - Once-per-build key preserved
+PASS - Once-per-build skip path preserved
+PASS - Acknowledgement write-reload-compare preserved
+PASS - Prompt once-per-Build wording preserved
+PASS - Backend exit handler exists
+PASS - Backend exit shares prompt outcome
+PASS - Backend exit closes prompt via BeginInvoke
+PASS - Backend exit has no DialogResult race
+PASS - Auto prefers verified exact-iPhone libusb0
+PASS - Auto libusb0 readiness precheck preserved
+PASS - Auto exact-parent selection log preserved
+PASS - Short libusb0 settle retry preserved
+PASS - UsbDk fallback preserved
+PASS - Normal libusb fallback preserved
+PASS - Exact-parent libusb0 request preserved
+PASS - Blocking USBMux 90s preflight remains removed
+PASS - Queued async reader startup before protocol object
+PASS - Async reader is 4096 bytes
+PASS - Async reader uses five transfers
+PASS - Only one async-stream enable point
+PASS - Startup log says queued before PING
+PASS - Canonical PING-only ordering preserved
+PASS - Timeout recovery preserved
+PASS - USB persistent host field preserved
+PASS - USB persistent host setup preserved
+PASS - USB persistent native frame preserved
+PASS - USB native min/max/close preserved
+PASS - USB black host preserved
+PASS - USB shell opens before backend
+PASS - USB renderer attach polling 25ms preserved
+PASS - USB temporary renderer hide preserved
+PASS - USB renderer child embedding preserved
+PASS - USB renderer returns to black on disconnect
+PASS - USB renderer bounds persistence preserved
+PASS - USB settings write/reload verification preserved
+PASS - USB Stop auto-save preserved
+PASS - Wi-Fi native sizable frame preserved
+PASS - Wi-Fi native control buttons preserved
+PASS - Wi-Fi fake titlebar remains disabled
+PASS - Wi-Fi MirrorTo-style pin path preserved
+PASS - Wi-Fi pin gray/blue colors preserved
+PASS - Wi-Fi pin primed before first show
+PASS - Wi-Fi no floating overlay preserved
+PASS - No active titlebar DLL injection
+PASS - Wi-Fi renderer child attach preserved
+PASS - Wi-Fi anti-flash 25ms preserved
+PASS - Wi-Fi FPS control preserved
+PASS - Stable FPS opt-in default OFF
+PASS - Firewall repair preserved
+PASS - Wi-Fi runtime self-repair preserved
+PASS - Direct USB section-only scope preserved
+PASS - Bounded USB backend tail preserved
+PASS - Important USB backend lines mirrored
+PASS - Backend exit summary preserved
+PASS - No File Explorer auto-open in main BAT
+PASS - One final pause in main BAT
+PASS - C# braces balanced - balance=0, min=0
+PASS - USB backend Python syntax
+
+TOTAL: 105/105 PASS
