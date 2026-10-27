@@ -1,0 +1,22 @@
+UxPlay Quality Launcher Full - v91o Build 95
+
+Archive status: METADATA ARCHIVED / EXACT BINARY ZIP PENDING
+
+Archived in this folder:
+- README.txt
+- SHA256.txt
+- STATIC_AUDIT_V91O_BUILD_95_RESULTS.txt
+- ARCHIVE_STATUS.txt
+
+Exact source ZIP produced in this chat:
+UxPlay_V91O_Build_95_Rollback_No_Hybrid_Fail_Fast.zip
+SHA-256: a41b1d6d2fc16efc342cbf05df08685e17d8b9ea8485ecd05054d3a30e0d9f62
+ZIP integrity: PASS
+Static/source audit: 198/198 PASS
+Python backend syntax: PASS
+
+The GitHub connector used here does not safely upload the exact binary ZIP bytes through the text-file archive path. Per MASTER_RULES, the binary archive item remains explicitly PENDING rather than being claimed complete. Do not create another Build only for this archival limitation.
+
+Windows C# compile: NOT TESTED here.
+Real Windows fail-fast behavior: NOT TESTED here.
+Real iPhone mirroring: NOT DONE / pending runtime validation.
