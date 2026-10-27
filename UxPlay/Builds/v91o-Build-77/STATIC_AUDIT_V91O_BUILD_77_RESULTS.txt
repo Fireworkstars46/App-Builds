@@ -1,0 +1,44 @@
+PASS - Build 77 identity
+PASS - Installer Build 77 identity
+PASS - Stable AppId
+PASS - Per-user install
+PASS - Main BAT targets Build 77
+PASS - Generic builder targets Build 77
+PASS - No inherited DONE evidence
+PASS - Native Wi-Fi sizable frame preserved
+PASS - Native Windows control box preserved
+PASS - Custom/fake title strip remains disabled
+PASS - Build 75 floating title-bar overlay absent
+PASS - Build 76 custom caption painting removed
+PASS - Native title-text pin glyph configured
+PASS - Windows owns visible pin rendering
+PASS - Pinned title state mark configured
+PASS - Pin click rectangle is only at leading title glyph
+PASS - Native caption drag path preserved
+PASS - Native caption buttons untouched
+PASS - Caption minimum width protects title/buttons
+PASS - Pin uses shared production setter
+PASS - Persistent host is primary pin target
+PASS - Pin state syncs title and system menu
+PASS - Wi-Fi visible-pin regression gate
+PASS - System-menu Pin fallback preserved
+PASS - No native-titlebar injection in Build 77 build path
+PASS - Embedded renderer remains borderless child
+PASS - First-connect anti-flash polling preserved
+PASS - Atomic renderer attach preserved
+PASS - Wi-Fi native-window regression gate preserved
+PASS - Section-only test engine preserved
+PASS - Wi-Fi FPS control preserved
+PASS - Stable-mode FPS opt-in default OFF
+PASS - Firewall repair preserved
+PASS - Runtime self-repair preserved
+PASS - Direct USB manual phone wait preserved
+PASS - Direct USB keep-waiting preserved
+PASS - Build 77 Direct USB runtime names
+PASS - Direct USB runtime log identity advanced
+PASS - No File Explorer auto-open in main BAT
+PASS - One final pause in main BAT
+PASS - C# braces balanced - balance=0, min=0
+PASS - Python syntax
+
+TOTAL: 42/42 PASS
