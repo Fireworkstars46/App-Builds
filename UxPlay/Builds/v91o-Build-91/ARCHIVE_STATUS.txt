@@ -1,0 +1,20 @@
+UxPlay Quality Launcher Full - v91o Build 91
+
+Local source ZIP: UxPlay_V91O_Build_91_Libusb0_No_Startup_Halt_Clear.zip
+SHA-256: 19292591fe6ca8c02575a7fafa7e8772c43a2cd44b025e0937b2e43ab565e9ca
+ZIP integrity: PASS
+Static audit: 162/162 PASS
+Release notes archived: YES
+Checksum archived: YES
+Static audit archived: YES
+Exact ZIP binary permanently archived in GitHub: NO / PENDING (connector supports UTF-8 text content, not exact binary ZIP bytes)
+Compiled Windows installer: NOT BUILT in this environment
+Windows C# compile: NOT TESTED
+Real Windows helper/UAC execution: NOT TESTED
+Real iPhone PING -> CWPA -> CVRP -> FEED -> H.264: NOT TESTED
+Build 80 Wi-Fi preservation: STATIC PASS
+Build 86 prompt preservation: STATIC PASS
+Build 88/89/90 one-button USB flow preservation: STATIC PASS
+
+Final status: NOT DONE / PENDING runtime validation.
+Do not create another Build solely to complete binary archival.
