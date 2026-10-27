@@ -1,0 +1,18 @@
+UxPlay Quality Launcher Full - v91o Build 89
+
+Local source ZIP: UxPlay_V91O_Build_89_One_Button_USB_No_Wait_Prompts.zip
+Exact SHA-256: e8032c3d7a5440e627affe2122fc36ae7b5a0f4806febfa66031c60a15fdfd6c
+ZIP integrity: PASS (unzip -t: no errors)
+Static/source audit: 152/152 PASS
+Python backend syntax: PASS
+Release notes archived: YES
+Checksum archived: YES
+Static audit summary archived: YES
+Exact ZIP binary permanently archived in GitHub: NO / PENDING connector binary-byte archival
+Compiled Windows installer: NOT BUILT in this environment
+Windows C# compile: NOT TESTED
+Real Direct USB one-click behavior: NOT TESTED
+Real iPhone H.264: NOT TESTED
+
+Status: NOT DONE / PENDING runtime validation and exact binary permanent archive.
+Do not create another Build solely to complete the unchanged Build 89 binary archive.
