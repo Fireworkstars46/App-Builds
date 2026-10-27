@@ -1,0 +1,14 @@
+UxPlay v91o Build 96 archive status
+
+Metadata archive: COMPLETE
+- README.txt archived.
+- SHA256.txt archived.
+- STATIC_AUDIT_V91O_BUILD_96_RESULTS.txt archived.
+
+Exact source ZIP binary archive: PENDING.
+Reason: the available GitHub text/content connector does not provide a safe direct path to upload the already-generated 2.55 MB ZIP as exact binary bytes without re-encoding it through chat/tool payloads. Per project rules, this is reported as pending rather than claiming the binary was archived.
+
+Authoritative local/conversation artifact SHA-256:
+91d22d79159459a7de5cd44f3d21b966ff9b23f110260d2170bdbb1540a11d10  UxPlay_V91O_Build_96_Temporary_AppleLowerFilter_Detach.zip
+
+Runtime status: NOT DONE / pending Windows compile and real iPhone validation, including temporary AppleLowerFilter detach/restore and PING -> CWPA -> CVRP -> FEED -> H.264.
