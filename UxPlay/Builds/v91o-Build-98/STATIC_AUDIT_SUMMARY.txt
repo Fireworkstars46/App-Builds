@@ -1,0 +1,21 @@
+UxPlay v91o Build 98 static audit summary
+
+Result: 230/230 PASS
+
+Key Build 98-specific gates passed:
+- Build 98 numeric/display/installer/runtime identities are consistent.
+- Stable AppId and per-user install scope preserved.
+- Exact Build 97 input checksum documented.
+- Guarded AppleLowerFilter exact-device behavior preserved.
+- Build 95 fail-fast/no-five-minute-freeze behavior preserved.
+- Build 80 known-good Wi-Fi behavior preserved.
+- Corrected LocalApplicationData and Temp Windows-backslash literals are present.
+- Build 97 malformed backslash form is absent.
+- UsbLibUsb0FilterHelper.cs has no newline/EOF C# literal defects.
+- All four C# source files compiled by the Windows builder pass the source-level newline/EOF literal scan.
+- Main launcher/filter helper/QuickTime helper C# brace checks pass.
+- usb_direct_backend.py syntax passes.
+
+ZIP integrity: PASS
+Windows C# compiler execution: NOT TESTED in ChatGPT Linux environment.
+Status: NOT DONE / pending user Windows build and real iPhone validation.
