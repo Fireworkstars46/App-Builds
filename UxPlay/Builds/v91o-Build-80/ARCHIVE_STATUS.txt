@@ -1,0 +1,27 @@
+UxPlay Quality Launcher Full - v91o Build 80
+
+Archive status: INCOMPLETE / PENDING
+
+Archived here:
+- README.md: YES
+- STATIC_AUDIT_V91O_BUILD_80_RESULTS.txt: YES
+- SHA256.txt: YES
+- ARCHIVE_STATUS.txt: YES
+
+Exact source ZIP:
+- Local artifact: UxPlay_V91O_Build_80_Immediate_MirrorTo_Pin.zip
+- SHA-256: 442bce8a146f6facf787753730c27a75696e8312ef4cf84dfe918d781150e468
+- ZIP integrity: PASS
+- Exact ZIP binary permanently archived here: NO
+
+Runtime/build evidence:
+- Static/source audit: PASS 58/58
+- Windows C# compile: NOT TESTED
+- Inno Setup installer build: NOT TESTED
+- Live Wi-Fi/AirPlay: NOT TESTED
+- First-frame pin visibility before any click: NOT TESTED
+- MirrorTo-style icon appearance: NOT TESTED
+- Gray/blue pin state behavior: NOT TESTED
+- Drag/minimize/maximize/resize regression: NOT TESTED
+
+Final status: NOT DONE / PENDING Windows build and live validation.
