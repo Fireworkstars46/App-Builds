@@ -1,0 +1,125 @@
+PASS - Build 87 numeric identity
+PASS - Build 87 display identity
+PASS - Installer Build 87 version
+PASS - Installer Build 87 filename
+PASS - Stable AppId preserved
+PASS - Per-user install preserved
+PASS - Main BAT targets Build 87
+PASS - Main BAT success banner Build 87
+PASS - Main BAT installer filename Build 87
+PASS - Generic builder targets Build 87
+PASS - Build status is pending
+PASS - README states live validation pending
+PASS - No stale Build 84 installer output in current ISS
+PASS - No stale Build 84 installer output in main BAT
+PASS - Build 87 runtime names in launcher
+PASS - Build 87 runtime names in builder
+PASS - Backend final exit identity Build 87
+PASS - Build 87 activation releases pre-transition handle
+PASS - Active activation path does not call persistent fast watcher
+PASS - Active activation path sends only one activation request
+PASS - Fresh re-enumeration polling is 500ms
+PASS - Non-ready polling handles are disposed each loop
+PASS - Dynamic QuickTime subclass/config discovery preserved
+PASS - No hardcoded config 5 requirement in active activation path
+PASS - Activation USB error treated as re-enumeration-compatible
+PASS - Build 87 re-enumeration diagnostic identity
+PASS - QuickTime IN endpoint halt clear added
+PASS - QuickTime OUT endpoint halt clear added
+PASS - Endpoint halt clear uses standard endpoint CLEAR_FEATURE request
+PASS - Endpoint halt clear occurs before first async read
+PASS - GPL reference source not vendored into package
+PASS - README documents independent implementation from GPL reference
+PASS - Prompt function exists
+PASS - Dedicated prompt Thread created
+PASS - Dedicated prompt thread is background
+PASS - Dedicated prompt thread named
+PASS - Dedicated prompt thread apartment is STA
+PASS - Dedicated prompt owns Application.Run loop
+PASS - No launcher Application.DoEvents in prompt
+PASS - No ShowDialog in prompt
+PASS - No MessageBox in prompt
+PASS - No DialogResult property race in prompt
+PASS - Single atomic prompt outcome reset
+PASS - OK atomically wins
+PASS - Cancel atomically wins
+PASS - Backend exit atomically wins
+PASS - OK hides before logging
+PASS - Cancel hides before logging
+PASS - Prompt X maps to cancel only if waiting
+PASS - Prompt stays visible above busy launcher
+PASS - Prompt is not in taskbar
+PASS - Prompt centers from captured owner bounds
+PASS - Prompt is clamped to working area
+PASS - Prompt OK gets initial focus
+PASS - Launcher waits without pumping its UI queue
+PASS - No prompt thread join latency
+PASS - OK visual hide occurs before Close
+PASS - OK log occurs after visual close request
+PASS - Prompt remains dedicated STA
+PASS - Prompt startup logged
+PASS - Prompt thread errors logged
+PASS - Prompt launch errors logged
+PASS - Backend-exit auto-close wording present
+PASS - Backend-exit result not acknowledged
+PASS - Only OK reaches acknowledgement save
+PASS - Once-per-build key preserved
+PASS - Once-per-build skip path preserved
+PASS - Acknowledgement write-reload-compare preserved
+PASS - Prompt once-per-Build wording preserved
+PASS - Backend exit handler exists
+PASS - Backend exit shares prompt outcome
+PASS - Backend exit closes prompt via BeginInvoke
+PASS - Backend exit has no DialogResult race
+PASS - Auto prefers verified exact-iPhone libusb0
+PASS - Auto libusb0 readiness precheck preserved
+PASS - Auto exact-parent selection log preserved
+PASS - Short libusb0 settle retry preserved
+PASS - UsbDk fallback preserved
+PASS - Normal libusb fallback preserved
+PASS - Exact-parent libusb0 request preserved
+PASS - Blocking USBMux 90s preflight remains removed
+PASS - Queued async reader startup before protocol object
+PASS - Async reader is 4096 bytes
+PASS - Async reader uses five transfers
+PASS - Only one async-stream enable point
+PASS - Startup log says queued before PING
+PASS - Canonical PING-only ordering preserved
+PASS - Timeout recovery preserved
+PASS - USB persistent host field preserved
+PASS - USB persistent host setup preserved
+PASS - USB persistent native frame preserved
+PASS - USB native min/max/close preserved
+PASS - USB black host preserved
+PASS - USB shell opens before backend
+PASS - USB renderer attach polling 25ms preserved
+PASS - USB temporary renderer hide preserved
+PASS - USB renderer child embedding preserved
+PASS - USB renderer returns to black on disconnect
+PASS - USB renderer bounds persistence preserved
+PASS - USB settings write/reload verification preserved
+PASS - USB Stop auto-save preserved
+PASS - Wi-Fi native sizable frame preserved
+PASS - Wi-Fi native control buttons preserved
+PASS - Wi-Fi fake titlebar remains disabled
+PASS - Wi-Fi MirrorTo-style pin path preserved
+PASS - Wi-Fi pin gray/blue colors preserved
+PASS - Wi-Fi pin primed before first show
+PASS - Wi-Fi no floating overlay preserved
+PASS - No active titlebar DLL injection
+PASS - Wi-Fi renderer child attach preserved
+PASS - Wi-Fi anti-flash 25ms preserved
+PASS - Wi-Fi FPS control preserved
+PASS - Stable FPS opt-in default OFF
+PASS - Firewall repair preserved
+PASS - Wi-Fi runtime self-repair preserved
+PASS - Direct USB section-only scope preserved
+PASS - Bounded USB backend tail preserved
+PASS - Important USB backend lines mirrored
+PASS - Backend exit summary preserved
+PASS - No File Explorer auto-open in main BAT
+PASS - One final pause in main BAT
+PASS - C# braces balanced - balance=0, min=0
+PASS - USB backend Python syntax
+
+TOTAL: 123/123 PASS
