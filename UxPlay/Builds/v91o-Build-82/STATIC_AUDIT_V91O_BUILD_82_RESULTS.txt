@@ -1,0 +1,81 @@
+PASS - Build 82 identity
+PASS - Installer Build 82 identity
+PASS - Stable AppId preserved
+PASS - Per-user install preserved
+PASS - Main BAT targets Build 82
+PASS - Generic builder targets Build 82
+PASS - No inherited DONE evidence
+PASS - Build 82 runtime identity in C#
+PASS - Build 82 runtime identity in builder
+PASS - Backend log identity Build 82
+PASS - Backend emits final exit code
+PASS - Wi-Fi native sizable frame preserved
+PASS - Wi-Fi native control box preserved
+PASS - Wi-Fi custom/fake title strip remains disabled
+PASS - Wi-Fi native Pin icon path preserved
+PASS - Wi-Fi pin colors preserved
+PASS - Wi-Fi pin primed before first Show
+PASS - Wi-Fi no floating titlebar overlay
+PASS - No active DLL injection/hooking
+PASS - Wi-Fi renderer remains borderless child
+PASS - Wi-Fi anti-flash polling preserved
+PASS - Wi-Fi native-window regression gate preserved
+PASS - Wi-Fi immediate pin visual verification preserved
+PASS - Wi-Fi FPS control preserved
+PASS - Stable-mode FPS opt-in default OFF
+PASS - Firewall repair preserved
+PASS - Wi-Fi runtime self-repair preserved
+PASS - USB persistent native host fields
+PASS - USB persistent host setup exists
+PASS - USB persistent host uses native frame
+PASS - USB host has native Min/Max/Close
+PASS - USB host is black before video
+PASS - USB Start shows persistent shell before backend
+PASS - USB renderer fast attach timer
+PASS - USB temporary renderer hidden immediately
+PASS - USB renderer embedded as child
+PASS - USB atomic/redraw attach
+PASS - USB disconnect returns host to black
+PASS - USB Stop hides persistent shell
+PASS - USB native pin uses shared topmost checkbox
+PASS - USB saved renderer bounds fields
+PASS - USB saved bounds clamped visible
+PASS - USB aspect lock moved to host
+PASS - USB persistent renderer regression gate
+PASS - Once-per-build prompt key
+PASS - Prompt compares saved build to current build
+PASS - Prompt acknowledgement write-reload-compare
+PASS - Prompt skip path after acknowledgement
+PASS - Prompt wording says once per Build
+PASS - iOS prompt ownership documented
+PASS - Direct USB settings write-reload-compare
+PASS - Stop auto-saves USB settings
+PASS - Page close auto-saves USB settings
+PASS - Prompt setting preserved by fresh-read writes
+PASS - Build 81 blocking phone MessageBox removed
+PASS - Project-owned phone prompt exists
+PASS - Prompt OK explicitly closes
+PASS - Prompt Cancel explicitly closes
+PASS - Prompt watches backend exit
+PASS - Backend exit handler closes prompt
+PASS - Backend-exit prompt result is not acknowledged
+PASS - Prompt regression wording updated
+PASS - Private iPhone ID still not saved
+PASS - USB backend tail is bounded
+PASS - Important USB backend lines mirrored to project log
+PASS - Protocol clues included in log filter
+PASS - USB error/hint included in log filter
+PASS - Backend exit summary has code/runtime/tail
+PASS - Backend exited event records summary
+PASS - Live test returns backend exit detail
+PASS - Direct USB section-only scope preserved
+PASS - Direct USB keep-waiting preserved
+PASS - libusb0 exact-parent path preserved
+PASS - UsbDk path preserved
+PASS - Normal libusb advanced path preserved
+PASS - No File Explorer auto-open in main BAT
+PASS - One final pause in main BAT
+PASS - C# braces balanced - balance=0, min=0
+PASS - Python syntax
+
+TOTAL: 79/79 PASS
