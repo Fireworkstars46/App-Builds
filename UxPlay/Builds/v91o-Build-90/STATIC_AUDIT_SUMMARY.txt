@@ -1,0 +1,24 @@
+UxPlay v91o Build 90 static/source audit
+
+TOTAL: 158/158 PASS
+
+Key gates include:
+- Build/package/runtime identity = Build 90
+- stable AppId/per-user install preserved
+- one-button Direct USB prerequisite orchestration preserved
+- no project-owned phone/keep-waiting prompts in Direct USB Test
+- current Windows libusb0 claim-first QuickTime open
+- SET_CONFIGURATION only for -22 configuration-0 repair
+- nonzero alternate setting selected only when required
+- both QuickTime endpoints halt-cleared
+- synchronous large libusb0 bulk reads
+- no live async 5x4096 enable
+- no synthetic timeout reset/PING injection
+- device-originated PING rule preserved
+- stage watchdogs for PING/CWPA/CVRP/FEED
+- persistent USB renderer/settings preserved
+- known-good Wi-Fi native renderer/pin/FPS/firewall/self-repair preserved
+- C# brace checks PASS
+- USB backend Python syntax PASS
+
+Windows C# compile and real iPhone runtime are NOT TESTED.
