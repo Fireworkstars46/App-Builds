@@ -1,0 +1,7 @@
+UxPlay v91o Build 98 baseline provenance
+
+Input artifact: UxPlay_V91O_Build_97_Guarded_AppleLowerFilter_Test.zip
+Input SHA-256: 7fbad19ea2ebbf7845c343473324ecc6f0c35a0382af7fb1b7ccdba42cbdeb9f
+Input ZIP integrity: PASS
+Reason for Build 98: real Windows Build 97 C# compile failure in UsbLibUsb0FilterHelper.cs lines 571-572 (CS1010/CS1012).
+Behavioral delta: none intended beyond fixing the malformed backslash literals and required Build 98 identity/artifact names.
