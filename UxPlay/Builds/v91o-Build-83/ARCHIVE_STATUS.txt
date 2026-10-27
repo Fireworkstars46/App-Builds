@@ -1,0 +1,28 @@
+UxPlay Quality Launcher Full — v91o Build 83
+
+STATUS: NOT DONE / PENDING REAL WINDOWS VALIDATION
+
+Exact source ZIP local name:
+UxPlay_V91O_Build_83_USB_Prompt_Single_Outcome_Fix.zip
+
+SHA-256:
+543391f8cf1edbf26e60c9122f718760d2d87a4079a7571b6fd7b157ee5a27e8
+
+ZIP integrity: PASS
+Static/source audit: 86/86 PASS
+Windows compile: NOT TESTED
+Inno Setup installer build: NOT TESTED
+Live Direct USB: NOT TESTED
+OK-click dismissal: NOT TESTED
+Backend-exit/OK race: NOT TESTED
+Known-good Wi-Fi preservation: source/static checks PASS; live behavior not re-run for Build 83
+
+Permanent archive:
+- README/release notes: YES
+- Checksum: YES
+- Static audit summary: YES
+- Archive status: YES
+- Exact ZIP binary bytes: NO / PENDING (current GitHub connector path used here does not archive the local binary ZIP directly)
+- Compiled Windows installer: NOT BUILT YET
+
+Do not mark Build 83 DONE until the real Windows regression test confirms the prompt closes immediately and USB testing continues normally.
