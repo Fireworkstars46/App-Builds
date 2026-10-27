@@ -1,0 +1,18 @@
+UxPlay v91o Build 99 static/source audit
+
+Result: 235/235 PASS
+
+New Build 99 regression checks include:
+- exact Build 98 baseline SHA-256 provenance;
+- ordinary install/remove backup local renamed to operationBackupPath;
+- ordinary final verification local renamed to finalVerifyReadable;
+- no generic backupPath/verifyReadable redeclaration after the guarded child scopes;
+- Build 98/97 C# literal regression checks retained;
+- all csc-targeted C# sources scanned for newline/EOF literal defects;
+- C# brace-balance checks;
+- USB backend Python syntax;
+- guarded AppleLowerFilter exact-parent safeguards;
+- Build 95 fail-fast behavior;
+- Build 80 known-good Wi-Fi baseline.
+
+Windows C# compilation itself remains NOT TESTED in the Linux build environment and must be validated by the user's Windows build.
