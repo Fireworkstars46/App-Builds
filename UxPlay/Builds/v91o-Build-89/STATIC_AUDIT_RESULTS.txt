@@ -1,0 +1,30 @@
+UxPlay Quality Launcher Full - v91o Build 89
+Static/source audit: 152/152 PASS
+
+Key Build 89 regression gates: PASS
+- Build 89 identity/version/installer/runtime filenames.
+- Stable installer AppId and per-user identity preserved.
+- Direct USB one-button prerequisite repair preserved.
+- Exact selected iPhone parent only; existing libusb0 stack only; UAC not bypassed.
+- Direct USB Test does not call the project-owned phone confirmation prompt.
+- Direct USB Test contains no MessageBox.
+- Direct USB Test contains no Keep Waiting Yes/No dialog.
+- Direct USB Test no longer waits for obsolete USBMUX_PREFLIGHT_RESULT.
+- Automatic wait is bounded to 180-300 seconds (normal 60-second request => 300-second maximum).
+- Renderer success and backend failure are detected automatically.
+- Safety timeout stops/restores USB automatically without another prompt.
+- Build 87 fresh-handle re-enumeration/dynamic subclass-0x2A/endpoint halt-clear behavior preserved.
+- Build 84 5x4096 queued async IN reader, canonical PING ordering, and Windows QT timeout recovery preserved.
+- Persistent black Direct USB renderer/settings preserved.
+- Build 80 known-good Wi-Fi native renderer/titlebar pin/FPS/firewall/runtime-repair behavior preserved.
+- C# structural brace audit PASS.
+- Filter-helper C# structural brace audit PASS.
+- Python backend py_compile syntax PASS.
+
+Environment limits:
+- Windows C# compile: NOT TESTED.
+- Inno installer build: NOT TESTED.
+- Real Windows UAC/helper execution: NOT TESTED for Build 89.
+- Real iPhone one-click flow/H.264: NOT TESTED.
+
+Overall release status: NOT DONE / PENDING runtime validation.
