@@ -1,0 +1,3 @@
+UxPlay_V91O_Build_78_Color_Pin.zip
+SHA-256: b1fa46b892cdc95e438855fc023f1f512c301fbaf8acfd862ca14dce45f8f3d4
+ZIP integrity: PASS — No errors detected in compressed data.
