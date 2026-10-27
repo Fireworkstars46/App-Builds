@@ -1,0 +1,35 @@
+UxPlay Quality Launcher Full - v91o Build 81
+
+ARCHIVE STATUS: INCOMPLETE / PENDING
+BUILD STATUS: NOT DONE / PENDING WINDOWS + LIVE USB TEST
+
+Release source ZIP:
+UxPlay_V91O_Build_81_USB_Persistent_Renderer_Prompt_Persistence.zip
+
+Final SHA-256:
+584f760e2914b86f9155bf8450b03971d4561bbf8479a147e0602e0f5e078ce4
+
+ZIP integrity: PASS
+Static/source audit: PASS 72/72
+
+Archived in this GitHub directory:
+- README.md: YES
+- SHA256.txt: YES
+- STATIC_AUDIT_V91O_BUILD_81_RESULTS.txt: YES
+- ARCHIVE_STATUS.txt: YES
+
+Exact source ZIP binary permanently archived in GitHub: NO / PENDING
+Reason: the currently available GitHub connector does not provide a direct exact local binary-file upload path for this source ZIP in the release workflow used here. Do not treat the text checksum/metadata as a substitute for the ZIP bytes.
+
+Compiled Windows installer: NOT BUILT / NOT ARCHIVED
+Windows C# compile: NOT TESTED
+Inno Setup installer build: NOT TESTED
+Live iPhone Direct USB behavior: NOT TESTED
+Persistent black USB renderer on Windows: NOT TESTED
+Once-per-build launcher reminder persistence: NOT TESTED
+H.264 arrival / renderer embedding: NOT TESTED
+
+Known evidence before Build 81:
+Build 80 Direct USB section-only test failed because the USB backend exited before H.264 arrived. Build 81 adds bounded backend exit/protocol evidence to the normal project log so the next live failure should identify the cause more precisely.
+
+Do not mark Build 81 DONE until the Windows build/install and requested live Direct USB behaviors are verified.
