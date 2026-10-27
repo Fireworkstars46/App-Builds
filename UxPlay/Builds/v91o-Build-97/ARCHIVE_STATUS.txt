@@ -1,0 +1,36 @@
+UxPlay Quality Launcher Full - v91o Build 97 archive status
+
+Release artifact:
+- UxPlay_V91O_Build_97_Guarded_AppleLowerFilter_Test.zip
+- SHA-256: 7fbad19ea2ebbf7845c343473324ecc6f0c35a0382af7fb1b7ccdba42cbdeb9f
+- Exact binary ZIP is available in the originating ChatGPT conversation, but the GitHub text connector does not preserve the binary ZIP directly.
+
+Verified baseline:
+- UxPlay_V91O_Build_95_Rollback_No_Hybrid_Fail_Fast.zip
+- SHA-256: a41b1d6d2fc16efc342cbf05df08685e17d8b9ea8485ecd05054d3a30e0d9f62
+- Build 97 was derived from that exact user-returned Build 95 ZIP.
+
+Source recovery archive:
+- Full Build95 -> Build97 source patch was gzip-compressed, base64 encoded, then split into 8 exact chunks under source-patch-parts/.
+- part01.b64 through part07.b64 are 4000 bytes each.
+- part08.b64 is 3748 bytes.
+- Concatenated base64 size: 31748 bytes.
+- SHA-256 of concatenated base64 text: 0ef0782ec11db11d24ca38c6ada77d2caee8b76182b96dc4a947b7f40f87d082
+- SHA-256 of decoded/decompressed source patch: e0edea2a4e898698166b8fe248db0bc19c33bfb7216cecca69543ee67d88aede
+
+Reconstruction:
+1. Start from the exact Build 95 ZIP above and extract it.
+2. Concatenate source-patch-parts/part01.b64 through part08.b64 in lexical order with no separators/newlines added between parts.
+3. Base64-decode the concatenated text.
+4. Gzip-decompress the result to obtain UxPlay_Build95_to_Build97_SOURCE.patch.
+5. Verify patch SHA-256 e0edea2a4e898698166b8fe248db0bc19c33bfb7216cecca69543ee67d88aede.
+6. Apply the patch to the exact Build 95 source tree.
+
+Audit:
+- STATIC_AUDIT_V91O_BUILD_97_RESULTS.txt: 223/223 PASS.
+- ZIP integrity: PASS before handoff.
+- Windows C# compile: NOT TESTED in Linux environment.
+- Real exact-device AppleLowerFilter detach/restart/restore: NOT TESTED.
+- Real iPhone PING -> CWPA -> CVRP -> FEED -> H.264: NOT TESTED.
+
+Status: NOT DONE / pending Windows + real iPhone validation.
