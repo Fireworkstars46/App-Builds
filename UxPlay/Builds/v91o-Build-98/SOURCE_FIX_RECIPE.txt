@@ -1,0 +1,18 @@
+UxPlay v91o Build 98 source reconstruction recipe
+
+Start from exact released Build 97 source ZIP SHA-256:
+7fbad19ea2ebbf7845c343473324ecc6f0c35a0382af7fb1b7ccdba42cbdeb9f
+
+Required functional source correction in Launcher_Maker/usb_backend_src/UsbLibUsb0FilterHelper.cs, IsSafeRestoreSignalPath():
+
+Build 97 malformed source at former lines 571-572 emitted unterminated Windows-backslash literals.
+Build 98 valid C# source must be:
+
+string local = Path.GetFullPath(
+    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)).TrimEnd('\\') + "\\";
+string temp = Path.GetFullPath(Path.GetTempPath()).TrimEnd('\\') + "\\";
+
+Then apply the established project-wide current-release identity update from Build 97 to Build 98 for launcher display/build number, runtime helper filenames/markers, installer output filename, builder filenames, release docs/audit filenames, and current-build diagnostics. Do not alter guarded AppleLowerFilter behavior, USB protocol behavior, Wi-Fi behavior, AppId, install scope, or security behavior.
+
+Real Build 97 Windows compiler failure being corrected:
+CS1010 newline in constant and CS1012 too many characters in character literal at UsbLibUsb0FilterHelper.cs lines 571-572.
