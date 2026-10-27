@@ -1,0 +1,181 @@
+PASS - Build 92 numeric identity
+PASS - Build 92 display identity
+PASS - Installer Build 92 version
+PASS - Installer Build 92 filename
+PASS - Stable AppId preserved
+PASS - Per-user install preserved
+PASS - Main BAT targets Build 92
+PASS - Main BAT success banner Build 92
+PASS - Main BAT installer filename Build 92
+PASS - Generic builder targets Build 92
+PASS - Build status is pending
+PASS - README states live validation pending
+PASS - No stale Build 84 installer output in current ISS
+PASS - No stale Build 84 installer output in main BAT
+PASS - Build 92 runtime names in launcher
+PASS - Build 92 runtime names in builder
+PASS - Backend final exit identity Build 92
+PASS - Build 92 activation releases pre-transition handle
+PASS - Active activation path does not call persistent fast watcher
+PASS - Active activation path sends only one activation request
+PASS - Fresh re-enumeration polling is 500ms
+PASS - Non-ready polling handles are disposed each loop
+PASS - Dynamic QuickTime subclass/config discovery preserved
+PASS - No hardcoded config 5 requirement in active activation path
+PASS - Activation USB error treated as re-enumeration-compatible
+PASS - Build 92 re-enumeration diagnostic identity
+PASS - Build 92 endpoint-toggle preservation marker exists
+PASS - Build 92 libusb0 startup sends no CLEAR_FEATURE mutation
+PASS - Build 92 startup documents no unconditional halt clear
+PASS - Read-only post-PING endpoint GET_STATUS diagnostics preserved
+PASS - GPL reference source not vendored into active source tree
+PASS - README documents independent implementation from open-source references
+PASS - Build 92 one-button prerequisite function exists
+PASS - Section test calls one-button prerequisite before StartUsbMirror
+PASS - One-button path only auto-repairs Auto selection
+PASS - One-button path exact selected parent required
+PASS - One-button auto repair is narrow-state gated
+PASS - One-button path writes install request directly
+PASS - One-button path invokes elevated helper
+PASS - One-button path has no extra application confirmation MessageBox
+PASS - One-button progress auto-closes
+PASS - One-button waits for post-restart readiness
+PASS - One-button continues automatically when ready
+PASS - One-button fail result is surfaced in section report
+PASS - Helper request supports AutoRestart
+PASS - Helper validates exact Apple physical parent before restart
+PASS - Helper uses exact-device pnputil restart
+PASS - Helper restart remains inside elevated exact-parent helper
+PASS - Helper reports automatic restart result
+PASS - Helper still uses existing libusb0 stack only
+PASS - Helper still rejects non-install/remove operations
+PASS - Helper Build 92 identity
+PASS - Build 92 backend imports subprocess/tempfile for helper handoff
+PASS - Build 92 capture closes normal verification handle before helper activation
+PASS - Build 92 live reference path no longer sends activation 0x52 on pre_handle
+PASS - Build 92 backend invokes sibling activation helper
+PASS - Build 92 helper result is bounded/validated
+PASS - Build 92 helper temp result is deleted
+PASS - Build 92 helper exposes activate-only mode
+PASS - Build 92 helper identifies current build
+PASS - Build 92 helper activation-only mode label
+PASS - Build 92 helper does not reactivate an already QuickTime phone
+PASS - Build 92 helper confirms QuickTime before handoff
+PASS - Build 92 activation-only returns before claim/restore diagnostic path
+PASS - Build 92 helper retains invalidated activation handle until process exit
+PASS - Build 92 backend opens fresh QuickTime handle after helper
+PASS - Build 92 launcher documents helper handoff
+PASS - README documents unchanged PING framing
+PASS - Prompt function exists
+PASS - Dedicated prompt Thread created
+PASS - Dedicated prompt thread is background
+PASS - Dedicated prompt thread named
+PASS - Dedicated prompt thread apartment is STA
+PASS - Dedicated prompt owns Application.Run loop
+PASS - No launcher Application.DoEvents in prompt
+PASS - No ShowDialog in prompt
+PASS - No MessageBox in prompt
+PASS - No DialogResult property race in prompt
+PASS - Single atomic prompt outcome reset
+PASS - OK atomically wins
+PASS - Cancel atomically wins
+PASS - Backend exit atomically wins
+PASS - OK hides before logging
+PASS - Cancel hides before logging
+PASS - Prompt X maps to cancel only if waiting
+PASS - Prompt stays visible above busy launcher
+PASS - Prompt is not in taskbar
+PASS - Prompt centers from captured owner bounds
+PASS - Prompt is clamped to working area
+PASS - Prompt OK gets initial focus
+PASS - Launcher waits without pumping its UI queue
+PASS - No prompt thread join latency
+PASS - OK visual hide occurs before Close
+PASS - OK log occurs after visual close request
+PASS - Prompt remains dedicated STA
+PASS - Prompt startup logged
+PASS - Prompt thread errors logged
+PASS - Prompt launch errors logged
+PASS - Backend-exit auto-close wording present
+PASS - Once-per-build key code retained for compatibility
+PASS - Acknowledgement write-reload-compare code retained
+PASS - Prompt implementation remains available but unused by section test
+PASS - Direct USB Test does not call project phone prompt
+PASS - Direct USB Test has no MessageBox
+PASS - Direct USB Test has no Keep Waiting dialog text
+PASS - Direct USB Test does not wait for obsolete USBMUX preflight result
+PASS - Direct USB Test logs one-button no-popup mode
+PASS - Direct USB Test uses bounded automatic wait
+PASS - Direct USB Test watches backend exit automatically
+PASS - Direct USB Test watches renderer success automatically
+PASS - Direct USB Test auto-stops at hard safety timeout
+PASS - README documents no project-owned wait prompts
+PASS - README distinguishes unavoidable OS/iOS prompts
+PASS - Backend exit handler exists
+PASS - Backend exit shares prompt outcome
+PASS - Backend exit closes prompt via BeginInvoke
+PASS - Backend exit has no DialogResult race
+PASS - Auto prefers verified exact-iPhone libusb0
+PASS - Auto libusb0 readiness precheck preserved
+PASS - Auto exact-parent selection log preserved
+PASS - Short libusb0 settle retry preserved
+PASS - UsbDk fallback preserved
+PASS - Normal libusb fallback preserved
+PASS - Exact-parent libusb0 request preserved
+PASS - Blocking USBMux 90s preflight remains removed
+PASS - Build 92 claim-first QuickTime open
+PASS - Build 92 configuration repair only on -22
+PASS - Build 92 post-repair single re-claim
+PASS - Build 92 nonzero alternate selection only
+PASS - Build 92 synchronous large reader selected
+PASS - Build 92 no live async-stream enable call
+PASS - Build 92 no synthetic timeout PING/reset traffic
+PASS - Canonical PING-only ordering preserved
+PASS - Build 92 phone-originated PING rule logged
+PASS - Build 92 no-PING watchdog
+PASS - Build 92 post-PING CWPA watchdog
+PASS - Build 92 post-CWPA CVRP watchdog
+PASS - Build 92 post-CVRP FEED watchdog
+PASS - Build 92 canonical PING bytes preserved
+PASS - Build 92 PING reply remains handler-owned only
+PASS - Build 92 CWPA watchdog remains bounded
+PASS - Build 92 no forced timeout reset traffic
+PASS - USB persistent host field preserved
+PASS - USB persistent host setup preserved
+PASS - USB persistent native frame preserved
+PASS - USB native min/max/close preserved
+PASS - USB black host preserved
+PASS - USB shell opens before backend
+PASS - USB renderer attach polling 25ms preserved
+PASS - USB temporary renderer hide preserved
+PASS - USB renderer child embedding preserved
+PASS - USB renderer returns to black on disconnect
+PASS - USB renderer bounds persistence preserved
+PASS - USB settings write/reload verification preserved
+PASS - USB Stop auto-save preserved
+PASS - Wi-Fi native sizable frame preserved
+PASS - Wi-Fi native control buttons preserved
+PASS - Wi-Fi fake titlebar remains disabled
+PASS - Wi-Fi MirrorTo-style pin path preserved
+PASS - Wi-Fi pin gray/blue colors preserved
+PASS - Wi-Fi pin primed before first show
+PASS - Wi-Fi no floating overlay preserved
+PASS - No active titlebar DLL injection
+PASS - Wi-Fi renderer child attach preserved
+PASS - Wi-Fi anti-flash 25ms preserved
+PASS - Wi-Fi FPS control preserved
+PASS - Stable FPS opt-in default OFF
+PASS - Firewall repair preserved
+PASS - Wi-Fi runtime self-repair preserved
+PASS - Direct USB section-only scope preserved
+PASS - Bounded USB backend tail preserved
+PASS - Important USB backend lines mirrored
+PASS - Backend exit summary preserved
+PASS - No File Explorer auto-open in main BAT
+PASS - One final pause in main BAT
+PASS - C# braces balanced - balance=0, min=0
+PASS - Filter helper C# braces balanced - balance=0, min=0
+PASS - QuickTime helper C# braces balanced - balance=0, min=0
+PASS - USB backend Python syntax
+
+TOTAL: 179/179 PASS
