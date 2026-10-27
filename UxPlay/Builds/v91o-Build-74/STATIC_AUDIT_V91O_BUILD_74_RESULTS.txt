@@ -1,0 +1,32 @@
+PASS - Build 74 identity
+PASS - Installer Build 74 identity
+PASS - Stable AppId
+PASS - Per-user install
+PASS - Main BAT targets Build 74
+PASS - Generic builder targets Build 74
+PASS - No inherited DONE evidence
+PASS - Native Wi-Fi sizable frame
+PASS - Native Windows control box
+PASS - Visible one-click Wi-Fi pin button
+PASS - Pin uses shared production setter
+PASS - Custom hit-test disabled
+PASS - Native resize owns client edge
+PASS - Embedded renderer remains child
+PASS - First-connect anti-flash polling
+PASS - Atomic attach preserved
+PASS - Wi-Fi window regression gate
+PASS - Section-only test engine preserved
+PASS - Wi-Fi FPS control preserved
+PASS - Stable-mode FPS opt-in default OFF
+PASS - Firewall repair preserved
+PASS - Runtime self-repair preserved
+PASS - Direct USB manual phone wait preserved
+PASS - Direct USB keep-waiting preserved
+PASS - Build 74 Direct USB runtime names
+PASS - Direct USB runtime log identity advanced
+PASS - No File Explorer auto-open in main BAT
+PASS - One final pause in main BAT
+PASS - C# braces balanced - balance=0, min=0
+PASS - Python syntax
+
+TOTAL: 30/30 PASS
