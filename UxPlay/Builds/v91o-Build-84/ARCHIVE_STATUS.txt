@@ -1,0 +1,25 @@
+UxPlay Quality Launcher Full - v91o Build 84
+
+SOURCE ZIP
+Local filename: UxPlay_V91O_Build_84_USB_Queued_Handshake_Fix.zip
+SHA-256: ef4c7585429df77b50c38cc195512653351f8deaefa9669631e2522d7ceadb76
+ZIP integrity: PASS
+
+ARCHIVE CONTENT
+Release notes: YES
+Static audit: YES (98/98 PASS)
+Checksum: YES
+Exact ZIP binary permanently archived in GitHub: NO / PENDING
+Compiled Windows installer: NOT BUILT
+
+VALIDATION
+Windows C# compile: NOT TESTED
+Inno Setup installer build: NOT TESTED
+Live Direct USB config-5/CWPA/H.264: NOT TESTED
+Build 83 prompt fix preserved by static audit: PASS
+Build 80 Wi-Fi known-good path preserved by static audit: PASS
+
+FINAL STATUS
+NOT DONE / PENDING Windows build + real iPhone Direct USB validation.
+
+Do not reconstruct or relabel this Build 84 ZIP later. If the source artifact is lost and a code correction is required, use the next Build number.
