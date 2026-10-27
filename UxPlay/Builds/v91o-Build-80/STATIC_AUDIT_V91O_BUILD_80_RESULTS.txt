@@ -1,0 +1,60 @@
+PASS - Build 80 identity
+PASS - Installer Build 80 identity
+PASS - Stable AppId
+PASS - Per-user install
+PASS - Main BAT targets Build 80
+PASS - Generic builder targets Build 80
+PASS - No inherited DONE evidence
+PASS - No active Build 79 runtime identity remains
+PASS - C# active runtime identity advanced
+PASS - Native Wi-Fi sizable frame preserved
+PASS - Native Windows control box preserved
+PASS - Custom/fake title strip remains disabled
+PASS - No floating title-bar overlay
+PASS - No custom caption paint path
+PASS - No native-titlebar DLL injection in active build path
+PASS - Native small icon is Pin button
+PASS - Unpinned pin is gray
+PASS - Pinned pin is MirrorTo blue
+PASS - MirrorTo reference alpha silhouette embedded
+PASS - Same pin shape for both states
+PASS - Pin graphic is converted to real HICON
+PASS - Pin primed before HWND creation
+PASS - Launcher icon no longer overwrites native Pin before Show
+PASS - Handle-created path re-applies primed Pin
+PASS - First caption paint gets bounded redraw
+PASS - Pin redraw is event/state driven, not timer loop
+PASS - Shown state is recorded
+PASS - Pin state updates Form.Icon
+PASS - Pin state updates native ICON_SMALL/SMALL2
+PASS - Pin visual update is state/handle bounded
+PASS - Pin icon cleanup is bounded
+PASS - Pin click limited to native system-icon hit target
+PASS - Native caption drag path preserved
+PASS - Native caption buttons untouched
+PASS - Caption minimum width preserved
+PASS - Pin uses shared production setter
+PASS - Persistent host remains primary pin target
+PASS - Pin state syncs icon and system menu
+PASS - System-menu Pin fallback preserved
+PASS - Wi-Fi first-frame pin regression gate
+PASS - Wi-Fi test asks for immediate visual verification
+PASS - Embedded renderer remains borderless child
+PASS - First-connect anti-flash polling preserved
+PASS - Atomic renderer attach preserved
+PASS - Wi-Fi native-window regression gate preserved
+PASS - Section-only test engine preserved
+PASS - Wi-Fi FPS control preserved
+PASS - Stable-mode FPS opt-in default OFF
+PASS - Firewall repair preserved
+PASS - Runtime self-repair preserved
+PASS - Direct USB manual phone wait preserved
+PASS - Direct USB keep-waiting preserved
+PASS - Build 80 Direct USB runtime names
+PASS - Direct USB runtime log identity advanced
+PASS - No File Explorer auto-open in main BAT
+PASS - One final pause in main BAT
+PASS - C# braces balanced - balance=0, min=0
+PASS - Python syntax
+
+TOTAL: 58/58 PASS
