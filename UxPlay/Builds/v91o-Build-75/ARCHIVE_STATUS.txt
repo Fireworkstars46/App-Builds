@@ -1,0 +1,29 @@
+UxPlay Quality Launcher Full — v91o Build 75
+Archive status: INCOMPLETE / PENDING
+
+Verified final local source package:
+- UxPlay_V91O_Build_75_Titlebar_Pin_Button.zip
+- SHA-256: 1d940dbca354f468912d8c5991d6f99a73a6599de672c4c7b11594f9b11ec917
+- ZIP integrity test: PASS
+
+Archived to GitHub:
+- README / release notes: YES
+- Static audit report: YES
+- SHA-256 record: YES
+- Archive status record: YES
+
+Not yet permanently archived:
+- Exact source ZIP binary: NO / PENDING.
+- Compiled Windows installer: NOT BUILT / NOT AVAILABLE yet.
+
+Validation status:
+- Source static audit: PASS 36/36
+- Source ZIP integrity: PASS
+- Windows C# compile: NOT TESTED
+- Inno Setup installer build: NOT TESTED
+- Live iPhone/AirPlay Wi-Fi renderer: NOT TESTED
+- Title-bar pin placement/follow behavior: NOT TESTED
+- Pin click/topmost synchronization: NOT TESTED
+- Native title-bar drag/minimize/maximize/close/edge resize regression: NOT TESTED
+
+Final status: NOT DONE / PENDING. Requires Windows build/live validation and permanent archival of exact applicable release artifacts before DONE.
