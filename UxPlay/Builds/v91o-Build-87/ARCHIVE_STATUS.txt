@@ -1,0 +1,25 @@
+UxPlay Quality Launcher Full - v91o Build 87
+
+Archive status: INCOMPLETE / PENDING
+
+Recorded source ZIP name:
+UxPlay_V91O_Build_87_Airplaya_USB_Reenumeration_Halt_Clear.zip
+
+SHA-256:
+ac16dff8283bb003ceab072d0bc71e26402d7c92de31bf818c7e82e45bc334df
+
+Validation recorded:
+- Static/source audit: 123/123 PASS
+- ZIP integrity: PASS
+- Windows C# compile: NOT TESTED
+- Inno Setup installer build: NOT TESTED
+- Real iPhone re-enumeration to QuickTime/subclass 0x2A: NOT TESTED
+- Endpoint halt-clear behavior on Windows: NOT TESTED
+- CWPA/CVRP/FEED/H.264 live mirror: NOT TESTED
+
+Permanent binary archive:
+- Exact source ZIP bytes in GitHub repository: NO / PENDING. The available GitHub connector in this session does not expose a branch-updating binary file upload path for the local ZIP.
+- Compiled installer: NOT BUILT.
+
+Do not create another build solely to complete archival.
+Build 87 remains NOT DONE pending Windows and real-iPhone validation.
