@@ -1,0 +1,40 @@
+PASS - Build 73 identity
+PASS - Installer Build 73 identity
+PASS - Stable AppId
+PASS - Per-user install
+PASS - Main BAT targets Build 73
+PASS - Generic builder targets Build 73
+PASS - No inherited DONE evidence
+PASS - Native Wi-Fi sizable frame
+PASS - Native Windows control box
+PASS - Custom hit-test disabled
+PASS - Native resize owns client edge
+PASS - Embedded renderer remains child
+PASS - First-connect anti-flash polling
+PASS - Atomic attach preserved
+PASS - Wi-Fi window regression gate
+PASS - Section-only test engine preserved
+PASS - Wi-Fi FPS control preserved
+PASS - Stable-mode FPS opt-in default OFF
+PASS - Firewall repair preserved
+PASS - Runtime self-repair preserved
+PASS - Direct USB manual phone wait preserved
+PASS - Direct USB keep-waiting preserved
+PASS - Build 73 Direct USB runtime names
+PASS - Direct USB runtime log identity advanced
+PASS - No File Explorer auto-open in main BAT
+PASS - One final pause in main BAT
+PASS - C# braces balanced - balance=0, min=0
+PASS - Python syntax
+
+TOTAL: 28/28 PASS
+
+Environment-limited checks
+==========================
+NOT TESTED - Windows C# compile: no Windows .NET Framework csc.exe is available in this Linux build container.
+NOT TESTED - Inno Setup installer build: Windows/Inno build environment is not available here.
+NOT TESTED - Live Wi-Fi/iPhone renderer: requires the user's Windows PC + iPhone/AirPlay session.
+NOT TESTED - Actual OS title-bar drag/minimize/maximize/edge resize: requires Windows runtime interaction.
+NOT TESTED - First-connect flash timing on real GStreamer Direct3D11 window: requires live Windows/AirPlay runtime.
+
+Status: SOURCE PACKAGE STATIC AUDIT PASS; runtime/release verification pending Windows build + live test.
