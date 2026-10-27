@@ -1,0 +1,3 @@
+UxPlay_V91O_Build_82_USB_Prompt_Dismiss_Fix.zip
+SHA-256: f5f2ddf227880d74793af737fb2464664e5ab1f7df976389a110bcdf6bd35da2
+ZIP integrity: PASS
