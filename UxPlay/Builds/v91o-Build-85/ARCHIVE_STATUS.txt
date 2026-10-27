@@ -1,0 +1,25 @@
+UxPlay Quality Launcher Full — v91o Build 85
+
+Archive status: INCOMPLETE / PENDING
+
+Archived in GitHub:
+- README.md: YES
+- STATIC_AUDIT_V91O_BUILD_85_RESULTS.txt: YES
+- SHA256.txt: YES
+- ARCHIVE_STATUS.txt: YES
+
+Exact source ZIP binary:
+- UxPlay_V91O_Build_85_USB_Prompt_STA_Fix.zip
+- SHA-256: 8710c1a58a18544c565725cd72372e88516ce1392095062ffa48a0c4afc34ffb
+- ZIP integrity: PASS
+- Exact binary permanently archived through connector: NO
+
+Runtime validation:
+- Static/source audit: 105/105 PASS
+- Windows compile: NOT TESTED
+- Installer build: NOT TESTED
+- Real Direct USB OK-button responsiveness: NOT TESTED
+- Live iPhone CWPA/H.264: NOT TESTED
+
+Final release status: NOT DONE / PENDING
+Reason: Build 85 must be built and tested on the user's Windows PC. The GitHub connector used here does not provide a direct exact-binary file upload action for this local ZIP, so binary archival is not claimed complete.
