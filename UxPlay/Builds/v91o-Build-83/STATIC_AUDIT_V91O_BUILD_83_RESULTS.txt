@@ -1,0 +1,28 @@
+UxPlay v91o Build 83 static/source regression audit
+
+RESULT: 86/86 PASS
+
+Key gates passed:
+- Build 83 identity and installer/runtime filenames advanced correctly.
+- Stable AppId and per-user install identity preserved.
+- Known-good Build 80 Wi-Fi native frame, title-bar pin, FPS, anti-flash, firewall repair, and runtime self-repair preserved.
+- Build 81 persistent black Direct USB renderer, native frame, saved bounds, auto-save, and fast in-place attach preserved.
+- Once-per-build Direct USB phone-prompt acknowledgement persistence preserved.
+- Build 82 modal ShowDialog/DialogResult path removed from the Direct USB phone reminder.
+- Build 83 reminder is modeless.
+- OK, Cancel/X, and backend-exit use one atomic first-wins outcome.
+- No prompt DialogResult assignments remain in the Build 83 reminder path.
+- OK/Cancel/backend-exit each hide/close through the shared outcome path.
+- Backend-exit cannot overwrite an OK outcome or be falsely persisted as acknowledgement.
+- Important USB backend lines and bounded exit-tail diagnostics preserved.
+- Direct USB section-only scope and keep-waiting flow preserved.
+- No File Explorer auto-open; one final BAT pause.
+- C# braces balanced.
+- Python syntax PASS.
+
+Environment-limited checks NOT TESTED:
+- Windows .NET Framework C# compile
+- Inno Setup installer build
+- Live iPhone Direct USB mirroring
+- Real OK-click dismissal on Windows
+- Real backend-exit/OK race behavior
