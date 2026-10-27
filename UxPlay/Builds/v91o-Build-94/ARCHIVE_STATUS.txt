@@ -1,0 +1,19 @@
+UxPlay Quality Launcher Full - v91o Build 94
+
+Local source ZIP: UxPlay_V91O_Build_94_Hybrid_Libusb0_Activate_UsbDk_Stream.zip
+SHA-256: ca37a8054788af70e1fa632d1690706a5cfcaadf20d9861e0de745f150be98be
+ZIP integrity: PASS
+Static audit: 209/209 PASS
+Release notes archived: YES
+Checksum archived: YES
+Static audit archived: YES
+Exact ZIP binary permanently archived in GitHub: NO / PENDING (connector text APIs do not safely preserve the exact binary ZIP bytes here)
+Windows C# compile: NOT TESTED
+Real Windows hybrid libusb0-activation -> UsbDk-stream handoff: NOT TESTED
+Real iPhone PING -> CWPA -> CVRP -> FEED -> H.264: NOT TESTED
+Build 80 Wi-Fi preservation: STATIC PASS
+One-button Direct USB flow preservation: STATIC PASS
+Apple driver/filter mutation in Build 94: NONE
+
+Final status: NOT DONE / PENDING runtime validation.
+Do not create another Build solely to complete binary archival.
