@@ -1,0 +1,26 @@
+UxPlay Quality Launcher Full — v91o Build 82
+
+Release status: NOT DONE / PENDING
+
+Local/source package:
+- UxPlay_V91O_Build_82_USB_Prompt_Dismiss_Fix.zip
+- SHA-256: f5f2ddf227880d74793af737fb2464664e5ab1f7df976389a110bcdf6bd35da2
+- ZIP integrity: PASS
+
+Validation:
+- Static/source audit: 79/79 PASS
+- Windows C# compile: NOT TESTED
+- Inno Setup installer build: NOT TESTED
+- Live Direct USB / iPhone: NOT TESTED
+- Build 81 stuck-prompt regression (OK dismiss + backend-exit auto-close): NOT TESTED on Windows
+- Known-good Build 80 Wi-Fi path preservation: static checks PASS; live regression retest not repeated here
+
+Archive contents:
+- README.md: YES
+- STATIC_AUDIT_V91O_BUILD_82_RESULTS.txt: YES
+- SHA256.txt: YES
+- ARCHIVE_STATUS.txt: YES
+- Exact Build 82 ZIP binary: NO / PENDING (current GitHub text connector does not directly ingest the local ZIP file bytes)
+- Compiled Windows installer: NOT BUILT
+
+Do not call Build 82 DONE until Windows build and live Direct USB regression testing pass. Do not create another Build solely for archival completion.
