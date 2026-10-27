@@ -1,0 +1,21 @@
+UxPlay Quality Launcher Full - v91o Build 88
+
+Metadata archive: COMPLETE
+- README.md archived
+- SHA256.txt archived
+- STATIC_AUDIT.txt archived
+
+Exact release ZIP binary: PENDING PERMANENT ARCHIVE
+Reason: this GitHub connector path is text-oriented and the exact 2,605,673-byte ZIP was not uploaded through it. Do not reconstruct or pretend an equivalent ZIP is the historical original.
+
+Exact local release ZIP SHA-256:
+f12b5dd4d300090ec87f23c1a333e53385d44eed340a96f40c861f9a7f2b307d
+
+Runtime validation: NOT DONE / PENDING
+- Windows compile/installer build: NOT TESTED
+- UAC/elevated helper: NOT TESTED
+- automatic exact-iPhone PnP restart: NOT TESTED
+- real iPhone QuickTime/subclass-0x2A transition: NOT TESTED
+- H.264 live mirror: NOT TESTED
+
+Do not create a new Build solely to complete permanent binary archival.
