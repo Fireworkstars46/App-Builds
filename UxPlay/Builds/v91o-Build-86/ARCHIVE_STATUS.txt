@@ -1,0 +1,19 @@
+UxPlay Quality Launcher Full - v91o Build 86
+
+Exact source ZIP local filename: UxPlay_V91O_Build_86_USB_Prompt_Instant_Dismiss.zip
+SHA-256: 50d0a8ed083aee5592b3a48fa7a1e860bfd3fef0bbad87de9235a33c336056d4
+ZIP bytes: 2539571
+ZIP integrity: PASS
+Static/source audit: 108/108 PASS
+Windows compile: NOT TESTED
+Inno installer build: NOT TESTED
+Live Direct USB/iPhone test: NOT TESTED
+Actual OK/Cancel visual latency: NOT TESTED
+Known-good Build 80 Wi-Fi behavior preservation: static checks PASS
+Build 84 USB transport preservation: static checks PASS
+
+Permanent archive metadata/checksum/audit: YES
+Exact ZIP binary in permanent GitHub archive: NO / PENDING (connector text/content path does not establish exact binary upload here)
+Compiled Windows installer: NOT BUILT in this environment
+
+Final status: NOT DONE / PENDING Windows validation
