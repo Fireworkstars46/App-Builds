@@ -1,0 +1,31 @@
+UxPlay Quality Launcher Full - v91o Build 77
+ARCHIVE STATUS: INCOMPLETE / PENDING
+
+Exact source ZIP local filename:
+UxPlay_V91O_Build_77_Native_Titlebar_Pin_Control.zip
+
+Final SHA-256:
+2c436042deab4681bbe0181612e344b550d8d5d719bc16898bcd3717616e96e4
+
+Archive contents stored in GitHub:
+- README/release notes: YES
+- SHA-256 metadata: YES
+- static audit: YES
+- archive status: YES
+- exact ZIP binary bytes: NO
+- compiled Windows installer: NOT BUILT
+
+Validation status:
+- ZIP integrity: PASS
+- source/static audit: PASS 42/42
+- Windows C# compile: NOT TESTED
+- Inno Setup installer build: NOT TESTED
+- live iPhone/AirPlay: NOT TESTED
+- native title pin glyph visibility/click: NOT TESTED
+- native drag/minimize/maximize/resize: NOT TESTED
+- renderer Always-on-Top behavior: NOT TESTED
+
+Reason exact ZIP binary is not archived here:
+The available GitHub connector can create/update UTF-8 repository content but does not provide a direct exact local binary/release-asset upload path for this ZIP in the current session. Do not claim permanent binary archival is complete.
+
+FINAL STATUS: NOT DONE / PENDING WINDOWS RUNTIME VALIDATION
