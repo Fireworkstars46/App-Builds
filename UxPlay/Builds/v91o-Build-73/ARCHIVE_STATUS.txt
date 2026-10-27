@@ -1,0 +1,28 @@
+UxPlay Quality Launcher Full — v91o Build 73
+Archive status: INCOMPLETE / PENDING
+
+Verified local source package:
+- UxPlay_V91O_Build_73_Native_WiFi_Window.zip
+- SHA-256: 3829a701a7194599e230be60058dcb634202372b99ea580cb7933f1e9571450c
+- ZIP integrity test: PASS
+
+Archived to GitHub:
+- README / release notes: YES
+- Static audit report: YES
+- SHA-256 record: YES
+- Archive status record: YES
+
+Not yet permanently archived:
+- Exact source ZIP binary: NO. The available GitHub connector in this session exposes text/content commits but no direct local-file binary or GitHub Release asset upload action suitable for preserving the exact 2.4 MB ZIP bytes. This is therefore reported as INCOMPLETE rather than claiming archival success.
+- Compiled Windows installer: NOT BUILT / NOT AVAILABLE yet.
+
+Validation status:
+- Source static audit: PASS 28/28
+- Source ZIP integrity: PASS
+- Windows C# compile: NOT TESTED (Windows .NET Framework compiler unavailable in build environment)
+- Inno Setup installer build: NOT TESTED
+- Live iPhone/AirPlay Wi-Fi renderer: NOT TESTED
+- Native title-bar drag/minimize/maximize/close/edge resize: NOT TESTED
+- First-connect renderer flash timing on real Direct3D11 window: NOT TESTED
+
+Final status: NOT DONE / PENDING. Requires Windows build, live runtime validation, and permanent archival of the exact applicable release artifacts before DONE.
