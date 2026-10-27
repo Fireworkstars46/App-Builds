@@ -1,0 +1,13 @@
+UxPlay v91o Build 99 archive status
+
+Release: UxPlay_V91O_Build_99_Filter_Helper_Scope_Compile_Fix.zip
+SHA-256: a591719fe2403cb02be32357c2e5d7914a79334a4f7f688f533e4c08ed3a208d
+Baseline: exact Build 98 ZIP SHA-256 dc732584b11c054ac3f688ca84f12a6bea9dbed0dd0c81df88c82c741d21bfa3
+Static/source audit: 235/235 PASS
+ZIP integrity: PASS
+Windows C# compile: NOT TESTED in Linux environment
+Real guarded AppleLowerFilter test: NOT TESTED
+Real iPhone video path: NOT TESTED
+Project status: NOT DONE / pending Windows build + runtime validation
+
+Reconstruction note: Build 99 differs functionally from Build 98 only by the UsbLibUsb0FilterHelper.cs CS0136 local-name collision correction (ordinary backupPath -> operationBackupPath; ordinary verifyReadable -> finalVerifyReadable) plus Build 99 identity/documentation/audit updates.
