@@ -1,0 +1,38 @@
+PASS - Build 75 identity
+PASS - Installer Build 75 identity
+PASS - Stable AppId
+PASS - Per-user install
+PASS - Main BAT targets Build 75
+PASS - Generic builder targets Build 75
+PASS - No inherited DONE evidence
+PASS - Native Wi-Fi sizable frame preserved
+PASS - Native Windows control box preserved
+PASS - Custom/fake title strip remains disabled
+PASS - Pin moved off renderer client
+PASS - Title-bar pin overlay class configured
+PASS - Title-bar pin is renderer-owned
+PASS - Title-bar pin sits left of native caption buttons
+PASS - Title-bar pin follows window state/geometry
+PASS - Pin uses shared production setter
+PASS - Pin state updates system menu + visible button
+PASS - Wi-Fi title-bar pin regression gate
+PASS - No native-titlebar injection in Build 75 build path
+PASS - Embedded renderer remains borderless child
+PASS - First-connect anti-flash polling preserved
+PASS - Atomic renderer attach preserved
+PASS - Wi-Fi native-window regression gate preserved
+PASS - Section-only test engine preserved
+PASS - Wi-Fi FPS control preserved
+PASS - Stable-mode FPS opt-in default OFF
+PASS - Firewall repair preserved
+PASS - Runtime self-repair preserved
+PASS - Direct USB manual phone wait preserved
+PASS - Direct USB keep-waiting preserved
+PASS - Build 75 Direct USB runtime names
+PASS - Direct USB runtime log identity advanced
+PASS - No File Explorer auto-open in main BAT
+PASS - One final pause in main BAT
+PASS - C# braces balanced - balance=0, min=0
+PASS - Python syntax
+
+TOTAL: 36/36 PASS
