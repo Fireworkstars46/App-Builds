@@ -1,0 +1,12 @@
+UxPlay v91o Build 98 archive status
+
+Release ZIP: UxPlay_V91O_Build_98_Filter_Helper_Compile_Fix.zip
+Release SHA-256: dc732584b11c054ac3f688ca84f12a6bea9dbed0dd0c81df88c82c741d21bfa3
+Static audit: 230/230 PASS
+ZIP integrity: PASS
+Windows C# compile: NOT TESTED in ChatGPT Linux environment.
+Real guarded AppleLowerFilter detach/restart/restore: NOT TESTED for Build 98.
+Real iPhone mirroring: NOT TESTED for Build 98.
+Status: NOT DONE / pending user Windows build + iPhone validation.
+
+Archive contains release notes, checksum, baseline provenance, source-fix recipe, and static-audit summary. The conversation artifact contains the exact release ZIP and full static-audit file.
