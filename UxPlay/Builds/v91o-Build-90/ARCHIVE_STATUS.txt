@@ -1,0 +1,15 @@
+UxPlay v91o Build 90 archive status
+
+Local source ZIP: UxPlay_V91O_Build_90_Windows_Libusb0_Transport_Fix.zip
+SHA-256: 6902418135ac36c2dc020c8284557cfb8c974c211df73b0fc9ee18c0a61dbb9e
+ZIP integrity: PASS
+Release notes archived: YES
+Checksum archived: YES
+Static audit summary archived: YES (158/158 PASS)
+Exact ZIP binary permanently archived in GitHub: NO / PENDING (connector metadata path only)
+Compiled Windows installer: NOT BUILT in this environment
+Windows C# compile: NOT TESTED
+Live Windows/iPhone PING/CWPA/CVRP/FEED/H.264: NOT TESTED
+Status: NOT DONE / PENDING runtime validation
+
+Do not create another build solely to complete binary archival.
