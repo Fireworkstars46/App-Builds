@@ -1,0 +1,27 @@
+UxPlay Quality Launcher Full - v91o Build 78
+
+FINAL SOURCE ZIP
+Name: UxPlay_V91O_Build_78_Color_Pin.zip
+SHA-256: b1fa46b892cdc95e438855fc023f1f512c301fbaf8acfd862ca14dce45f8f3d4
+ZIP integrity: PASS
+
+ARCHIVED HERE
+- Release notes: YES
+- Static audit: YES (48/48 PASS)
+- Final checksum: YES
+- Archive status: YES
+
+NOT ARCHIVED HERE
+- Exact ZIP binary: NO (current GitHub connector path used for this release records UTF-8 text metadata, not the exact local ZIP bytes)
+- Compiled Windows installer: NOT BUILT YET
+
+NOT TESTED YET
+- Windows C# compile
+- Inno Setup installer build
+- Live Wi-Fi/AirPlay mirroring
+- Gray unpinned title-bar pin rendering
+- Blue pinned title-bar pin rendering
+- One-click pin/unpin behavior
+- Drag/minimize/maximize/resize regression behavior
+
+FINAL STATUS: NOT DONE / PENDING WINDOWS + LIVE VALIDATION
