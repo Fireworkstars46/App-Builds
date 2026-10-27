@@ -1,0 +1,17 @@
+UxPlay Quality Launcher Full - v91o Build 76
+
+ARCHIVE STATUS: INCOMPLETE / BINARY PENDING
+
+Archived in GitHub:
+- README.md release/correction notes
+- SHA256.txt final checksum
+- STATIC_AUDIT.txt static/source audit evidence
+
+Not archived by the available connector:
+- exact binary/source ZIP bytes: UxPlay_V91O_Build_76_Native_Titlebar_Pin_Fix.zip
+- Windows-built installer (not built/tested in this environment)
+
+Final local ZIP SHA-256:
+6558a7661fc22ba058bd358de8a2c34a0319e9285085a089f21a65ab357dce84
+
+Do not treat this archive as complete until the exact ZIP bytes are stored durably and verified against that checksum.
