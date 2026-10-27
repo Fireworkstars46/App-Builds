@@ -1,0 +1,22 @@
+UxPlay Quality Launcher Full - v91o Build 79
+
+Exact source ZIP local filename:
+UxPlay_V91O_Build_79_MirrorTo_Pin_Icon.zip
+
+Final SHA-256:
+a614b621c3e0cc07832aabd284b290182a7294a0cb957b3a94abe17e4da6e2cb
+
+Evidence/status:
+- Source static audit: PASS 50/50
+- ZIP integrity: PASS
+- Notes/checksum/audit/status archived in GitHub: YES
+- Exact ZIP binary permanently archived in GitHub: NO / PENDING
+- Windows C# compile: NOT TESTED
+- Inno Setup installer build: NOT TESTED
+- Live iPhone/AirPlay: NOT TESTED
+- MirrorTo-style tilted pin rendering: NOT TESTED
+- Gray/blue state change: NOT TESTED
+- Pin click behavior: NOT TESTED
+- Drag/minimize/maximize/resize regression behavior: NOT TESTED
+
+Final release status: NOT DONE / PENDING Windows build + live validation.
