@@ -1,0 +1,27 @@
+UxPlay Quality Launcher Full - v91o Build 103
+Unsafe Apple-filter stack -> same-backend UsbDk first
+
+What changed from Build 102
+- Build 102 proved the exact ConfigMgr removal -> arrival -> 750 ms stable activation lifecycle works, but the phone still stopped after canonical PING/PING reply with no CWPA.
+- The current Windows reference marks legacy libusb0 stacked with AppleLowerFilter/AppleKmdfFilter as unsafe and prefers a non-libusb0 backend first.
+- Auto now treats READY_WITH_APPLE_KERNEL_FILTER_CAUTION as a safety signal, not as permission to choose libusb0 first.
+- When UsbDk is installed, Auto chooses the existing DIRECT UsbDk path so one backend owns activation, re-enumeration, QuickTime configuration, PING/CWPA/FEED I/O, and cleanup from the beginning.
+- This is NOT the old Build 94 hybrid. Build 94 activated with libusb0 and then switched to UsbDk. Build 103 does not hand a live session between those backends.
+- The legacy Windows usbccgp configuration-assist registry mutation is skipped for the same-backend UsbDk path.
+- AppleLowerFilter and AppleKmdfFilter are not detached, removed, or modified.
+- Explicit libusb0/Normal troubleshooting selections remain available.
+
+Preserved
+- Stable per-user AppId {F07F126D-812E-48F9-A296-46D459067E7C}.
+- Build 80 known-good Wi-Fi behavior.
+- One-button Direct USB Test UX and persistent black native-framed renderer.
+- Build 95 fail-fast/no-five-minute-freeze behavior.
+- Build 102 ConfigMgr/libusb0 troubleshooting path remains present.
+
+Validation
+- Static/source audit: 89/89 PASS.
+- Python backend syntax: PASS.
+- ZIP integrity: PASS.
+- Windows C# compile: NOT TESTED in Linux.
+- Real Windows/iPhone same-backend UsbDk activation/CWPA/video: NOT TESTED.
+- Status: NOT DONE.
