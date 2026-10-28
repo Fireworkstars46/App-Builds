@@ -1,0 +1,63 @@
+name: Precheck DisneyNOW Fire TV Build 14 generator
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/disneynow-fire-tv-build14-precheck.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  precheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Reconstruct Build 13 and record generator precondition counts
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=_pre14/DisneyNOWFireTV/Source
+          mkdir -p _pre14/DisneyNOWFireTV DisneyNOWFireTV/Build14
+          python3 DisneyNOWFireTV/SourceSeed/reconstruct.py --output "$P"
+          python3 DisneyNOWFireTV/Build2/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build4/reconstruct_build3.py --source "$P"
+          python3 DisneyNOWFireTV/Build4/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build5/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build6/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build7/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build8/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build9/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build10/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build11/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build13/apply.py --source "$P"
+          python3 - "$P" > DisneyNOWFireTV/Build14/_precheck.txt <<'PY'
+          from pathlib import Path
+          import sys
+          r=Path(sys.argv[1])
+          m=(r/'app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java').read_text()
+          g=(r/'app/build.gradle').read_text()
+          a=(r/'tools/static_audit.py').read_text()
+          tests={
+          'constant': '    private static final boolean AUTO_NATIVE_HANDOFF_ENABLED = false;\n    private static final long AUTO_NATIVE_FALLBACK_TIMEOUT_MS = 20000L;',
+          'fields': '    private long debugKeyDispatchMaxNanos;\n    private int debugWebErrorCount;',
+          'dispatch_marker': '''            if (isNativePlayerVisible()) {\n                result = super.dispatchKeyEvent(event);\n                recordDebugKeyDispatch(debugStarted);\n                return result;\n            }\n\n            if (customView == null && isCursorEnabled() && isCursorNavigationKey(keyCode)) {''',
+          'record': '''        if (elapsed > debugKeyDispatchMaxNanos) debugKeyDispatchMaxNanos = elapsed;\n    }''',
+          'reset': '''        debugKeyDispatchMaxNanos = 0L;\n        debugWebErrorCount = 0;''',
+          'report': '''        out.append(String.format(Locale.US, "D-pad dispatch samples: %d; avg=%.3f ms; max=%.3f ms\\n", debugKeyEventCount, avgKeyMs, maxKeyMs));''',
+          }
+          for k,v in tests.items(): print(k, m.count(v))
+          print('gradle_version',g.count('versionCode 13'))
+          print('gradle_buildconfig',g.count("buildConfigField 'int', 'APP_BUILD', '13'"))
+          print('audit_sentinel',a.count('\n# Write report.\n'))
+          print('audit_version_regex',a.count('versionCode\\s+13\\b'))
+          print('audit_buildconfig',a.count("'APP_BUILD', '13'"))
+          print('audit_runtime',a.count('BuildConfig.APP_BUILD == 13 && BuildConfig.VERSION_CODE == 13'))
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add DisneyNOWFireTV/Build14/_precheck.txt
+          git commit -m 'Record Build 14 generator preconditions'
+          git push
