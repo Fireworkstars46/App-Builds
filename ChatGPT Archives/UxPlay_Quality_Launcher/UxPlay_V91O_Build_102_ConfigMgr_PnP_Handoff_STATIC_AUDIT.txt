@@ -1,0 +1,32 @@
+UxPlay Quality Launcher Full v91o Build 102 static audit
+
+Result: 244/244 PASS
+Python backend syntax: PASS
+ZIP integrity: PASS
+
+Build 102-specific gates passed:
+- Stable AppId/per-user identity preserved.
+- Build 80 known-good Wi-Fi signatures preserved.
+- Build 95 fail-fast/no-five-minute-freeze behavior preserved.
+- AppleLowerFilter guard is not invoked by the one-button path.
+- Normal Apple/libusb0 filter stack is kept intact.
+- Exact libusb0 Configuration Manager interface notification APIs are declared and used.
+- Exact interface matching requires Apple VID/PID + normalized serial + libusb0 interface GUID.
+- Exact PnP observer is registered before activate-only 0x40/0x52.
+- Notification registration failure closes only the still-valid pre-request handle and fails closed.
+- Post-0x52 activation-only block declares zero libusb calls.
+- Post-0x52 block contains no libusb enumerate/open/refresh/usb_close/config/alt/halt/control operations.
+- Invalidated activation handle is process-exit-only.
+- libusb0.dll unload is deferred until helper process exit.
+- PnP success requires removal -> arrival -> 750 ms stable interface presence within bounded 15 s.
+- PING payload/order remains canonical and Build 101 timing diagnostics are preserved.
+- No Apple driver/filter uninstall/rebind, usbccgp replacement, or Windows security weakening is added.
+- All C# sources pass lexical string/char literal and brace-balance regression checks.
+
+Windows C# compile: NOT TESTED in this Linux environment.
+Real ConfigMgr callback/PNP handoff: NOT TESTED.
+Real iPhone CWPA/CVRP/FEED/H.264: NOT TESTED.
+
+The complete 244-line audit output is also included inside the released Build 102 ZIP as STATIC_AUDIT_V91O_BUILD_102_RESULTS.txt.
+
+Status: NOT DONE / pending real Windows build and iPhone validation.
