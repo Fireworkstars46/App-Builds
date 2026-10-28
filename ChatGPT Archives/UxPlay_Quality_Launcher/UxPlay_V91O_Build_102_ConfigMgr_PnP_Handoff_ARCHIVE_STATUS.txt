@@ -1,0 +1,16 @@
+UxPlay v91o Build 102 archive status
+
+ZIP SHA-256: 9eb5dd6dc972878874171438e32e4d072e380afa8ccfa8f0b14df80ecc8e7ab0
+Static audit: 244/244 PASS
+ZIP integrity: PASS
+Baseline Build 101 ZIP SHA-256: f18cbc3fa275344f7fb372f7abe808e67ff56cb7e43e0d6f89d1209887eda70e
+
+Binary ZIP remains a ChatGPT conversation artifact; GitHub archive stores metadata and a reconstructible Build101->Build102 source patch.
+
+Patch raw SHA-256: 97b78d51eea104ece74128edfc9917786c04cdad10d06b03347d448052086e0f
+Patch gzip SHA-256: fda62a88450e12ebfb46dc863d8cb75cf97f5aab880c80edcebae7a441bde80e
+Patch gzip-base64 SHA-256: c12edfb1dfec66968be49ce6eedc8dd25433723eefea6fd330877f83553872a1
+
+Windows C# compile: NOT TESTED for Build 102.
+Real iPhone/ConfigMgr behavior: NOT TESTED.
+Status: NOT DONE.
