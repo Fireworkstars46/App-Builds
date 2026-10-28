@@ -1,0 +1,17 @@
+DisneyNOW Fire TV Hybrid TV Shell
+Version 0.1 Build 14
+Status: NOT DONE - COMPATIBILITY TEST
+
+Build 14 is a targeted input-lag/stability correction based on physical Build 12 evidence that showed a rare D-pad dispatch spike of about 2.5 seconds while the safer no-auto-native playback behavior remained stable.
+
+In Native TV Navigation mode only, Build 14 suppresses rapid repeated directional ACTION_DOWN events that arrive inside an 85 ms guard window. The first directional press and ACTION_UP continue through normally. Select, Menu, Back, Cursor Navigation, Legacy Focus Navigation, Performance Mode, zoom, Silk fallback, crash-stage breadcrumbs, package identity, app data/settings/login path, and permanent signer are preserved.
+
+Debug Mode adds privacy-safe counters for directional repeats suppressed by the guard and D-pad dispatches taking at least 100 ms. These fields are intended for physical before/after comparison; CI does not claim the Fire TV lag is fixed until physically tested.
+
+Automatic native Media3 playback remains disabled and the manual Try Native Player normal-menu action remains omitted after the Build 11 physical regression. Dormant Media3 implementation remains only for controlled future diagnostics; normal app use does not call it.
+
+Build 14 does not bypass DRM, extract keys, fabricate entitlement/license/token responses, copy Disney proprietary code, export cookies/auth tokens, or enable WebView remote debugging.
+
+Verification: public and private CI independently reconstructed the exact source. Static/release audit 227 PASS / 0 FAIL; lint 0 errors / 14 warnings; compile/unit tests/package/version checks passed; permanent signer fingerprint matched; APK v1/v2/v3 verification passed.
+
+Physical Fire TV responsiveness, actual DisneyNOW playback, auth, zoom, and crash/restart behavior remain NOT TESTED by CI. Build 14 is not claimed DONE until physically tested.

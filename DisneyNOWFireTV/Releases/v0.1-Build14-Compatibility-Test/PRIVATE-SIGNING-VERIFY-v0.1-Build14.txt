@@ -1,0 +1,10 @@
+DisneyNOW Fire TV v0.1 Build 14 private signing verification
+Public source commit: 28022f3deeb2374f82d23a6e691f8cd4c8683fa9
+PASS - Build 14 reconstruction hash chain and audit finalizer passed
+PASS - static audit 227 PASS / 0 FAIL verified
+PASS - compile/lint/unit-test/assembleRelease passed
+PASS - recovered established keystore fingerprint matched expected permanent identity
+PASS - apksigner v1/v2/v3 verification passed
+PASS - package com.fireworkstars46.disneynowfiretv verified
+PASS - versionCode 14 / versionName 0.1 verified
+Physical Fire TV D-pad improvement/playback stability: NOT TESTED
