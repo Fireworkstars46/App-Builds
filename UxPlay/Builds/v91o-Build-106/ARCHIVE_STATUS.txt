@@ -1,0 +1,15 @@
+UxPlay v91o Build 106 archive status
+
+Baseline exact ZIP:
+UxPlay_V91O_Build_105_Fresh_UsbDk_Context_Reenumeration.zip
+SHA-256: 830835b0a91f0e4a5230985a4104a6378636402957dbcd77a56b167987ae422a
+
+Static source audit: 119/119 PASS.
+Python backend syntax: PASS.
+Windows C# compile: NOT TESTED in the creation environment.
+Real iPhone topology-bound UsbDk re-enumeration: NOT TESTED.
+
+Permanent archive stores release metadata plus a reconstructable Build105 -> Build106 text-source delta. Source-delta checksums are stored separately in the archive SHA256 metadata to avoid self-referential package hashes.
+
+Binary ZIP: conversation artifact; GitHub archive preserves metadata + reconstructable source delta, not a claim that the built installer binary is permanently hosted there.
+Status: NOT DONE / PENDING Windows compile + real iPhone validation.
