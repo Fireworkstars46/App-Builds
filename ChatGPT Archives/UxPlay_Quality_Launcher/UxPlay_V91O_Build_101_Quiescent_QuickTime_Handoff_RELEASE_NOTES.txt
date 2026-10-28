@@ -1,0 +1,17 @@
+UxPlay Quality Launcher Full - v91o Build 101
+Quiescent QuickTime activation handoff + PING->CWPA diagnostics
+
+Baseline: exact released Build 100 ZIP SHA-256 3de6c5c891feb323299a7117711cb7c73b0a579ba024fdf699f5cac7652f9885.
+
+Why: real Build 100 compiled and packaged successfully on Windows, but the activation helper crashed at runtime with exit code 3221225477 (0xC0000005) before writing a result. Build 100's stability loop re-entered libusb0 enumeration while retaining the invalidated activation handle.
+
+Build 101 removes that unsafe overlap. Once the exact QuickTime config 5 / subclass 0x2A descriptor is first observed, activate-only mode closes the fresh observation handle, makes ZERO further libusb enumeration/open/refresh calls for 750 ms, then writes ACTIVATION_ONLY_OK and exits. The stale activation handle stays owned until helper process exit; the backend then opens a fresh streaming handle.
+
+AppleLowerFilter remains untouched. Protocol framing/order remains unchanged. Build 100 PING payload/timing diagnostics are preserved. Build 95 fail-fast and Build 80 Wi-Fi baseline are preserved.
+
+Static/source audit: 239/239 PASS.
+Python backend syntax: PASS.
+ZIP integrity: PASS.
+Windows C# compile: NOT TESTED for Build 101.
+Real iPhone PING -> CWPA -> CVRP -> FEED -> H.264: NOT TESTED.
+Status: NOT DONE / pending Windows + iPhone validation.
