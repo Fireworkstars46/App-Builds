@@ -1,0 +1,82 @@
+name: Finalize DisneyNOW Fire TV Build 14 audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/disneynow-fire-tv-build14-finalize-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Generate fail-closed Build 14 audit finalizer
+        shell: bash
+        run: |
+          set -euo pipefail
+          P=_final14/DisneyNOWFireTV/Source
+          rm -rf _final14 /tmp/build14-audit-final.zip DisneyNOWFireTV/Build14/audit_final_parts
+          mkdir -p _final14/DisneyNOWFireTV DisneyNOWFireTV/Build14/audit_final_parts
+          python3 DisneyNOWFireTV/SourceSeed/reconstruct.py --output "$P"
+          python3 DisneyNOWFireTV/Build2/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build4/reconstruct_build3.py --source "$P"
+          python3 DisneyNOWFireTV/Build4/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build5/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build6/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build7/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build8/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build9/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build10/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build11/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build13/apply.py --source "$P"
+          python3 DisneyNOWFireTV/Build14/apply.py --source "$P"
+          python3 - "$P" <<'PY'
+          from pathlib import Path
+          import base64,hashlib,io,zipfile,sys
+          root=Path(sys.argv[1])
+          rels=['app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java','tools/static_audit.py']
+          base={r:hashlib.sha256((root/r).read_bytes()).hexdigest() for r in rels}
+          mp=root/rels[0]; ap=root/rels[1]
+          main=mp.read_text()
+          old='Build 13 automatic native launch safety rollback'
+          if main.count(old)!=1: raise SystemExit(f'self-test label precondition count={main.count(old)}')
+          main=main.replace(old,'Build 14 automatic native launch stability guard')
+          mp.write_text(main)
+          audit=ap.read_text()
+          replacements={
+            'Build 14 safety rollback keeps Media3 out of normal use':'Build 14 stability guard keeps Media3 out of normal use',
+            'Automatic native handoff: disabled by Build 14 safety rollback':'Automatic native handoff: disabled by Build 14 stability guard',
+            'Build 14 automatic native launch safety rollback':'Build 14 automatic native launch stability guard',
+            "Version code incremented to 13":"Version code incremented to 14",
+            "BuildConfig build number is 13":"BuildConfig build number is 14",
+            "Build 14/versionCode 13":"Build 14/versionCode 14",
+            "versionCode 13 only":"versionCode 14 only",
+          }
+          for old,new in replacements.items():
+              c=audit.count(old)
+              if c<1: raise SystemExit(f'audit wording precondition missing: {old}')
+              audit=audit.replace(old,new)
+          ap.write_text(audit)
+          result={r:hashlib.sha256((root/r).read_bytes()).hexdigest() for r in rels}
+          zpath=Path('/tmp/build14-audit-final.zip')
+          with zipfile.ZipFile(zpath,'w',zipfile.ZIP_DEFLATED) as z:
+              for r in rels: z.write(root/r,r)
+          zsha=hashlib.sha256(zpath.read_bytes()).hexdigest()
+          enc=base64.b64encode(zpath.read_bytes()).decode()
+          out=Path('DisneyNOWFireTV/Build14/audit_final_parts'); out.mkdir(parents=True,exist_ok=True)
+          parts=[]
+          for i in range(0,len(enc),9000):
+              n=f'part{i//9000:02d}.b64'; (out/n).write_text(enc[i:i+9000]); parts.append(n)
+          Path('DisneyNOWFireTV/Build14/finalize_audit.py').write_text('''#!/usr/bin/env python3\nfrom pathlib import Path\nimport argparse,base64,hashlib,io,zipfile\nBASE='''+repr(base)+'''\nRESULT='''+repr(result)+'''\nZIP_SHA='''+repr(zsha)+'''\nPARTS='''+repr(parts)+'''\ndef h(b):return hashlib.sha256(b).hexdigest()\ndef check(root,want,label):\n bad=[]\n for r,x in want.items():\n  p=root/r; y=h(p.read_bytes()) if p.is_file() else 'missing'\n  if x!=y:bad.append(f"{r}: expected {x}, got {y}")\n if bad:raise SystemExit(label+' hash verification failed\\n'+'\\n'.join(bad))\ndef main():\n q=argparse.ArgumentParser();q.add_argument('--source',required=True);a=q.parse_args();root=Path(a.source).resolve();check(root,BASE,'Build 14 pre-finalization')\n d=Path(__file__).resolve().parent/'audit_final_parts';raw=base64.b64decode(''.join((d/n).read_text() for n in PARTS),validate=True)\n if h(raw)!=ZIP_SHA:raise SystemExit('Build 14 audit finalizer ZIP mismatch')\n with zipfile.ZipFile(io.BytesIO(raw)) as z:\n  if set(z.namelist())!=set(RESULT):raise SystemExit('Build 14 audit finalizer entries mismatch')\n  for r,x in RESULT.items():\n   b=z.read(r)\n   if h(b)!=x:raise SystemExit('Build 14 audit finalizer payload mismatch: '+r)\n   (root/r).write_bytes(b)\n check(root,RESULT,'Build 14 finalized');print('Build 14 audit finalization applied and verified.')\nif __name__=='__main__':main()\n''')
+          print('BASE',base);print('RESULT',result);print('ZIP_SHA',zsha);print('PARTS',parts)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add DisneyNOWFireTV/Build14/finalize_audit.py DisneyNOWFireTV/Build14/audit_final_parts
+          git commit -m 'Finalize DisneyNOW Build 14 audit expectations'
+          git push
