@@ -1,0 +1,95 @@
+STATIC AUDIT V91O BUILD 104 RESULTS: 94/94 PASS
+PASS - Build number 104
+PASS - Display version 104
+PASS - Stable AppId preserved
+PASS - Per-user installer preserved
+PASS - Installer version 104
+PASS - Installer filename 104
+PASS - Top BAT targets 104 builder
+PASS - Generic builder targets 104
+PASS - Top BAT success banner 104
+PASS - Top BAT installer path 104
+PASS - 104 runtime backend name
+PASS - 104 runtime MI01 helper name
+PASS - 104 runtime WDI name
+PASS - 104 runtime filter helper name
+PASS - 104 runtime QT helper name
+PASS - No active Build103 runtime identity
+PASS - No stale Build102 diagnostic identity
+PASS - Launcher stack diagnostic identity 104
+PASS - QT helper diagnostic identity 104
+PASS - Filter helper diagnostic identity 104
+PASS - Exact Build103 baseline SHA documented
+PASS - Status NOT DONE pending
+PASS - Windows compile truthfully NOT TESTED
+PASS - Foreground runtime truthfully NOT TESTED
+PASS - USB not falsely claimed fixed
+PASS - SetForegroundWindow imported
+PASS - Shared one-shot foreground helper exists
+PASS - Foreground helper normalizes minimized window
+PASS - Foreground helper shows if needed
+PASS - Foreground helper BringToFront
+PASS - Foreground helper Activate
+PASS - Foreground helper SetForegroundWindow
+PASS - Foreground helper deferred with BeginInvoke
+PASS - Foreground helper does not touch TopMost
+PASS - Foreground helper does not call pin mutators
+PASS - Main menu first Shown requests foreground
+PASS - Chooser App Settings shown requests foreground
+PASS - Wi-Fi main first Shown requests foreground
+PASS - Direct USB open requests foreground
+PASS - Ethernet/network open requests foreground
+PASS - Tray restore uses foreground helper
+PASS - Chooser restore uses foreground helper
+PASS - Return-to-main uses foreground helper
+PASS - Foreground helper used broadly | count=15
+PASS - README explicitly preserves pin-off
+PASS - README says no TopMost mutation
+PASS - Existing native pin code remains
+PASS - Caution result recognized
+PASS - Unsafe-stack boolean preserved
+PASS - Caution still blocks libusb0-first
+PASS - UsbDk-first safety policy preserved
+PASS - Same-backend UsbDk selection preserved
+PASS - Legacy usbccgp assist still gated away from UsbDk
+PASS - UsbDk availability function preserved
+PASS - PyUSB UsbDk enable patch preserved
+PASS - Direct backend one activation request preserved
+PASS - Fresh 500ms re-enumeration polling preserved
+PASS - Dynamic QT subclass discovery preserved
+PASS - UsbDk activation timeout remains bounded
+PASS - Explicit libusb0 troubleshooting path preserved
+PASS - Build102 ConfigMgr markers preserved behaviorally
+PASS - Process-exit-only activation handle policy preserved
+PASS - No-libUSB-after-request diagnostic preserved
+PASS - Canonical PING bytes preserved
+PASS - PING handler reply behavior preserved
+PASS - CWPA watchdog preserved
+PASS - 60s max one-button fail-fast preserved
+PASS - No Keep Waiting prompt
+PASS - Read-only stack diagnostic preserved
+PASS - AppleLowerFilter guard remains disabled in caution path
+PASS - README says no Apple driver rebind/uninstall
+PASS - README says no usbccgp replacement
+PASS - README says no security weakening
+PASS - Zadig not used by build
+PASS - Persistent USB renderer host preserved
+PASS - Wi-Fi renderer attach logic preserved
+PASS - Build80 preservation documented
+PASS - Stable native App Settings behavior still modal
+PASS - File present UxPlayQualityLauncher.cs
+PASS - File present BUILD_LAUNCHER_INSTALLER_V91O_BUILD_104.ps1
+PASS - File present BUILD_LAUNCHER_INSTALLER_V91O.ps1
+PASS - File present 0_BUILD_V91O_BUILD_104_ALL_IN_ONE.bat
+PASS - File present UxPlayQualityLauncherSetup.iss
+PASS - File present usb_direct_backend.py
+PASS - File present UsbLibUsb0QuickTimeProbe.cs
+PASS - File present UsbLibUsb0FilterHelper.cs
+PASS - File present README_V91O_BUILD_104_FOREGROUND_FOCUS_FIX.txt
+PASS - File present BUILD_STATUS.txt
+PASS - File present BUILD_103_BASELINE_PROVENANCE.txt
+PASS - File present BUILD104_RELEASE_NOTES.txt
+PASS - File present BUILD104_ARCHIVE_STATUS.txt
+PASS - Python backend syntax compile
+PASS - C# brace count balanced | {=1668 }=1668
+PASS - C# parenthesis count plausibly balanced | (=4745 )=4745
