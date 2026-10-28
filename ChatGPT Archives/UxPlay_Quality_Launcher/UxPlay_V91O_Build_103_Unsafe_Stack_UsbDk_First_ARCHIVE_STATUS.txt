@@ -1,0 +1,14 @@
+UxPlay v91o Build 103 archive status
+
+ZIP SHA-256: aee681be857246d8542dc6620bf7a1362f94133e2a610767496392c790d3d15b
+Static/source audit: 89/89 PASS
+ZIP integrity: PASS
+Exact Build 102 input SHA-256: 9eb5dd6dc972878874171438e32e4d072e380afa8ccfa8f0b14df80ecc8e7ab0
+
+Build 102 real result: ConfigMgr removal/arrival/750ms-stable handoff succeeded; QuickTime config 5/interface 2 claimed; canonical PING reply sent; CWPA did not arrive.
+
+Build 103 target: on READY_WITH_APPLE_KERNEL_FILTER_CAUTION, Auto prefers the existing same-backend UsbDk activation + streaming path instead of choosing libusb0 first. This is not the old Build 94 libusb0->UsbDk hybrid. Same-backend UsbDk also skips the legacy usbccgp configuration-assist mutation. AppleLowerFilter/AppleKmdfFilter remain unchanged.
+
+Windows C# compile: NOT TESTED in Linux.
+Real iPhone same-backend UsbDk behavior: NOT TESTED.
+Status: NOT DONE.
