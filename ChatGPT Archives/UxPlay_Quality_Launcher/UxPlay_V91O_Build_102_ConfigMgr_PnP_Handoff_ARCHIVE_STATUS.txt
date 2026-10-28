@@ -5,11 +5,11 @@ Static audit: 244/244 PASS
 ZIP integrity: PASS
 Baseline Build 101 ZIP SHA-256: f18cbc3fa275344f7fb372f7abe808e67ff56cb7e43e0d6f89d1209887eda70e
 
-Binary ZIP remains a ChatGPT conversation artifact; GitHub archive stores metadata and a reconstructible Build101->Build102 source patch.
+Binary ZIP remains a ChatGPT conversation artifact. GitHub stores release metadata plus an exact compressed/base64 core functional source delta for the two behavior-bearing USB files changed from Build 101 to Build 102. The core-delta manifest separately records that release/build identity and documentation files also changed; the core patch alone is not claimed to reproduce the full ZIP byte-for-byte.
 
-Patch raw SHA-256: 97b78d51eea104ece74128edfc9917786c04cdad10d06b03347d448052086e0f
-Patch gzip SHA-256: fda62a88450e12ebfb46dc863d8cb75cf97f5aab880c80edcebae7a441bde80e
-Patch gzip-base64 SHA-256: c12edfb1dfec66968be49ce6eedc8dd25433723eefea6fd330877f83553872a1
+Core raw patch SHA-256: d7ae1e4b77d1c43a93efcbc6ad0ffa8eea4daeebd27f11122a6054d0160f1a72
+Core gzip SHA-256: 3fe40b2f687e185542b17fb0701442f6827af2d94274232d4dac44b93722cbee
+Core gzip-base64 SHA-256: ae0d1b2c1e580561a6b790729acecf442f93b865f9f2b1751bb8d55dfbd6ec84
 
 Windows C# compile: NOT TESTED for Build 102.
 Real iPhone/ConfigMgr behavior: NOT TESTED.
