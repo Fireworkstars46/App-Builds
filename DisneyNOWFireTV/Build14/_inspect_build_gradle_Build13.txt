@@ -1,0 +1,44 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.fireworkstars46.disneynowfiretv'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.fireworkstars46.disneynowfiretv'
+        minSdk 22
+        targetSdk 35
+        versionCode 13
+        versionName '0.1'
+        buildConfigField 'int', 'APP_BUILD', '13'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        abortOnError true
+        checkReleaseBuilds true
+        textReport true
+        textOutput file("${rootDir}/build/reports/lint-results-debug.txt")
+        htmlReport true
+        htmlOutput file("${rootDir}/build/reports/lint-results-debug.html")
+    }
+}
+
+
+dependencies {
+    def media3_version = "1.8.1"
+    implementation "androidx.media3:media3-exoplayer:$media3_version"
+    implementation "androidx.media3:media3-exoplayer-dash:$media3_version"
+    implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
+    implementation "androidx.media3:media3-ui:$media3_version"
+}
