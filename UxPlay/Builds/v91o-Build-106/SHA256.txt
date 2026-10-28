@@ -1,0 +1,26 @@
+UxPlay Quality Launcher Full - v91o Build 106 checksums
+
+Build 106 source-package ZIP:
+UxPlay_V91O_Build_106_Topology_Bound_UsbDk_Reenumeration.zip
+SHA-256: 67dcb6be8d1fee19d317d386cca16f2f7109ebc508a9bd6afc0c75e975fd7505
+Size: 2731831 bytes
+
+Exact Build 105 baseline ZIP SHA-256:
+830835b0a91f0e4a5230985a4104a6378636402957dbcd77a56b167987ae422a
+
+Build105 -> Build106 text-source patch:
+UxPlay_Build105_to_Build106_TEXT_SOURCE.patch
+SHA-256: ac128f05565c80d3a2588a44ea3fbbb0728f0a6df95b0a2b4bd079cb4ec35d96
+Size: 182389 bytes
+
+Compressed/base64 patch transport:
+UxPlay_Build105_to_Build106_TEXT_SOURCE.patch.gz.b64
+SHA-256: 70f63506f0b4a1fba8e3d5a59e93c046637ece40c0917a79ac35872c9f91afdd
+Size: 52344 bytes
+
+Static source audit: 119/119 PASS
+ZIP integrity: PASS
+Python backend syntax: PASS
+Windows C# compile: NOT TESTED in creation environment
+Real iPhone Direct USB: NOT TESTED
+Status: NOT DONE / PENDING Windows + iPhone validation
