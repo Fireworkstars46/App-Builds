@@ -1,0 +1,18 @@
+UxPlay Quality Launcher Full - Build 106 baseline provenance
+
+Exact baseline ZIP:
+UxPlay_V91O_Build_105_Fresh_UsbDk_Context_Reenumeration.zip
+
+Exact baseline SHA-256:
+830835b0a91f0e4a5230985a4104a6378636402957dbcd77a56b167987ae422a
+
+Observed Build 105 validation from user-supplied logs:
+- Windows build completed successfully; BUILD_STATUS.txt = DONE.
+- Direct USB backend, MI_01 helper, libusb0 filter helper, libusb0 QuickTime helper, launcher, and Inno Setup completed successfully.
+- Auto selected same-backend UsbDk because the exact Apple parent reports READY_WITH_APPLE_KERNEL_FILTER_CAUTION.
+- QVH activation request 0x40/0x52/index2 returned normally.
+- Build 105 fresh-context probing changed the observation: first no Apple device was visible; then the same iPhone briefly exposed 5 configurations with QuickTime config 5 descriptor present but activeQT=no; about 0.4 seconds later it was back to the normal 4-configuration/no-QuickTime state.
+- No H.264 frame arrived; Build 105 timed out after the bounded 20 second activation window.
+- Build 105 left the Apple driver/filter stack unchanged.
+
+Build 106 is a direct descendant of this exact Build 105 source package.
