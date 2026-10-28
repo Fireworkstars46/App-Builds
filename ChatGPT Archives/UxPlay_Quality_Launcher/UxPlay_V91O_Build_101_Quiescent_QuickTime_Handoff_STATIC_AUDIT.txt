@@ -1,0 +1,24 @@
+UxPlay v91o Build 101 static/source audit
+
+Result: 239/239 PASS
+Python backend syntax: PASS
+ZIP integrity: PASS
+
+Build 101-specific regression gates include:
+- normal Apple/libusb0 stack preserved; AppleLowerFilter guard not invoked
+- exact Build 100 baseline hash documented
+- quiescent handoff block exists only in activate-only path
+- fresh QuickTime observation handle is closed before quiescent wait
+- 750 ms quiescent handoff is exact and bounded
+- ZERO Enumerate/Refresh/OpenCandidate calls occur in the quiescent block
+- no configuration mutation, alt-setting selection, or endpoint halt-clear in the quiescent block
+- stale activation handle remains owned until helper process exit
+- Build 100 PING payload/timing diagnostics preserved
+- canonical PING bytes unchanged
+- Build 95 fail-fast behavior preserved
+- Build 80 Wi-Fi baseline preserved
+- all four C# sources pass newline/EOF literal regression scan
+- C# brace-balance checks pass
+- Python syntax check passes
+
+Windows C# compile and real iPhone validation remain NOT TESTED for Build 101.
