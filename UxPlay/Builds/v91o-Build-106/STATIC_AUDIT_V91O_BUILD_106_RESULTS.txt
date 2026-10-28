@@ -1,0 +1,120 @@
+STATIC AUDIT V91O BUILD 106 RESULTS: 119/119 PASS
+PASS - Build number 106
+PASS - Display version 106
+PASS - Stable AppId preserved
+PASS - Per-user installer preserved
+PASS - Installer version 106
+PASS - Installer filename 106
+PASS - Top BAT targets 106 builder
+PASS - Generic builder targets 106
+PASS - Top BAT success banner 106
+PASS - Top BAT installer path 106
+PASS - 106 runtime backend name
+PASS - 106 runtime MI01 helper name
+PASS - 106 runtime WDI name
+PASS - 106 runtime filter helper name
+PASS - 106 runtime QT helper name
+PASS - No active Build105 runtime identity
+PASS - Launcher stack diagnostic identity 106
+PASS - QT helper diagnostic identity 106
+PASS - Filter helper diagnostic identity 106
+PASS - Exact Build105 baseline SHA documented
+PASS - Build105 Windows success documented
+PASS - Build105 transient config5 result documented
+PASS - Build105 returned to normal state documented
+PASS - Status NOT DONE pending
+PASS - Windows compile truthfully NOT TESTED
+PASS - Real USB truthfully NOT TESTED
+PASS - Physical topology helper exists
+PASS - Topology helper reads bus without serial
+PASS - Topology helper reads port_numbers without serial
+PASS - Topology helper does not read serial_number
+PASS - Topology match helper exists
+PASS - Pre-activation topology cached
+PASS - Topology cache diagnostic present
+PASS - Topology matching runs before serial fallback
+PASS - Topology candidate selection present
+PASS - Topology selection marks no serial open
+PASS - Serial fallback explicitly separate
+PASS - Single-device fallback only when topology unavailable
+PASS - Topology branch itself does not call serial helper
+PASS - Candidate diagnostics accept serial hint
+PASS - Candidate diagnostics use hint before serial read
+PASS - Topology refs dropped before context finalize
+PASS - README documents no serial open on topology match
+PASS - README documents serial as fallback
+PASS - Re-enumeration context-recreate option preserved
+PASS - Fresh libusb backend helper preserved
+PASS - PyUSB cached backend finalized
+PASS - Cached backend pointer cleared
+PASS - Fresh backend created
+PASS - Fresh backend fail closed
+PASS - usb.core.find receives explicit fresh backend
+PASS - Direct UsbDk enables context recreation
+PASS - Fresh-context poll cadence 250ms
+PASS - Fresh-context timeout bounded 20s
+PASS - Fresh context used each probe
+PASS - Final timeout scan also fresh
+PASS - QuickTime active state inspected
+PASS - Strict UsbDk requires active QT
+PASS - Strict UsbDk refuses forced SET_CONFIGURATION
+PASS - One activation request preserved
+PASS - No automatic activation retry
+PASS - Multiple Apple devices remain blocked
+PASS - Caution result recognized
+PASS - Unsafe-stack boolean preserved
+PASS - Caution blocks libusb0-first
+PASS - UsbDk-first safety policy preserved
+PASS - Same-backend UsbDk selection preserved
+PASS - Legacy usbccgp assist gated away from UsbDk
+PASS - Explicit libusb0 troubleshooting preserved
+PASS - Canonical PING bytes preserved
+PASS - PING reply behavior preserved
+PASS - CWPA watchdog preserved
+PASS - No synthetic timeout traffic marker preserved
+PASS - README says no protocol packet change
+PASS - ConfigMgr notification markers preserved
+PASS - Process-exit-only activation handle preserved
+PASS - No-libUSB-after-request diagnostic preserved
+PASS - 60s one-button fail-fast preserved
+PASS - No Keep Waiting prompt
+PASS - Read-only stack diagnostic preserved
+PASS - Apple stack kept on caution path
+PASS - README says Apple filters not removed
+PASS - README says no Apple rebind/uninstall
+PASS - README says no usbccgp replacement
+PASS - README says no security weakening
+PASS - Zadig not used
+PASS - SetForegroundWindow imported
+PASS - Shared foreground helper preserved
+PASS - Foreground helper BringToFront
+PASS - Foreground helper Activate
+PASS - Foreground helper SetForegroundWindow
+PASS - Foreground helper no TopMost
+PASS - App Settings foreground hook preserved
+PASS - Main menu foreground hook preserved
+PASS - Direct USB foreground hook preserved
+PASS - Persistent USB renderer preserved
+PASS - Build80 preservation documented
+PASS - Native pin code remains
+PASS - App Settings remains modal
+PASS - File present UxPlayQualityLauncher.cs
+PASS - File present BUILD_LAUNCHER_INSTALLER_V91O_BUILD_106.ps1
+PASS - File present BUILD_LAUNCHER_INSTALLER_V91O.ps1
+PASS - File present 0_BUILD_V91O_BUILD_106_ALL_IN_ONE.bat
+PASS - File present UxPlayQualityLauncherSetup.iss
+PASS - File present usb_direct_backend.py
+PASS - File present UsbLibUsb0QuickTimeProbe.cs
+PASS - File present UsbLibUsb0FilterHelper.cs
+PASS - File present README_V91O_BUILD_106_TOPOLOGY_BOUND_USBDK_REENUMERATION.txt
+PASS - File present BUILD_STATUS.txt
+PASS - File present BUILD_105_BASELINE_PROVENANCE.txt
+PASS - File present BUILD106_RELEASE_NOTES.txt
+PASS - File present BUILD106_ARCHIVE_STATUS.txt
+PASS - Python backend syntax compile
+PASS - Launcher C# brace count balanced | {=1668 }=1668
+PASS - Launcher C# parenthesis count balanced | (=4745 )=4745
+PASS - QT helper C# brace count balanced | {=171 }=171
+PASS - QT helper C# parenthesis count balanced | (=587 )=587
+PASS - Filter helper C# brace count balanced | {=146 }=146
+PASS - Filter helper C# parenthesis count balanced | (=578 )=578
