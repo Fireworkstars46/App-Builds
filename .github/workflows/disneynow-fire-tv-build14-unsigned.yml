@@ -6,6 +6,8 @@ on:
     paths:
       - 'DisneyNOWFireTV/Build14/apply.py'
       - 'DisneyNOWFireTV/Build14/patch_parts/**'
+      - 'DisneyNOWFireTV/Build14/finalize_audit.py'
+      - 'DisneyNOWFireTV/Build14/audit_final_parts/**'
       - '.github/workflows/disneynow-fire-tv-build14-unsigned.yml'
   workflow_dispatch:
 
@@ -24,7 +26,7 @@ jobs:
       - name: Check out App-Builds
         uses: actions/checkout@v7
 
-      - name: Reconstruct verified Build 13 chain and apply Build 14 lag fix
+      - name: Reconstruct verified Build 13 chain and apply finalized Build 14
         shell: bash
         run: |
           set -euo pipefail
@@ -43,6 +45,7 @@ jobs:
           python3 DisneyNOWFireTV/Build11/apply.py --source "$PROJECT_DIR"
           python3 DisneyNOWFireTV/Build13/apply.py --source "$PROJECT_DIR"
           python3 DisneyNOWFireTV/Build14/apply.py --source "$PROJECT_DIR"
+          python3 DisneyNOWFireTV/Build14/finalize_audit.py --source "$PROJECT_DIR"
           MAIN="$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
           GRADLE="$PROJECT_DIR/app/build.gradle"
           grep -q 'versionCode 14' "$GRADLE"
@@ -52,6 +55,7 @@ jobs:
           grep -q 'debugNativeTvRepeatSuppressedCount++' "$MAIN"
           grep -q 'debugKeyDispatchSlowCount++' "$MAIN"
           grep -q 'Native TV repeat throttle:' "$MAIN"
+          grep -q 'Build 14 automatic native launch stability guard' "$MAIN"
           grep -q 'initializeRuntimeCrashTracking' "$MAIN"
           if grep -q 'scheduleAutomaticNativePlayback();' "$MAIN"; then
             echo 'Build 14 unexpectedly schedules automatic native playback' >&2
@@ -105,6 +109,7 @@ jobs:
           python3 "$PROJECT_DIR/tools/static_audit.py"
           REPORT="$PROJECT_DIR/build/reports/STATIC-AUDIT-v0.1-Build14.txt"
           test -s "$REPORT"
+          grep -q 'STATIC TOTAL: PASS=227 FAIL=0' "$REPORT"
           grep -q 'RESULT: PASS' "$REPORT"
           if grep -q ' FAIL - ' "$REPORT"; then
             echo 'Static audit contains a failure' >&2
