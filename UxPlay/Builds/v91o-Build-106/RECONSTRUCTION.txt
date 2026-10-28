@@ -1,0 +1,51 @@
+UxPlay Quality Launcher Full - v91o Build 106 reconstruction
+
+Purpose:
+Reconstruct the Build 105 -> Build 106 changed text-source state from the exact Build 105 baseline.
+
+1. Start from the exact baseline ZIP:
+   UxPlay_V91O_Build_105_Fresh_UsbDk_Context_Reenumeration.zip
+   SHA-256: 830835b0a91f0e4a5230985a4104a6378636402957dbcd77a56b167987ae422a
+
+2. Concatenate these files in lexical order, with NO separators and NO added newlines:
+   source-patch-parts/part01.b64
+   source-patch-parts/part02.b64
+   source-patch-parts/part03.b64
+   source-patch-parts/part04.b64
+   source-patch-parts/part05.b64
+   source-patch-parts/part06.b64
+   source-patch-parts/part07.b64
+
+3. Verify the concatenated base64 transport:
+   Size: 52344 bytes
+   SHA-256: 70f63506f0b4a1fba8e3d5a59e93c046637ece40c0917a79ac35872c9f91afdd
+
+4. Base64-decode the concatenated content.
+
+5. Gzip-decompress the decoded bytes.
+
+6. Verify the resulting text-source patch:
+   Filename: UxPlay_Build105_to_Build106_TEXT_SOURCE.patch
+   Size: 182389 bytes
+   SHA-256: ac128f05565c80d3a2588a44ea3fbbb0728f0a6df95b0a2b4bd079cb4ec35d96
+
+7. Extract the exact Build 105 baseline ZIP and apply the text-source patch to that exact source tree.
+
+8. Build using:
+   0_BUILD_V91O_BUILD_106_ALL_IN_ONE.bat
+
+Important scope note:
+This source delta reconstructs the changed text-source/artifact content for Build 106 from the exact Build 105 baseline. It does NOT claim byte-for-byte reproduction of environment-generated files such as .pyc files, PyInstaller executable bytes, or Inno Setup installer bytes, which can vary with the build environment/tool versions.
+
+Expected Build 106 source-package ZIP metadata from the creation environment:
+Filename: UxPlay_V91O_Build_106_Topology_Bound_UsbDk_Reenumeration.zip
+Size: 2731831 bytes
+SHA-256: 67dcb6be8d1fee19d317d386cca16f2f7109ebc508a9bd6afc0c75e975fd7505
+
+Status at archive time:
+Static source audit: 119/119 PASS
+ZIP integrity: PASS
+Python backend syntax: PASS
+Windows C# compile: NOT TESTED in the creation environment
+Real iPhone Direct USB: NOT TESTED
+Project status: NOT DONE / pending Windows + real iPhone validation
