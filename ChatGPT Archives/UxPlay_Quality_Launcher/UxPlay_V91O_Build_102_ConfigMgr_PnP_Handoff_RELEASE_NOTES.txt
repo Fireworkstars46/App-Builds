@@ -1,0 +1,39 @@
+UxPlay Quality Launcher Full - v91o Build 102
+ConfigMgr exact-interface removal/arrival handoff
+
+BASELINE
+Exact released Build 101 ZIP SHA-256:
+f18cbc3fa275344f7fb372f7abe808e67ff56cb7e43e0d6f89d1209887eda70e
+
+REAL BUILD 101 RESULT
+- Windows build/install packaging succeeded.
+- Active QuickTime configuration 5 was present.
+- Interface 2 claim succeeded after the established config-0 repair.
+- Canonical 16-byte device PING was received.
+- Canonical 16-byte PING reply payload 10000000676e69700000000001000000 was written in about 0.2 ms.
+- CWPA still did not arrive within 10 seconds.
+
+BUILD 102 TARGETED CHANGE
+- Keep normal Apple/libusb0 stack intact; do not detach AppleLowerFilter.
+- Before activate-only 0x40/0x52/index2, register exact libusb0 device-interface notification using Windows Configuration Manager.
+- Scope notification to exact Apple VID/PID + normalized serial + libusb0 interface GUID.
+- After 0x52, make zero libusb calls while observing exact removal -> arrival -> 750 ms stable presence.
+- Never usb_close the invalidated activation handle; leave libusb0.dll loaded until helper process exit.
+- Only return ACTIVATION_ONLY_OK after exact stable transition.
+- Protocol packet bytes/order are unchanged.
+
+SAFETY
+No Apple driver/filter removal, no usbccgp replacement, no security-product weakening.
+
+VALIDATION
+Static audit: 244/244 PASS.
+Python syntax: PASS.
+ZIP integrity: PASS.
+Windows C# compile: NOT TESTED for Build 102.
+Real ConfigMgr PnP transition: NOT TESTED.
+Real iPhone video: NOT TESTED.
+
+ZIP SHA-256
+9eb5dd6dc972878874171438e32e4d072e380afa8ccfa8f0b14df80ecc8e7ab0
+
+Status: NOT DONE / pending Windows build and real iPhone validation.
