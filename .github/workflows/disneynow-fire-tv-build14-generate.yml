@@ -36,7 +36,7 @@ jobs:
           python3 DisneyNOWFireTV/Build13/apply.py --source "$PROJECT_DIR"
           python3 - "$PROJECT_DIR" <<'PY'
           from pathlib import Path
-          import hashlib, zipfile, base64, textwrap
+          import hashlib, zipfile, base64
           root=Path(__import__('sys').argv[1])
           mainp=root/'app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java'
           gradlep=root/'app/build.gradle'
@@ -79,6 +79,7 @@ jobs:
           main=main.replace('disabled by Build 13 safety rollback','disabled by Build 14 stability guard')
           main=main.replace('disabled in Build 13 after physical crash/regression','disabled in Build 14 after physical crash/regression')
           main=main.replace('DisneyNOWFireTV-Debug-v0.1-Build13-','DisneyNOWFireTV-Debug-v0.1-Build14-')
+          main=main.replace('SafeSelfTest-v0.1-Build13.txt','SafeSelfTest-v0.1-Build14.txt')
           main=main.replace('BuildConfig.APP_BUILD == 13 && BuildConfig.VERSION_CODE == 13','BuildConfig.APP_BUILD == 14 && BuildConfig.VERSION_CODE == 14')
           mainp.write_text(main)
 
@@ -88,20 +89,21 @@ jobs:
           gradlep.write_text(gradle)
 
           info=infop.read_text().replace('Build 13','Build 14').replace('Build13','Build14').replace('versionCode 13','versionCode 14')
-          info += '\n\n## Build 14 lag/stability correction\n- Native TV Navigation now suppresses only rapid repeated directional ACTION_DOWN events inside an 85 ms guard window; initial directional presses and releases still pass through.\n- Adds privacy-safe counters for suppressed repeats and dispatches taking at least 100 ms.\n- Automatic native Media3 launch remains disabled; crash-stage breadcrumbs and all existing compatibility settings remain preserved.\n'
+          info += '\n\n## Build 14 lag/stability correction\n- Native TV Navigation suppresses only rapid repeated directional ACTION_DOWN events inside an 85 ms guard window; initial directional presses and ACTION_UP still pass through.\n- Adds privacy-safe counters for suppressed repeats and dispatches taking at least 100 ms.\n- Automatic native Media3 launch remains disabled; crash-stage breadcrumbs and existing compatibility settings remain preserved.\n'
           infop.write_text(info)
           readme=readmep.read_text().replace('Build 13','Build 14').replace('Build13','Build14').replace('versionCode 13','versionCode 14')
-          readme += '\n\n## Build 14 input-lag correction\nBuild 14 keeps the stable no-auto-native playback behavior and adds an 85 ms Native TV directional-repeat guard to prevent remote key-repeat floods from building a long WebView input queue. Single presses, releases, Select/Menu/Back, Cursor Navigation, Legacy Focus Navigation, crash breadcrumbs, Performance Mode, zoom, and Silk fallback are preserved. Debug reports now include suppressed-repeat and >=100 ms dispatch counts for physical comparison.\n'
+          readme += '\n\n## Build 14 input-lag correction\nBuild 14 keeps the stable no-auto-native playback behavior and adds an 85 ms Native TV directional-repeat guard to reduce remote key-repeat backlog in the WebView input path. Initial presses and releases, Select/Menu/Back, Cursor Navigation, Legacy Focus Navigation, crash breadcrumbs, Performance Mode, zoom, and Silk fallback are preserved. Debug reports include suppressed-repeat and >=100 ms dispatch counts for physical comparison.\n'
           readmep.write_text(readme)
 
           audit=auditp.read_text()
           audit=audit.replace('Build13','Build14').replace('Build 13','Build 14')
-          audit=audit.replace('versionCode\\s+13\\b','versionCode\\s+14\\b').replace("'13')", "'14')")
+          audit=audit.replace('versionCode\\s+13\\b','versionCode\\s+14\\b')
           audit=audit.replace("'APP_BUILD', '13'", "'APP_BUILD', '14'")
           audit=audit.replace('BuildConfig.APP_BUILD == 13 && BuildConfig.VERSION_CODE == 13','BuildConfig.APP_BUILD == 14 && BuildConfig.VERSION_CODE == 14')
+          audit=audit.replace("'13')", "'14')")
           inject="""\n# Build 14 Native TV input-backlog correction.\nadd('Native TV repeat throttle constant is 85 ms', 'NATIVE_TV_REPEAT_THROTTLE_MS = 85L' in main, '85 ms')\nadd('Native TV repeat throttle is limited to directional ACTION_DOWN repeats', 'event.getRepeatCount() == 0' in main and 'now - lastNativeTvDirectionalForwardAt < NATIVE_TV_REPEAT_THROTTLE_MS' in main, 'initial press preserved, rapid repeats suppressed')\nadd('Suppressed native-TV repeats are counted without file logging', 'debugNativeTvRepeatSuppressedCount++' in main, 'privacy-safe in-memory counter')\nadd('Slow dispatch counter retained for physical comparison', 'debugKeyDispatchSlowCount++' in main and '100_000_000L' in main, '>=100 ms')\nadd('Debug snapshot reports repeat throttle evidence', 'Native TV repeat throttle:' in main and 'suppressed=' in main, 'physical comparison field')\n"""
-          sentinel="\n# Write report.\n"
-          if sentinel not in audit: raise SystemExit('static audit write-report sentinel missing')
+          sentinel='\n# Privacy: tokens/URLs must not be exported/logged.\n'
+          if audit.count(sentinel)!=1: raise SystemExit('static audit privacy sentinel mismatch')
           audit=audit.replace(sentinel,inject+sentinel)
           auditp.write_text(audit)
 
@@ -121,7 +123,7 @@ jobs:
           ap.write_text('''#!/usr/bin/env python3\nfrom pathlib import Path\nimport argparse,base64,hashlib,io,zipfile\nBASE='''+repr(base)+'''\nRESULT='''+repr(post)+'''\nPATCH_ZIP_SHA256='''+repr(zsha)+'''\nPATCH_PARTS='''+repr(parts)+'''\ndef sha(b): return hashlib.sha256(b).hexdigest()\ndef verify(root,expected,label):\n f=[]\n for r,w in expected.items():\n  p=root/r; g=sha(p.read_bytes()) if p.is_file() else 'missing'\n  if g!=w:f.append(f"{r}: expected {w}, got {g}")\n if f: raise SystemExit(label+' hash verification failed:\\n'+'\\n'.join(f))\ndef main():\n pa=argparse.ArgumentParser();pa.add_argument('--source',required=True);a=pa.parse_args();root=Path(a.source).resolve();verify(root,BASE,'Build 13 baseline')\n d=Path(__file__).resolve().parent/'patch_parts';data=base64.b64decode(''.join((d/n).read_text() for n in PATCH_PARTS),validate=True)\n if sha(data)!=PATCH_ZIP_SHA256: raise SystemExit('Build 14 patch ZIP SHA-256 mismatch')\n with zipfile.ZipFile(io.BytesIO(data)) as z:\n  if set(z.namelist())!=set(RESULT): raise SystemExit('Build 14 patch entries mismatch')\n  for r in RESULT:\n   b=z.read(r)\n   if sha(b)!=RESULT[r]: raise SystemExit('Build 14 payload hash mismatch: '+r)\n   p=(root/r).resolve()\n   if root not in p.parents: raise SystemExit('Unsafe Build 14 patch path: '+r)\n   p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b)\n verify(root,RESULT,'Build 14 result');print('Build 14 lag/stability patch applied and verified.')\nif __name__=='__main__': main()\n''')
           print('BASE',base);print('RESULT',post);print('ZIP',zsha);print('PARTS',parts)
           PY
-          rm -f DisneyNOWFireTV/Build14/_inspect_MainActivity_Build13.java DisneyNOWFireTV/Build14/_inspect_static_audit_Build13.py DisneyNOWFireTV/Build14/_inspect_build_gradle_Build13.txt
+          rm -f DisneyNOWFireTV/Build14/_inspect_MainActivity_Build13.java DisneyNOWFireTV/Build14/_inspect_static_audit_Build13.py DisneyNOWFireTV/Build14/_inspect_build_gradle_Build13.txt DisneyNOWFireTV/Build14/_precheck.txt
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add -A DisneyNOWFireTV/Build14
