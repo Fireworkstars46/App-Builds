@@ -1,0 +1,11 @@
+Build 105 source-package ZIP SHA-256:
+830835b0a91f0e4a5230985a4104a6378636402957dbcd77a56b167987ae422a  UxPlay_V91O_Build_105_Fresh_UsbDk_Context_Reenumeration.zip
+
+Exact Build 104 baseline ZIP SHA-256:
+2a8e2bc91d95646c55af37b4525bd57232138338dd31a58710b962e818450607  UxPlay_V91O_Build_104_Foreground_Focus_Fix.zip
+
+Exact Build104->Build105 source patch SHA-256:
+3cc18141a3f62e36435fd629b84fecf8055cd6fcadd0f4c40f42f0c711b95983  UxPlay_Build104_to_Build105_SOURCE.patch
+
+Compressed/base64 patch SHA-256:
+f2f8127a953703933780d951af9189e51c2da46ceb0aff565332d59bcfd320f9  UxPlay_Build104_to_Build105_SOURCE.patch.gz.b64
