@@ -1,0 +1,24 @@
+Build 104 baseline provenance
+
+Exact baseline package:
+UxPlay_V91O_Build_103_Unsafe_Stack_UsbDk_First.zip
+SHA-256:
+aee681be857246d8542dc6620bf7a1362f94133e2a610767496392c790d3d15b
+
+Build 103 Windows build evidence supplied by user:
+- Direct USB backend PyInstaller exit code 0.
+- C# launcher compile exit code 0.
+- Inno Setup completed successfully.
+
+Build 103 real iPhone result supplied by user:
+- Apple kernel-filter caution detected.
+- Auto chose same-backend UsbDk activation + streaming.
+- 0x40/0x52/index2 activation request returned normally.
+- QuickTime subclass 0x2A did not appear in the bounded 45-second fresh-handle wait.
+- Build 103 exited with activation failure before PING/CWPA/video.
+
+Build 104 delta:
+- one-shot foreground presentation fix only for the user-facing UI behavior;
+- current-release identity bump to Build 104;
+- stale helper diagnostic build markers corrected from 102 to 104;
+- USB transport behavior otherwise preserved from Build 103.
