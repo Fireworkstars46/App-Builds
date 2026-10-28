@@ -1,0 +1,27 @@
+UxPlay v91o Build 104 archive status
+
+Permanent archive path:
+Fireworkstars46/App-Builds/UxPlay/Builds/v91o-Build-104/
+
+Archived:
+- README.txt
+- SHA256.txt
+- BASELINE_PROVENANCE.txt
+- STATIC_AUDIT_V91O_BUILD_104_RESULTS.txt
+- ARCHIVE_STATUS.txt
+- source-patch-parts/part00.b64
+- source-patch-parts/part01.b64
+- source-patch-parts/part02.b64
+
+Source delta is reconstructable from the exact Build 103 baseline using README.txt.
+Build 104 source ZIP SHA-256: 2a8e2bc91d95646c55af37b4525bd57232138338dd31a58710b962e818450607
+Raw source patch SHA-256: cfc0bc1ebb4890e7b3faf4e1fae2b4b649eb0c16711690859b2269429c8aae48
+
+Validation status:
+- Static audit: 94/94 PASS.
+- Python backend syntax: PASS.
+- Source ZIP integrity: PASS.
+- Windows C# compile: NOT TESTED for Build 104 in the current environment.
+- Real Windows foreground/z-order behavior: NOT TESTED / pending user validation.
+- Direct USB behavior: intentionally unchanged from Build 103; NOT claimed fixed.
+- Build status: NOT DONE / pending Windows build and foreground validation.
