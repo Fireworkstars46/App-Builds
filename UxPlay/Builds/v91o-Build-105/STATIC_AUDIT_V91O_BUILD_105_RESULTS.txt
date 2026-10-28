@@ -1,0 +1,112 @@
+STATIC AUDIT V91O BUILD 105 RESULTS: 111/111 PASS
+PASS - Build number 105
+PASS - Display version 105
+PASS - Stable AppId preserved
+PASS - Per-user installer preserved
+PASS - Installer version 105
+PASS - Installer filename 105
+PASS - Top BAT targets 105 builder
+PASS - Generic builder targets 105
+PASS - Top BAT success banner 105
+PASS - Top BAT installer path 105
+PASS - 105 runtime backend name
+PASS - 105 runtime MI01 helper name
+PASS - 105 runtime WDI name
+PASS - 105 runtime filter helper name
+PASS - 105 runtime QT helper name
+PASS - No active Build104 runtime identity
+PASS - Launcher stack diagnostic identity 105
+PASS - QT helper diagnostic identity 105
+PASS - Filter helper diagnostic identity 105
+PASS - Exact Build104 baseline SHA documented
+PASS - Build104 Windows success documented
+PASS - Build104 UsbDk failure documented
+PASS - Status NOT DONE pending
+PASS - Windows compile truthfully NOT TESTED
+PASS - Real USB truthfully NOT TESTED
+PASS - Re-enumeration patch has context-recreate option
+PASS - Fresh libusb backend helper exists
+PASS - PyUSB cached backend referenced
+PASS - Cached backend finalized safely
+PASS - Cached backend pointer cleared
+PASS - Fresh backend created
+PASS - Fresh backend fail closed
+PASS - usb.core.find receives explicit fresh backend
+PASS - Direct UsbDk enables context recreation
+PASS - Normal/external path does not force context recreation
+PASS - Fresh-context poll cadence 250ms
+PASS - Fresh-context timeout bounded 20s
+PASS - Fresh context used each post-0x52 scan
+PASS - Final timeout scan also fresh
+PASS - Reference alignment diagnostic present
+PASS - QuickTime active state inspected
+PASS - Strict UsbDk requires active QT before break
+PASS - Strict UsbDk refuses forced SET_CONFIGURATION
+PASS - Legacy set_configuration retained only non-strict
+PASS - Old device references dropped before context finalize
+PASS - One activation request preserved
+PASS - No automatic activation retry introduced
+PASS - Exact serial selection remains first
+PASS - Single Apple fallback remains bounded
+PASS - Multiple Apple devices remain blocked
+PASS - README documents PyUSB global cache bug
+PASS - README documents fresh context per probe
+PASS - README documents active QT requirement
+PASS - README documents no forced config5
+PASS - Caution result recognized
+PASS - Unsafe-stack boolean preserved
+PASS - Caution still blocks libusb0-first
+PASS - UsbDk-first safety policy preserved
+PASS - Same-backend UsbDk selection preserved
+PASS - Legacy usbccgp assist still gated away from UsbDk
+PASS - Explicit libusb0 troubleshooting path preserved
+PASS - Canonical PING bytes preserved
+PASS - PING reply behavior preserved
+PASS - CWPA watchdog preserved
+PASS - No synthetic timeout traffic marker preserved
+PASS - No protocol packet change claimed
+PASS - ConfigMgr notification markers preserved
+PASS - Process-exit-only activation handle preserved
+PASS - No-libUSB-after-request diagnostic preserved
+PASS - 60s one-button fail-fast preserved
+PASS - No Keep Waiting prompt
+PASS - Read-only stack diagnostic preserved
+PASS - Apple stack kept on caution path
+PASS - README says Apple filters not removed
+PASS - README says no Apple rebind/uninstall
+PASS - README says no usbccgp replacement
+PASS - README says no security weakening
+PASS - Zadig not used
+PASS - SetForegroundWindow imported
+PASS - Shared foreground helper preserved
+PASS - Foreground helper BringToFront
+PASS - Foreground helper Activate
+PASS - Foreground helper SetForegroundWindow
+PASS - Foreground helper no TopMost
+PASS - App Settings foreground hook preserved
+PASS - Main menu foreground hook preserved
+PASS - Direct USB foreground hook preserved
+PASS - Persistent USB renderer preserved
+PASS - Build80 preservation documented
+PASS - Native pin code remains
+PASS - App Settings remains modal
+PASS - File present UxPlayQualityLauncher.cs
+PASS - File present BUILD_LAUNCHER_INSTALLER_V91O_BUILD_105.ps1
+PASS - File present BUILD_LAUNCHER_INSTALLER_V91O.ps1
+PASS - File present 0_BUILD_V91O_BUILD_105_ALL_IN_ONE.bat
+PASS - File present UxPlayQualityLauncherSetup.iss
+PASS - File present usb_direct_backend.py
+PASS - File present UsbLibUsb0QuickTimeProbe.cs
+PASS - File present UsbLibUsb0FilterHelper.cs
+PASS - File present README_V91O_BUILD_105_FRESH_USBDK_CONTEXT_REENUMERATION.txt
+PASS - File present BUILD_STATUS.txt
+PASS - File present BUILD_104_BASELINE_PROVENANCE.txt
+PASS - File present BUILD105_RELEASE_NOTES.txt
+PASS - File present BUILD105_ARCHIVE_STATUS.txt
+PASS - Python backend syntax compile
+PASS - Launcher C# brace count balanced | {=1668 }=1668
+PASS - Launcher C# parenthesis count balanced | (=4745 )=4745
+PASS - QT helper C# brace count balanced | {=171 }=171
+PASS - QT helper C# parenthesis count balanced | (=587 )=587
+PASS - Filter helper C# brace count balanced | {=146 }=146
+PASS - Filter helper C# parenthesis count balanced | (=578 )=578
