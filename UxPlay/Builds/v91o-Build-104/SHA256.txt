@@ -1,0 +1,16 @@
+Build 104 source package ZIP:
+2a8e2bc91d95646c55af37b4525bd57232138338dd31a58710b962e818450607  UxPlay_V91O_Build_104_Foreground_Focus_Fix.zip
+
+Build 103 baseline ZIP:
+aee681be857246d8542dc6620bf7a1362f94133e2a610767496392c790d3d15b  UxPlay_V91O_Build_103_Unsafe_Stack_UsbDk_First.zip
+
+Raw Build103->Build104 patch:
+cfc0bc1ebb4890e7b3faf4e1fae2b4b649eb0c16711690859b2269429c8aae48  UxPlay_Build103_to_Build104_SOURCE.patch
+
+Concatenated xz/base64 patch:
+6cf5b7d8d4ac9390efdd972bce58385c988826afb0c37b8467a0afa270d0af38  UxPlay_Build103_to_Build104_SOURCE.patch.xz.b64
+
+Patch parts:
+7ab458e67322c5631c6627d4718d0b5960892901634af22fafec547fb880021a  source-patch-parts/part00.b64
+dcad2e3781469a61cf651b1aaeb2b11ce4f6a78e949c3028af3ef99b11c467d6  source-patch-parts/part01.b64
+4ebd4aa0ac04dc45d52832eb8b3d9e23d6f6746507471f88a8dd2768709b12c3  source-patch-parts/part02.b64
