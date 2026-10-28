@@ -1,0 +1,16 @@
+UxPlay v91o Build 100
+Status: NOT DONE / PENDING Windows + real iPhone validation.
+
+Source/static regression audit: 233/233 PASS.
+Python backend syntax: PASS.
+ZIP integrity: PASS.
+Windows C# compile: NOT TESTED in the Linux build environment.
+Real stable QuickTime activation handoff: NOT TESTED.
+Real iPhone PING -> CWPA -> CVRP -> FEED -> H.264: NOT TESTED.
+
+Build 100 keeps AppleLowerFilter installed and unchanged. The Build 99 guarded detach experiment is disabled in the one-button path.
+
+Exact Build 100 ZIP SHA-256: 3de6c5c891feb323299a7117711cb7c73b0a579ba024fdf699f5cac7652f9885
+Exact Build 99 input ZIP SHA-256: a591719fe2403cb02be32357c2e5d7914a79334a4f7f688f533e4c08ed3a208d
+
+The exact binary ZIP remains on the ChatGPT conversation surface; this GitHub archive records metadata/provenance and does not claim the exact ZIP bytes are stored here.
