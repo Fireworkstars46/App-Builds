@@ -1,0 +1,24 @@
+UxPlay v91o Build 102 core source delta manifest
+
+Baseline Build 101 ZIP SHA-256:
+f18cbc3fa275344f7fb372f7abe808e67ff56cb7e43e0d6f89d1209887eda70e
+
+Archived file:
+UxPlay_V91O_Build_102_CORE_SOURCE_DELTA.patch.gz.b64
+
+It contains the exact unified diffs for the two behavior-bearing USB files changed from Build 101 to Build 102:
+- Launcher_Maker/usb_backend_src/UsbLibUsb0QuickTimeProbe.cs
+- Launcher_Maker/usb_backend_src/usb_direct_backend.py
+
+Decode base64, then gunzip to recover build102_core.patch.
+
+Core raw patch SHA-256:
+d7ae1e4b77d1c43a93efcbc6ad0ffa8eea4daeebd27f11122a6054d0160f1a72
+Core gzip SHA-256:
+3fe40b2f687e185542b17fb0701442f6827af2d94274232d4dac44b93722cbee
+Core gzip-base64 SHA-256:
+ae0d1b2c1e580561a6b790729acecf442f93b865f9f2b1751bb8d55dfbd6ec84
+
+Other Build 101 -> Build 102 changed files are release/build identity, installer/build-script identity, diagnostics wording, README/status/audit metadata, and the filter-helper build marker. No functional Wi-Fi behavior is changed.
+
+The exact Build 102 binary ZIP remains the ChatGPT conversation artifact. This archive does not claim the core patch alone is a byte-for-byte replacement for the full ZIP.
