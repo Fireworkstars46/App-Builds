@@ -8,19 +8,19 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   inspect:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Reconstruct Build 13 and print lag-sensitive source excerpts
+      - name: Reconstruct Build 13 and persist lag-sensitive source snapshot
         shell: bash
         run: |
           set -euo pipefail
           PROJECT_DIR=_inspect13/DisneyNOWFireTV/Source
-          mkdir -p _inspect13/DisneyNOWFireTV
+          mkdir -p _inspect13/DisneyNOWFireTV DisneyNOWFireTV/Build14
           python3 DisneyNOWFireTV/SourceSeed/reconstruct.py --output "$PROJECT_DIR"
           python3 DisneyNOWFireTV/Build2/apply.py --source "$PROJECT_DIR"
           python3 DisneyNOWFireTV/Build4/reconstruct_build3.py --source "$PROJECT_DIR"
@@ -34,19 +34,11 @@ jobs:
           python3 DisneyNOWFireTV/Build11/apply.py --source "$PROJECT_DIR"
           python3 DisneyNOWFireTV/Build13/apply.py --source "$PROJECT_DIR"
           MAIN="$PROJECT_DIR/app/src/main/java/com/fireworkstars46/disneynowfiretv/MainActivity.java"
-          echo '=== MATCHES ==='
-          grep -n -E 'dispatchKeyEvent|onKeyDown|DPAD|D-pad|dpad|keyLatency|inputLatency|elapsedRealtime|System\.nanoTime|record.*Key|appendDebug|writeDebug|debugLog' "$MAIN" || true
-          echo '=== DISPATCH CONTEXT ==='
-          python3 - "$MAIN" <<'PY'
-          import re,sys
-          p=sys.argv[1]
-          lines=open(p,encoding='utf-8').read().splitlines()
-          pats=[r'dispatchKeyEvent',r'onKeyDown',r'DPAD',r'D-pad',r'dpad',r'elapsedRealtime',r'nanoTime']
-          hits=set()
-          for i,l in enumerate(lines):
-              if any(re.search(x,l,re.I) for x in pats): hits.add(i)
-          for i in sorted(hits):
-              lo=max(0,i-12); hi=min(len(lines),i+28)
-              print(f'--- lines {lo+1}-{hi} around {i+1} ---')
-              for j in range(lo,hi): print(f'{j+1:05d}: {lines[j]}')
-          PY
+          cp "$MAIN" DisneyNOWFireTV/Build14/_inspect_MainActivity_Build13.java
+          cp "$PROJECT_DIR/tools/static_audit.py" DisneyNOWFireTV/Build14/_inspect_static_audit_Build13.py
+          cp "$PROJECT_DIR/app/build.gradle" DisneyNOWFireTV/Build14/_inspect_build_gradle_Build13.txt
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add DisneyNOWFireTV/Build14/_inspect_MainActivity_Build13.java DisneyNOWFireTV/Build14/_inspect_static_audit_Build13.py DisneyNOWFireTV/Build14/_inspect_build_gradle_Build13.txt
+          git commit -m 'Temporary Build 14 source inspection snapshot'
+          git push
