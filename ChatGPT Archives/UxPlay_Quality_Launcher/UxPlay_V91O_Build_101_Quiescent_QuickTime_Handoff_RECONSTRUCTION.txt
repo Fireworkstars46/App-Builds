@@ -1,0 +1,34 @@
+Build 101 reconstruction record
+
+Required baseline:
+UxPlay_V91O_Build_100_Stable_QuickTime_Handoff_Diagnostics.zip
+SHA-256: 3de6c5c891feb323299a7117711cb7c73b0a579ba024fdf699f5cac7652f9885
+
+Required identity changes:
+- BuildNumber 100 -> 101
+- LIBUSB0_STACK_DIAGNOSTIC_BUILD=100 -> =101
+- FILTER_HELPER_BUILD=100 -> =101
+- LIBUSB0_QT_PROBE_BUILD=100 -> =101
+- runtime/build filenames build100 -> build101
+- installer/output/build-script identity Build 100 -> Build 101
+
+Functional helper change in UsbLibUsb0QuickTimeProbe.cs, activate-only path after exact QuickTime descriptor is observed:
+1. Close quickTimeHandle if nonzero and set it to IntPtr.Zero.
+2. Do NOT call Enumerate(api,...), api.Refresh(), SelectExactParentSlot(), OpenCandidate(), usb_set_configuration(), usb_set_altinterface(), or endpoint halt-clear during the handoff window.
+3. Add log markers:
+   LIBUSB0_QT_PROBE_STABLE_HANDOFF_MODE=QUIESCENT_NO_LIBUSB
+   LIBUSB0_QT_PROBE_STABLE_HANDOFF_REQUIRED_MS=750
+   LIBUSB0_QT_PROBE_STABLE_HANDOFF_REENUMERATION_CALLS=0
+4. Record quiescentStart=DateTime.UtcNow; Thread.Sleep(750); log elapsed milliseconds.
+5. Add LIBUSB0_QT_PROBE_STABLE_HANDOFF_OK=1.
+6. Preserve PROCESS_EXIT_RELEASES_STALE_ACTIVATION_HANDLE and RESULT=ACTIVATION_ONLY_OK.
+
+Reason for change:
+Real Build 100 helper exited 3221225477 (0xC0000005) with NO_RESULT after the Build 100 stability loop repeatedly re-entered libusb0 enumeration while retaining the invalidated activation handle.
+
+Release artifact:
+UxPlay_V91O_Build_101_Quiescent_QuickTime_Handoff.zip
+SHA-256: f18cbc3fa275344f7fb372f7abe808e67ff56cb7e43e0d6f89d1209887eda70e
+Static audit: 239/239 PASS
+ZIP integrity: PASS
+Windows compile / real iPhone test: NOT TESTED at archive time.
