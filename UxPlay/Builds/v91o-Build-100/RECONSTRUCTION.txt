@@ -1,0 +1,27 @@
+Build 100 reconstruction/provenance
+
+Baseline:
+- UxPlay_V91O_Build_99_Filter_Helper_Scope_Compile_Fix.zip
+- SHA-256 a591719fe2403cb02be32357c2e5d7914a79334a4f7f688f533e4c08ed3a208d
+
+Target ZIP:
+- UxPlay_V91O_Build_100_Stable_QuickTime_Handoff_Diagnostics.zip
+- SHA-256 3de6c5c891feb323299a7117711cb7c73b0a579ba024fdf699f5cac7652f9885
+
+Functional source delta from Build 99:
+1. Launcher one-button prerequisite no longer calls StartAppleLowerFilterGuardForSectionTest when READY_WITH_APPLE_KERNEL_FILTER_CAUTION is returned. It logs action=READ_ONLY_KEEP_APPLE_STACK and continues with the normal exact-parent libusb0 path. The same no-mutation policy applies after automatic libusb0 prerequisite repair.
+2. UsbLibUsb0QuickTimeProbe activate-only mode, after first observing the exact parent's QuickTime configuration/subclass, closes the fresh observation handle and requires that exact parent's QuickTime descriptor to remain continuously visible for >=750 ms, polling every 100 ms and bounded to 5 seconds. The invalidated activation handle remains held until helper process exit. Failure result: QUICKTIME_STABLE_HANDOFF_TIMEOUT.
+3. usb_direct_backend logs LIBUSB0_QT_PROBE_STABLE_HANDOFF_* helper result fields.
+4. usb_direct_backend first bulk-OUT diagnostic now records requested byte count, timeout, and payload hex (max 64 bytes).
+5. The PING dispatch wrapper logs reply-write completion timing and bulk-OUT counters after the pinned protocol handler returns.
+6. PING/CWPA/CVRP/FEED framing and reply behavior are unchanged.
+7. Version/build/runtime/installer identity advanced to v91o Build 100; stable installer AppId remains unchanged.
+
+Source audit: 233/233 PASS.
+Python backend syntax: PASS.
+Windows C# compile: NOT TESTED before handoff.
+
+A local active-source unified patch was generated during the build session:
+- uncompressed patch SHA-256 f04498c0fb5112a45110c3a20fb7fc4c582557cadf9a076c30dbf0d835478e06
+- gzip patch SHA-256 2a3ffc0c82da453d083d45d9679c2637cb1d2f95eb8a58cf4bd22ef94dedb008
+The exact patch bytes are not claimed to be archived in this GitHub directory unless separately added later.
