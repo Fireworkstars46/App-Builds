@@ -1,0 +1,19 @@
+UxPlay Quality Launcher Full - Build 105 baseline provenance
+
+Exact baseline ZIP:
+UxPlay_V91O_Build_104_Foreground_Focus_Fix.zip
+
+Exact baseline SHA-256:
+2a8e2bc91d95646c55af37b4525bd57232138338dd31a58710b962e818450607
+
+Observed Build 104 validation from user-supplied logs:
+- Windows build completed successfully; BUILD_STATUS.txt = DONE.
+- Launcher and all USB helpers compiled with exit code 0.
+- Inno Setup completed with exit code 0.
+- Main menu and Direct USB one-shot foreground presentation paths logged as accepted.
+- Exact App Settings foreground behavior was not directly exercised in that run.
+- Auto selected same-backend UsbDk because the exact Apple parent reports READY_WITH_APPLE_KERNEL_FILTER_CAUTION.
+- QVH activation request 0x40/0x52/index2 returned normally.
+- Build 104 then polled through PyUSB's cached libusb backend/context; first poll saw the normal-mode iPhone, but QuickTime subclass 0x2A never became visible and the final scan saw zero Apple candidates.
+
+Build 105 is a direct descendant of this exact Build 104 source package.
