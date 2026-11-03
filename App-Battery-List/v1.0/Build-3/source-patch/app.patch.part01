@@ -1,0 +1,154 @@
+diff --git a/old/app/build.gradle b/new/app/build.gradle
+index 4634955..b4a71d2 100644
+--- a/old/app/build.gradle
++++ b/new/app/build.gradle
+@@ -2,7 +2,7 @@ plugins {
+     id 'com.android.application'
+ }
+ 
+-def projectBuild = 2
++def projectBuild = 3
+ 
+ def releaseStore = System.getenv('APP_BATTERY_LIST_KEYSTORE')
+ def releaseStorePassword = System.getenv('APP_BATTERY_LIST_STORE_PASSWORD')
+@@ -18,7 +18,7 @@ android {
+         applicationId 'com.fireworkstars46.appbatterylist'
+         minSdk 29
+         targetSdk 36
+-        versionCode 2
++        versionCode 3
+         versionName '1.0'
+ 
+         buildConfigField 'int', 'PROJECT_BUILD', projectBuild.toString()
+diff --git a/new/app/src/main/java/com/fireworkstars46/appbatterylist/GuidedReviewAutoAdvance.java b/new/app/src/main/java/com/fireworkstars46/appbatterylist/GuidedReviewAutoAdvance.java
+new file mode 100644
+index 0000000..efda396
+--- /dev/null
++++ b/new/app/src/main/java/com/fireworkstars46/appbatterylist/GuidedReviewAutoAdvance.java
+@@ -0,0 +1,13 @@
++package com.fireworkstars46.appbatterylist;
++
++final class GuidedReviewAutoAdvance {
++    private GuidedReviewAutoAdvance() {}
++
++    static boolean shouldAdvance(GuidedReviewStore.State state, String returnedPackage) {
++        return state != null
++                && state.active
++                && state.autoAdvance
++                && returnedPackage != null
++                && returnedPackage.equals(state.currentPackage());
++    }
++}
+diff --git a/old/app/src/main/java/com/fireworkstars46/appbatterylist/GuidedReviewStore.java b/new/app/src/main/java/com/fireworkstars46/appbatterylist/GuidedReviewStore.java
+index 1734365..e5981b4 100644
+--- a/old/app/src/main/java/com/fireworkstars46/appbatterylist/GuidedReviewStore.java
++++ b/new/app/src/main/java/com/fireworkstars46/appbatterylist/GuidedReviewStore.java
+@@ -15,18 +15,21 @@ final class GuidedReviewStore {
+     private static final String KEY_INDEX = "index";
+     private static final String KEY_PACKAGES = "packages";
+     private static final String KEY_SKIPPED = "skipped";
++    private static final String KEY_AUTO_ADVANCE = "auto_advance";
+ 
+     static final class State {
+         final boolean active;
+         final int index;
+         final List<String> packages;
+         final Set<String> skipped;
++        final boolean autoAdvance;
+ 
+-        State(boolean active, int index, List<String> packages, Set<String> skipped) {
++        State(boolean active, int index, List<String> packages, Set<String> skipped, boolean autoAdvance) {
+             this.active = active;
+             this.index = index;
+             this.packages = packages;
+             this.skipped = skipped;
++            this.autoAdvance = autoAdvance;
+         }
+ 
+         boolean isComplete() {
+@@ -58,20 +61,36 @@ final class GuidedReviewStore {
+         int storedIndex = prefs.getInt(KEY_INDEX, 0);
+         int index = Math.max(0, Math.min(storedIndex, packages.size()));
+         boolean active = prefs.getBoolean(KEY_ACTIVE, false) && !packages.isEmpty() && index < packages.size();
+-        return new State(active, index, packages, skipped);
++        boolean autoAdvance = prefs.getBoolean(KEY_AUTO_ADVANCE, false);
++        return new State(active, index, packages, skipped, autoAdvance);
+     }
+ 
+     boolean start(List<String> packages) {
++        return start(packages, false);
++    }
++
++    boolean start(List<String> packages, boolean autoAdvance) {
+         List<String> safe = packages == null ? new ArrayList<>() : new ArrayList<>(packages);
+         boolean committed = prefs.edit()
+                 .putBoolean(KEY_ACTIVE, !safe.isEmpty())
+                 .putInt(KEY_INDEX, 0)
+                 .putString(KEY_PACKAGES, join(safe))
+                 .putString(KEY_SKIPPED, "")
++                .putBoolean(KEY_AUTO_ADVANCE, autoAdvance)
+                 .commit();
+         if (!committed) return false;
+         State state = load();
+-        return state.packages.equals(safe) && state.index == 0 && state.active == !safe.isEmpty();
++        return state.packages.equals(safe)
++                && state.index == 0
++                && state.active == !safe.isEmpty()
++                && state.autoAdvance == autoAdvance;
++    }
++
++    boolean setAutoAdvance(boolean enabled) {
++        State before = load();
++        if (before.packages.isEmpty()) return false;
++        if (!prefs.edit().putBoolean(KEY_AUTO_ADVANCE, enabled).commit()) return false;
++        return load().autoAdvance == enabled;
+     }
+ 
+     boolean advance(boolean skippedCurrent) {
+diff --git a/old/app/src/main/java/com/fireworkstars46/appbatterylist/MainActivity.java b/new/app/src/main/java/com/fireworkstars46/appbatterylist/MainActivity.java
+index 56c2409..172afb9 100644
+--- a/old/app/src/main/java/com/fireworkstars46/appbatterylist/MainActivity.java
++++ b/new/app/src/main/java/com/fireworkstars46/appbatterylist/MainActivity.java
+@@ -35,6 +35,8 @@ import java.util.concurrent.ExecutorService;
+ import java.util.concurrent.Executors;
+ 
+ public final class MainActivity extends Activity {
++    private static final int GUIDED_APP_INFO_REQUEST = 4603;
++
+     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+     private final List<AppEntry> allApps = new ArrayList<>();
+     private final List<AppEntry> visibleApps = new ArrayList<>();
+@@ -45,8 +47,10 @@ public final class MainActivity extends Activity {
+     private ProgressBar progress;
+     private LinearLayout reviewPanel;
+     private TextView reviewStatus;
++    private Button autoNextButton;
+     private BoundedLogger logger;
+     private GuidedReviewStore reviewStore;
++    private String guidedRequestPackage;
+ 
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+@@ -64,6 +68,15 @@ public final class MainActivity extends Activity {
+         syncGuidedReviewUi();
+     }
+ 
++    @Override
++    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
++        super.onActivityResult(requestCode, resultCode, data);
++        if (requestCode != GUIDED_APP_INFO_REQUEST) return;
++        String returnedPackage = guidedRequestPackage;
++        guidedRequestPackage = null;
++        handleGuidedSettingsReturn(returnedPackage);
++    }
++
+     @Override
+     protected void onDestroy() {
+         logger.log("STOP");
+@@ -137,7 +150,7 @@ public final class MainActivity extends Activity {
+         reviewPanel.addView(reviewStatus, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+ 
+         TextView reviewHelp = new TextView(this);
+-        reviewHelp.setText("In App Info, tap Battery and choose the setting you want. Press Back here, then Done & Next. App Battery List opens the next app for you.");
++        reviewHelp.setText("In App Info, tap Battery and choose the setting you want. Auto mode opens the next app when you return. Manual mode keeps Done & Next / Skip & Next controls.");
+         reviewHelp.setTextSize(12);
