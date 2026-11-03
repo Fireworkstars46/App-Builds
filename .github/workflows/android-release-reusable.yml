@@ -1,0 +1,193 @@
+name: Reusable Android Permanent Release
+
+on:
+  workflow_call:
+    inputs:
+      project_dir:
+        description: Project source directory containing release/ and signing/ metadata
+        required: true
+        type: string
+      environment_name:
+        description: GitHub Environment containing this app's private signing secrets
+        required: true
+        type: string
+      publish_release:
+        description: Create a permanent GitHub Release after every gate passes
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: ${{ inputs.environment_name }}
+    env:
+      PROJECT_DIR: ${{ inputs.project_dir }}
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
+    steps:
+      - name: Checkout exact source revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Load and validate release config
+        shell: bash
+        run: |
+          set -euo pipefail
+          CONFIG="$PROJECT_DIR/release/RELEASE_CONFIG.env"
+          test -f "$CONFIG"
+          set -a
+          source "$CONFIG"
+          set +a
+          required=(APP_NAME PACKAGE_ID VERSION_NAME VERSION_CODE BUILD_NUMBER TAG_NAME RELEASE_TITLE ARTIFACT_FILENAME APK_RELATIVE_PATH ANDROID_PLATFORM_PACKAGE BUILD_TOOLS_VERSION SDK_CHANNEL)
+          for key in "${required[@]}"; do
+            test -n "${!key:-}" || { echo "Missing $key in $CONFIG" >&2; exit 1; }
+          done
+          {
+            echo "APP_NAME=$APP_NAME"
+            echo "PACKAGE_ID=$PACKAGE_ID"
+            echo "VERSION_NAME=$VERSION_NAME"
+            echo "VERSION_CODE=$VERSION_CODE"
+            echo "BUILD_NUMBER=$BUILD_NUMBER"
+            echo "TAG_NAME=$TAG_NAME"
+            echo "RELEASE_TITLE=$RELEASE_TITLE"
+            echo "ARTIFACT_FILENAME=$ARTIFACT_FILENAME"
+            echo "APK_RELATIVE_PATH=$APK_RELATIVE_PATH"
+            echo "ANDROID_PLATFORM_PACKAGE=$ANDROID_PLATFORM_PACKAGE"
+            echo "BUILD_TOOLS_VERSION=$BUILD_TOOLS_VERSION"
+            echo "SDK_CHANNEL=$SDK_CHANNEL"
+          } >> "$GITHUB_ENV"
+
+      - name: Verify permanent-release gate metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 Android-Release-System/scripts/verify_release_contract.py --project-dir "$PROJECT_DIR" --metadata-only
+
+      - name: Require app-specific private signing secrets
+        shell: bash
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_B64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for key in KEYSTORE_B64 STORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            test -n "${!key:-}" || { echo "Missing required GitHub Environment secret: $key" >&2; exit 1; }
+          done
+          KEYSTORE_PATH="$RUNNER_TEMP/android-release.keystore"
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > "$KEYSTORE_PATH"
+          chmod 600 "$KEYSTORE_PATH"
+          echo "ANDROID_RELEASE_KEYSTORE=$KEYSTORE_PATH" >> "$GITHUB_ENV"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install required Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "$ANDROID_PLATFORM_PACKAGE" "build-tools;$BUILD_TOOLS_VERSION" --channel="$SDK_CHANNEL"
+
+      - name: Set up Gradle 9.6.0
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.6.0'
+
+      - name: Build permanently signed release APK
+        working-directory: ${{ inputs.project_dir }}
+        shell: bash
+        env:
+          ANDROID_RELEASE_STORE_PASSWORD: ${{ secrets.ANDROID_RELEASE_STORE_PASSWORD }}
+          ANDROID_RELEASE_KEY_ALIAS: ${{ secrets.ANDROID_RELEASE_KEY_ALIAS }}
+          ANDROID_RELEASE_KEY_PASSWORD: ${{ secrets.ANDROID_RELEASE_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          gradle :app:assembleRelease --stacktrace
+
+      - name: Verify package, version, and permanent signer
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="$PROJECT_DIR/$APK_RELATIVE_PATH"
+          test -f "$APK"
+          AAPT="$ANDROID_HOME/build-tools/$BUILD_TOOLS_VERSION/aapt"
+          APKSIGNER="$ANDROID_HOME/build-tools/$BUILD_TOOLS_VERSION/apksigner"
+          test -x "$AAPT"
+          test -x "$APKSIGNER"
+          python3 Android-Release-System/scripts/verify_release_contract.py \
+            --project-dir "$PROJECT_DIR" \
+            --apk "$APK" \
+            --aapt "$AAPT" \
+            --apksigner "$APKSIGNER"
+
+      - name: Stage immutable release files and checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/android-release-out"
+          mkdir -p "$OUT"
+          cp "$PROJECT_DIR/$APK_RELATIVE_PATH" "$OUT/$ARTIFACT_FILENAME"
+          sha256sum "$OUT/$ARTIFACT_FILENAME" | tee "$OUT/$ARTIFACT_FILENAME.sha256"
+          echo "RELEASE_OUT=$OUT" >> "$GITHUB_ENV"
+
+      - name: Upload verification artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_FILENAME }}-verified
+          path: |
+            ${{ env.RELEASE_OUT }}/${{ env.ARTIFACT_FILENAME }}
+            ${{ env.RELEASE_OUT }}/${{ env.ARTIFACT_FILENAME }}.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Refuse to overwrite historical release/tag
+        if: ${{ inputs.publish_release }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Release $TAG_NAME already exists. Refusing to replace historical release bytes." >&2
+            exit 1
+          fi
+          if git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null; then
+            echo "Tag $TAG_NAME already exists. Refusing to reuse it." >&2
+            exit 1
+          fi
+
+      - name: Publish permanent GitHub Release
+        if: ${{ inputs.publish_release }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          NOTES="$PROJECT_DIR/release/RELEASE_NOTES.md"
+          test -f "$NOTES"
+          gh release create "$TAG_NAME" \
+            "$RELEASE_OUT/$ARTIFACT_FILENAME" \
+            "$RELEASE_OUT/$ARTIFACT_FILENAME.sha256" \
+            --target "$GITHUB_SHA" \
+            --title "$RELEASE_TITLE" \
+            --notes-file "$NOTES"
+
+      - name: Cleanup private signing material
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          rm -f "$RUNNER_TEMP/android-release.keystore"
