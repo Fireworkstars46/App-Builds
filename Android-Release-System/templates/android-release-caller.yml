@@ -1,0 +1,19 @@
+name: Example App Permanent Android Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish_release:
+        description: Publish the verified APK as a permanent GitHub Release
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  permanent-release:
+    uses: ./.github/workflows/android-release-reusable.yml
+    with:
+      project_dir: Example-App/v1.0/Build-1/source
+      environment_name: android-example-app
+      publish_release: ${{ inputs.publish_release }}
+    secrets: inherit
