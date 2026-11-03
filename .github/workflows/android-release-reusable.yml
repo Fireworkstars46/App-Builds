@@ -147,10 +147,8 @@ jobs:
       - name: Upload verification artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_FILENAME }}-verified
-          path: |
-            ${{ env.RELEASE_OUT }}/${{ env.ARTIFACT_FILENAME }}
-            ${{ env.RELEASE_OUT }}/${{ env.ARTIFACT_FILENAME }}.sha256
+          name: android-release-verified-${{ github.run_id }}
+          path: ${{ runner.temp }}/android-release-out/
           if-no-files-found: error
           retention-days: 30
 
