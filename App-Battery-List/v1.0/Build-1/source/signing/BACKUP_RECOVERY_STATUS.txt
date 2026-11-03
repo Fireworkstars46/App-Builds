@@ -1,0 +1,3 @@
+PENDING
+Permanent keystore created, but the MASTER_RULES durable backup + real recovery-test gate has NOT yet passed.
+Do not change this file to PASS until at least two durable user-controlled backup copies exist outside ChatGPT/temp/CI storage and a recovered backup copy has been verified against EXPECTED_SIGNER_SHA256.txt.
