@@ -1,0 +1,121 @@
+         reviewHelp.setPadding(0, dp(2), 0, dp(2));
+         reviewPanel.addView(reviewHelp);
+@@ -149,6 +162,7 @@ public final class MainActivity extends Activity {
+         reviewScroller.addView(reviewButtons);
+         reviewPanel.addView(reviewScroller, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+         addButton(reviewButtons, "Open Current", v -> openGuidedCurrent());
++        autoNextButton = addButton(reviewButtons, "Auto Next: Off", v -> toggleGuidedAutoAdvance());
+         addButton(reviewButtons, "Previous", v -> previousGuided());
+         addButton(reviewButtons, "Done & Next", v -> advanceGuided(false));
+         addButton(reviewButtons, "Skip & Next", v -> advanceGuided(true));
+@@ -223,16 +237,22 @@ public final class MainActivity extends Activity {
+ 
+     private void openAppInfo(AppEntry app) {
+         if (app == null) return;
+-        openAppInfoPackage(app.packageName, "OPEN_APP_INFO");
++        openAppInfoPackage(app.packageName, "OPEN_APP_INFO", false);
+     }
+ 
+-    private boolean openAppInfoPackage(String packageName, String logTag) {
++    private boolean openAppInfoPackage(String packageName, String logTag, boolean guidedResult) {
+         try {
+             Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + packageName));
+-            startActivity(intent);
+-            logger.log(logTag + " | " + packageName);
++            if (guidedResult) {
++                guidedRequestPackage = packageName;
++                startActivityForResult(intent, GUIDED_APP_INFO_REQUEST);
++            } else {
++                startActivity(intent);
++            }
++            logger.log(logTag + " | " + packageName + (guidedResult ? " | result-return" : ""));
+             return true;
+         } catch (RuntimeException ex) {
++            if (guidedResult && packageName.equals(guidedRequestPackage)) guidedRequestPackage = null;
+             logger.log(logTag + "_FAIL | " + packageName + " | " + ex);
+             showMessage("Could not open App Info", ex.toString());
+             return false;
+@@ -244,7 +264,7 @@ public final class MainActivity extends Activity {
+         if (state.active) {
+             new AlertDialog.Builder(this)
+                     .setTitle("Guided Review")
+-                    .setMessage("A review is already in progress at " + (state.index + 1) + " of " + state.packages.size() + ".")
++                    .setMessage("A review is already in progress at " + (state.index + 1) + " of " + state.packages.size() + ".\nAuto Next: " + (state.autoAdvance ? "ON" : "OFF") + ".")
+                     .setPositiveButton("Resume", (d, w) -> openGuidedCurrent())
+                     .setNeutralButton("Restart", (d, w) -> confirmStartNewGuidedReview())
+                     .setNegativeButton("Cancel", null)
+@@ -262,20 +282,24 @@ public final class MainActivity extends Activity {
+         }
+         new AlertDialog.Builder(this)
+                 .setTitle("Start Guided Battery Review")
+-                .setMessage("Review " + queue.size() + " enabled user apps. For each app, App Info opens. Tap Battery, choose Optimized/Unrestricted/Restricted, then press Back and use Done & Next. Progress is remembered if you leave the app.")
+-                .setPositiveButton("Start", (d, w) -> {
+-                    if (!reviewStore.start(queue)) {
+-                        showMessage("Guided Review", "Could not save the review session. Nothing was changed.");
+-                        return;
+-                    }
+-                    logger.log("GUIDED_START | count=" + queue.size());
+-                    syncGuidedReviewUi();
+-                    openGuidedCurrent();
+-                })
++                .setMessage("Review " + queue.size() + " enabled user apps.\n\nAuto Review: App Info opens. Tap Battery, choose the setting, then Back out of Settings. Returning counts that app as done and opens the next app automatically.\n\nManual Review: keeps the Build 2 Done & Next / Skip & Next workflow. Progress is remembered in either mode.")
++                .setPositiveButton("Auto Review", (d, w) -> startGuidedReview(queue, true))
++                .setNeutralButton("Manual Review", (d, w) -> startGuidedReview(queue, false))
+                 .setNegativeButton("Cancel", null)
+                 .show();
+     }
+ 
++    private void startGuidedReview(List<String> queue, boolean autoAdvance) {
++        guidedRequestPackage = null;
++        if (!reviewStore.start(queue, autoAdvance)) {
++            showMessage("Guided Review", "Could not save the review session. Nothing was changed.");
++            return;
++        }
++        logger.log("GUIDED_START | count=" + queue.size() + " | auto=" + autoAdvance);
++        syncGuidedReviewUi();
++        openGuidedCurrent();
++    }
++
+     private void syncGuidedReviewUi() {
+         if (reviewPanel == null || reviewStatus == null || reviewStore == null) return;
+         GuidedReviewStore.State state = reviewStore.load();
+@@ -288,7 +312,9 @@ public final class MainActivity extends Activity {
+         String label = app == null ? pkg : app.label;
+         reviewStatus.setText("Guided Review  " + (state.index + 1) + " / " + state.packages.size()
+                 + "  •  " + label + "\n" + pkg
++                + "\nAuto Next: " + (state.autoAdvance ? "ON" : "OFF")
+                 + (state.skipped.isEmpty() ? "" : "\nSkipped so far: " + state.skipped.size()));
++        if (autoNextButton != null) autoNextButton.setText(state.autoAdvance ? "Auto Next: On" : "Auto Next: Off");
+         reviewPanel.setVisibility(View.VISIBLE);
+     }
+ 
+@@ -300,7 +326,7 @@ public final class MainActivity extends Activity {
+             AppEntry app = findApp(pkg);
+             if (app != null) {
+                 syncGuidedReviewUi();
+-                openAppInfoPackage(pkg, "GUIDED_OPEN");
++                openAppInfoPackage(pkg, "GUIDED_OPEN", true);
+                 return;
+             }
+             logger.log("GUIDED_MISSING_SKIP | " + pkg);
+@@ -314,7 +340,48 @@ public final class MainActivity extends Activity {
+         else syncGuidedReviewUi();
+     }
+ 
++    private void handleGuidedSettingsReturn(String returnedPackage) {
++        GuidedReviewStore.State state = reviewStore.load();
++        if (!GuidedReviewAutoAdvance.shouldAdvance(state, returnedPackage)) {
++            if (returnedPackage != null) {
++                logger.log("GUIDED_RETURN | " + returnedPackage + " | auto=" + state.autoAdvance + " | no-auto-advance");
++            }
++            syncGuidedReviewUi();
++            return;
++        }
++
++        if (!reviewStore.advance(false)) {
++            logger.log("GUIDED_AUTO_ADVANCE_FAIL | " + returnedPackage);
++            showMessage("Guided Review", "Returned from Settings, but the next review position could not be saved. Use Done & Next to continue.");
++            syncGuidedReviewUi();
++            return;
++        }
++
