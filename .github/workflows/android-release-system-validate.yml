@@ -1,0 +1,51 @@
+name: Validate Android Release System
+
+on:
+  push:
+    paths:
+      - '.github/workflows/android-release-reusable.yml'
+      - '.github/workflows/android-release-system-validate.yml'
+      - 'Android-Release-System/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python syntax check
+        run: python3 -m py_compile Android-Release-System/scripts/verify_release_contract.py
+
+      - name: Template safety defaults
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -qx 'SET_BEFORE_RELEASE' Android-Release-System/templates/EXPECTED_SIGNER_SHA256.txt
+          grep -q '^PENDING$' Android-Release-System/templates/BACKUP_RECOVERY_STATUS.txt
+          grep -q 'workflow_call:' .github/workflows/android-release-reusable.yml
+          grep -q 'Refuse to overwrite historical release/tag' .github/workflows/android-release-reusable.yml
+          grep -q 'Cleanup private signing material' .github/workflows/android-release-reusable.yml
+
+      - name: Simulate valid recovery metadata gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          TMP="$(mktemp -d)"
+          mkdir -p "$TMP/release" "$TMP/signing"
+          cp Android-Release-System/templates/RELEASE_CONFIG.env "$TMP/release/RELEASE_CONFIG.env"
+          FINGERPRINT='AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA:AA'
+          printf '%s\n' "$FINGERPRINT" > "$TMP/signing/EXPECTED_SIGNER_SHA256.txt"
+          cat > "$TMP/signing/BACKUP_RECOVERY_STATUS.txt" <<EOF
+          PASS
+          VerifiedFingerprint=$FINGERPRINT
+          VerifiedDate=2099-01-01
+          RecoveryCopyLabel=CI-Isolated-Test
+          EOF
+          python3 Android-Release-System/scripts/verify_release_contract.py --project-dir "$TMP" --metadata-only
+          rm -rf "$TMP"
