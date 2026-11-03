@@ -11,9 +11,9 @@
 - Guided Review real App Info -> Battery -> Back -> Next round-trip: NOT TESTED on-device.
 - Secure Folder profile test: NOT TESTED.
 - Safe Self-Test runtime execution on the Galaxy S22: NOT TESTED.
-- Permanent signing durable-backup + real recovery-test gate: PENDING.
-- Permanent release APK: NOT CREATED / NOT RELEASED because the signing hard gate has not passed.
+- Permanent signing durable-backup + real recovery-test gate: **PASS** — two durable recovery copies exist and private recovery test run `41659723022`, job `125999413354` verified the exact permanent certificate identity.
+- Permanent release APK: PENDING permanent release build/sign/archive.
 
-Overall project/release status: **NOT DONE / pending**.
+Overall project/release status: **NOT DONE / pending permanent APK + remaining on-device checks**.
 
 This source archive does not contain private signing keys or passwords. The debug APK above exists only as compiler-verification evidence and must not be treated as the permanent release/update identity.
