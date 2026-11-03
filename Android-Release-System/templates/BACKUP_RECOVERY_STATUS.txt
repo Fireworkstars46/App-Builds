@@ -1,0 +1,7 @@
+PENDING
+# Change the first line to PASS only after a real recovery test from a durable backup copy.
+# Do not put passwords, private keys, storage URLs, or other secrets here.
+# When PASS, include the public certificate fingerprint recovered from the backup, for example:
+# VerifiedFingerprint=AA:BB:CC:...
+# VerifiedDate=YYYY-MM-DD
+# RecoveryCopyLabel=Backup-A
