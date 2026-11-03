@@ -1,0 +1,86 @@
+plugins {
+    id 'com.android.application'
+}
+
+def projectBuild = 2
+
+def releaseStore = System.getenv('APP_BATTERY_LIST_KEYSTORE')
+def releaseStorePassword = System.getenv('APP_BATTERY_LIST_STORE_PASSWORD')
+def releaseKeyAlias = System.getenv('APP_BATTERY_LIST_KEY_ALIAS')
+def releaseKeyPassword = System.getenv('APP_BATTERY_LIST_KEY_PASSWORD')
+def releaseSigningReady = [releaseStore, releaseStorePassword, releaseKeyAlias, releaseKeyPassword].every { it != null && !it.trim().isEmpty() }
+
+android {
+    namespace 'com.fireworkstars46.appbatterylist'
+    compileSdk 37
+
+    defaultConfig {
+        applicationId 'com.fireworkstars46.appbatterylist'
+        minSdk 29
+        targetSdk 36
+        versionCode 2
+        versionName '1.0'
+
+        buildConfigField 'int', 'PROJECT_BUILD', projectBuild.toString()
+        buildConfigField 'String', 'PROJECT_NAME', '"App Battery List"'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    if (releaseSigningReady) {
+        signingConfigs {
+            release {
+                storeFile file(releaseStore)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+                enableV1Signing true
+                enableV2Signing true
+                enableV3Signing true
+                enableV4Signing true
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix '.dev'
+            versionNameSuffix '-dev'
+        }
+        release {
+            minifyEnabled false
+            if (releaseSigningReady) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+tasks.register('verifyReleaseSigning') {
+    doLast {
+        if (!releaseSigningReady) {
+            throw new GradleException('Release signing gate FAILED: permanent keystore environment variables are missing. Do not build a release APK with a temporary/debug signer.')
+        }
+        def expected = file("${rootDir}/signing/EXPECTED_SIGNER_SHA256.txt")
+        if (!expected.exists() || expected.text.trim().isEmpty() || expected.text.contains('PENDING')) {
+            throw new GradleException('Release signing gate FAILED: expected signer SHA-256 metadata is missing/pending.')
+        }
+        def recovery = file("${rootDir}/signing/BACKUP_RECOVERY_STATUS.txt")
+        if (!recovery.exists() || !recovery.readLines().first().trim().equalsIgnoreCase('PASS')) {
+            throw new GradleException('Release signing gate FAILED: durable backup + real recovery-test status is not PASS.')
+        }
+    }
+}
+
+afterEvaluate {
+    tasks.matching { it.name == 'preReleaseBuild' }.configureEach {
+        dependsOn tasks.named('verifyReleaseSigning')
+    }
+}

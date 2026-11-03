@@ -1,0 +1,55 @@
+name: App Battery List Build 2 Verify
+
+on:
+  push:
+    paths:
+      - 'App-Battery-List/v1.0/Build-2/source/**'
+      - '.github/workflows/app-battery-list-build2-verify.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile-debug:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android API 37 and Build Tools 36.0.0
+        run: sdkmanager 'platforms;android-37' 'build-tools;36.0.0'
+
+      - name: Set up Gradle 9.6.0
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.6.0'
+
+      - name: Compile debug APK
+        working-directory: App-Battery-List/v1.0/Build-2/source
+        run: gradle :app:assembleDebug --stacktrace
+
+      - name: Verify debug artifact and hash
+        working-directory: App-Battery-List/v1.0/Build-2/source
+        run: |
+          test -f app/build/outputs/apk/debug/app-debug.apk
+          sha256sum app/build/outputs/apk/debug/app-debug.apk | tee app/build/outputs/apk/debug/app-debug.apk.sha256
+
+      - name: Upload compiler-verification artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-Battery-List-v1.0-Build-2-DEBUG-VERIFICATION-ONLY
+          path: |
+            App-Battery-List/v1.0/Build-2/source/app/build/outputs/apk/debug/app-debug.apk
+            App-Battery-List/v1.0/Build-2/source/app/build/outputs/apk/debug/app-debug.apk.sha256
+          if-no-files-found: error
