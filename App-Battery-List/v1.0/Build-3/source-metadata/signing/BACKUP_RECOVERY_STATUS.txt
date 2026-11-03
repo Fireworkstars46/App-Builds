@@ -1,0 +1,4 @@
+PASS
+Two durable recovery copies of the established permanent App Battery List signing material exist outside ChatGPT/temp/CI-only storage.
+A real recovery test from the private GitHub recovery copy reproduced the exact expected permanent signing certificate SHA-256 recorded in EXPECTED_SIGNER_SHA256.txt.
+Public evidence is archived in the App-Builds project history; no private signing secret is included here.
