@@ -1,0 +1,114 @@
++        logger.log("GUIDED_AUTO_DONE | " + returnedPackage);
++        GuidedReviewStore.State after = reviewStore.load();
++        if (after.isComplete()) {
++            showGuidedComplete(after);
++            return;
++        }
++        syncGuidedReviewUi();
++        reviewPanel.postDelayed(this::openGuidedCurrent, 250L);
++    }
++
++    private void toggleGuidedAutoAdvance() {
++        GuidedReviewStore.State state = reviewStore.load();
++        if (state.packages.isEmpty()) return;
++        boolean next = !state.autoAdvance;
++        if (!reviewStore.setAutoAdvance(next)) {
++            showMessage("Guided Review", "Could not save the Auto Next setting.");
++            return;
++        }
++        logger.log("GUIDED_AUTO_MODE | " + next);
++        syncGuidedReviewUi();
++        Toast.makeText(this, next ? "Auto Next enabled" : "Auto Next disabled", Toast.LENGTH_SHORT).show();
++    }
++
+     private void advanceGuided(boolean skipped) {
++        guidedRequestPackage = null;
+         GuidedReviewStore.State before = reviewStore.load();
+         if (!before.active) {
+             syncGuidedReviewUi();
+@@ -336,6 +403,7 @@ public final class MainActivity extends Activity {
+     }
+ 
+     private void previousGuided() {
++        guidedRequestPackage = null;
+         GuidedReviewStore.State state = reviewStore.load();
+         if (state.packages.isEmpty()) return;
+         if (state.index <= 0) {
+@@ -352,6 +420,7 @@ public final class MainActivity extends Activity {
+     }
+ 
+     private void endGuidedReview() {
++        guidedRequestPackage = null;
+         GuidedReviewStore.State state = reviewStore.load();
+         if (!state.active && state.packages.isEmpty()) return;
+         new AlertDialog.Builder(this)
+@@ -472,8 +541,8 @@ public final class MainActivity extends Activity {
+         }
+         GuidedReviewStore.State review = reviewStore.load();
+         String reviewText = review.active
+-                ? (review.index + 1) + "/" + review.packages.size() + " active; skipped=" + review.skipped.size()
+-                : (review.isComplete() ? "Complete; total=" + review.packages.size() + "; skipped=" + review.skipped.size() : "Not active");
++                ? (review.index + 1) + "/" + review.packages.size() + " active; skipped=" + review.skipped.size() + "; auto=" + review.autoAdvance
++                : (review.isComplete() ? "Complete; total=" + review.packages.size() + "; skipped=" + review.skipped.size() + "; auto=" + review.autoAdvance : "Not active");
+         String text = BuildConfig.PROJECT_NAME + " v" + BuildConfig.VERSION_NAME + " Build " + BuildConfig.PROJECT_BUILD
+                 + "\nPackage: " + getPackageName()
+                 + "\nAndroid SDK: " + android.os.Build.VERSION.SDK_INT
+diff --git a/old/app/src/main/java/com/fireworkstars46/appbatterylist/SafeSelfTest.java b/new/app/src/main/java/com/fireworkstars46/appbatterylist/SafeSelfTest.java
+index 77e0208..44f83cc 100644
+--- a/old/app/src/main/java/com/fireworkstars46/appbatterylist/SafeSelfTest.java
++++ b/new/app/src/main/java/com/fireworkstars46/appbatterylist/SafeSelfTest.java
+@@ -78,10 +78,28 @@ final class SafeSelfTest {
+             GuidedReviewStore store = GuidedReviewStore.isolated(context, testPrefs);
+             store.clear();
+             List<String> queue = Arrays.asList("test.pkg.one", "test.pkg.two", "test.pkg.three");
+-            boolean startOk = store.start(queue);
++            boolean startOk = store.start(queue, true);
+             GuidedReviewStore.State afterStart = store.load();
+-            boolean ok = startOk && afterStart.active && afterStart.index == 0 && afterStart.packages.equals(queue);
+-            result(report, ok, "Guided review persistence start -> reload/read -> compare", "3 isolated test packages");
++            boolean ok = startOk && afterStart.active && afterStart.index == 0 && afterStart.packages.equals(queue) && afterStart.autoAdvance;
++            result(report, ok, "Guided review persistence start -> reload/read -> compare", "3 isolated test packages; Auto Next ON");
++            if (ok) pass++; else fail++;
++
++            boolean modeOffOk = store.setAutoAdvance(false);
++            GuidedReviewStore.State modeOff = store.load();
++            ok = modeOffOk && !modeOff.autoAdvance && modeOff.index == 0 && modeOff.packages.equals(queue);
++            result(report, ok, "Guided review Auto Next OFF -> reload/read -> compare", "Queue/progress preserved");
++            if (ok) pass++; else fail++;
++
++            boolean modeOnOk = store.setAutoAdvance(true);
++            GuidedReviewStore.State modeOn = store.load();
++            ok = modeOnOk && modeOn.autoAdvance && modeOn.index == 0 && modeOn.packages.equals(queue);
++            result(report, ok, "Guided review Auto Next ON -> reload/read -> compare", "Queue/progress preserved");
++            if (ok) pass++; else fail++;
++
++            ok = GuidedReviewAutoAdvance.shouldAdvance(modeOn, "test.pkg.one")
++                    && !GuidedReviewAutoAdvance.shouldAdvance(modeOn, "test.pkg.two")
++                    && !GuidedReviewAutoAdvance.shouldAdvance(modeOff, "test.pkg.one");
++            result(report, ok, "Guided review Auto Next return decision", "Only active Auto Next + matching current package advances");
+             if (ok) pass++; else fail++;
+ 
+             boolean advanceOk = store.advance(true);
+@@ -92,8 +110,8 @@ final class SafeSelfTest {
+ 
+             boolean previousOk = store.previous();
+             GuidedReviewStore.State afterPrevious = store.load();
+-            ok = previousOk && afterPrevious.active && afterPrevious.index == 0 && !afterPrevious.skipped.contains("test.pkg.one");
+-            result(report, ok, "Guided review Previous -> reload/read -> compare", "Returned to first package; skip marker cleared");
++            ok = previousOk && afterPrevious.active && afterPrevious.index == 0 && !afterPrevious.skipped.contains("test.pkg.one") && afterPrevious.autoAdvance;
++            result(report, ok, "Guided review Previous -> reload/read -> compare", "Returned to first package; skip marker cleared; Auto Next preserved");
+             if (ok) pass++; else fail++;
+ 
+             store.advance(false);
+@@ -109,6 +127,13 @@ final class SafeSelfTest {
+             ok = clearOk && !cleared.active && cleared.packages.isEmpty() && cleared.index == 0;
+             result(report, ok, "Guided review isolated state clear -> reload/read -> compare", "Temporary test state removed");
+             if (ok) pass++; else fail++;
++
++            boolean legacyStartOk = store.start(queue);
++            GuidedReviewStore.State legacy = store.load();
++            ok = legacyStartOk && legacy.active && !legacy.autoAdvance;
++            result(report, ok, "Build 2-compatible Guided Review start default", "Old/manual start path defaults Auto Next OFF");
++            if (ok) pass++; else fail++;
++            store.clear();
+         } catch (RuntimeException ex) {
