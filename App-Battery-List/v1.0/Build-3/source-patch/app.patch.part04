@@ -1,0 +1,14 @@
+             context.getSharedPreferences(testPrefs, Context.MODE_PRIVATE).edit().clear().commit();
+             result(report, false, "Guided review persistence production-path tests", ex.toString()); fail++;
+@@ -134,9 +159,9 @@ final class SafeSelfTest {
+ 
+         report.append("SKIPPED/NOT TESTED - Physical Downloads export + Android share sheet | Requires interactive OS UI / external storage confirmation\n");
+         skipped++;
+-        report.append("SKIPPED/NOT TESTED - App-info screen launch result | Requires interactive Android Settings UI\n");
++        report.append("SKIPPED/NOT TESTED - App-info screen launch/result callback | Requires interactive Android Settings UI\n");
+         skipped++;
+-        report.append("SKIPPED/NOT TESTED - Guided Review real Settings round-trip | Requires manually changing/returning from Android/Samsung App Info UI\n");
++        report.append("SKIPPED/NOT TESTED - Guided Review Auto Next real Settings round-trip | Requires returning from Android/Samsung App Info so the OS result callback can be observed\n");
+         skipped++;
+         report.append("SKIPPED/NOT TESTED - Secure Folder cross-profile visibility | Android/Knox profile isolation requires a real Secure Folder install\n");
+         skipped++;
