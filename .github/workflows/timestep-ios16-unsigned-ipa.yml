@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -106,3 +106,24 @@ jobs:
             TimeStep_1.0.0_Build1_STATUS.txt
             TimeStep_Binary_Type.txt
           if-no-files-found: error
+
+      - name: Preserve immutable unsigned IPA as a draft GitHub download
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEST_DIR='Projects/TimeStep/drafts/Build1/artifacts'
+          IPA='TimeStep_1.0.0_Build1_UNSIGNED_Sideloadly.ipa'
+          mkdir -p "$DEST_DIR"
+          if [ -e "$DEST_DIR/$IPA" ]; then
+            cmp "$IPA" "$DEST_DIR/$IPA" || { echo 'Existing Build 1 artifact differs; hard stop instead of overwriting.'; exit 1; }
+            echo 'Exact same IPA already preserved; no replacement required.'
+          else
+            cp "$IPA" "$DEST_DIR/$IPA"
+            cp TimeStep_1.0.0_Build1_SHA256SUMS.txt "$DEST_DIR/"
+            cp TimeStep_1.0.0_Build1_STATUS.txt "$DEST_DIR/"
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add "$DEST_DIR"
+            git commit -m 'Preserve first Time Step Build 1 unsigned IPA draft (not signed or released)'
+            git push origin HEAD:main
+          fi
