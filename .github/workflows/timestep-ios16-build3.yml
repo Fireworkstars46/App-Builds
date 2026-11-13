@@ -79,7 +79,9 @@ jobs:
       - name: Test production calculator core (XCTest)
         working-directory: TimeStep_1.0.0_Build1_Source
         shell: bash
-        run: |\n          set -o pipefail\n          swift test --no-parallel 2>&1 | tee "$GITHUB_WORKSPACE/TimeStep_Build3_Host_Tests.txt"
+        run: |
+          set -o pipefail
+          swift test --no-parallel 2>&1 | tee "$GITHUB_WORKSPACE/TimeStep_Build3_Host_Tests.txt"
 
       - name: Compile native iOS 16 application without signing
         working-directory: TimeStep_1.0.0_Build1_Source
@@ -157,7 +159,9 @@ jobs:
             TimeStep_1.0.0_Build3_UNSIGNED_Sideloadly.ipa
             TimeStep_1.0.0_Build3_SHA256SUMS.txt
             TimeStep_1.0.0_Build3_STATUS.txt
-            TimeStep_Binary_Type.txt\n            TimeStep_Build3_Host_Tests.txt\n            TimeStep_1.0.0_Build3_Source.zip
+            TimeStep_Binary_Type.txt
+            TimeStep_Build3_Host_Tests.txt
+            TimeStep_1.0.0_Build3_Source.zip
           if-no-files-found: error
 
       - name: Preserve immutable unsigned IPA as a draft GitHub download
@@ -173,7 +177,10 @@ jobs:
           else
             cp "$IPA" "$DEST_DIR/$IPA"
             cp TimeStep_1.0.0_Build3_SHA256SUMS.txt "$DEST_DIR/"
-            cp TimeStep_1.0.0_Build3_STATUS.txt "$DEST_DIR/"\n            cp TimeStep_1.0.0_Build3_Source.zip "$DEST_DIR/"\n            cp TimeStep_Build3_Host_Tests.txt "$DEST_DIR/"\n            cp TimeStep_Binary_Type.txt "$DEST_DIR/"
+            cp TimeStep_1.0.0_Build3_STATUS.txt "$DEST_DIR/"
+            cp TimeStep_1.0.0_Build3_Source.zip "$DEST_DIR/"
+            cp TimeStep_Build3_Host_Tests.txt "$DEST_DIR/"
+            cp TimeStep_Binary_Type.txt "$DEST_DIR/"
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git add "$DEST_DIR"
