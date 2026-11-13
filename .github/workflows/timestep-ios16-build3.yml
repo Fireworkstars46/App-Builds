@@ -1,0 +1,182 @@
+name: Time Step iOS 16 Build 3 unsigned IPA (Sideloadly)
+
+on:
+  push:
+    paths:
+      - '.github/workflows/timestep-ios16-build3.yml'
+      - 'Projects/TimeStep/drafts/Build3/source.overlay.b64'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Time Step 1.0.0 Build 3 (unsigned)
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Restore original source and verify SHA-256
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, hashlib, tarfile
+          folder = Path('Projects/TimeStep/drafts/Build1')
+          parts = [folder / f'source.part{i:02}.b64' for i in (1, 2, 3)]
+          source = ''.join(p.read_text(encoding='utf-8') for p in parts)
+          data = base64.b64decode(source, validate=True)
+          digest = hashlib.sha256(data).hexdigest()
+          expected = 'b26ebf1373a1b449194a8dfb24c8a5926eddc580f2ec056413e8cc61d469058c'
+          if digest != expected:
+              raise SystemExit(f'SOURCE CHECKSUM MISMATCH: {digest} != {expected}')
+          archive = Path('TimeStep_Build1_OriginalSource.tar.xz')
+          archive.write_bytes(data)
+          with tarfile.open(archive, 'r:xz') as tar:
+              for member in tar.getmembers():
+                  target = Path(member.name)
+                  if target.is_absolute() or '..' in target.parts or member.issym() or member.islnk():
+                      raise SystemExit(f'Unsafe archive entry: {member.name}')
+              tar.extractall(path='.')
+          print('Verified original Build 1 source archive:', digest)
+          PY
+
+      - name: Apply targeted Build 3 keypad overlay and verify checksum
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, hashlib, io, tarfile
+          path = Path('Projects/TimeStep/drafts/Build3/source.overlay.b64')
+          payload = base64.b64decode(path.read_text(encoding='utf-8').strip(), validate=True)
+          digest = hashlib.sha256(payload).hexdigest()
+          expected = '6545672bfe3302d562c9d9bd364883477ade7df95bb95f9a588f0eda69bbbd18'
+          if digest != expected:
+              raise SystemExit(f'BUILD 3 OVERLAY SHA MISMATCH: {digest} != {expected}')
+          expected_files = {
+              'TimeStep/CalculatorView.swift',
+              'TimeStepCore/KeypadCalculator.swift',
+              'TimeStepCore/SafeSelfTest.swift',
+              'Tests/TimeStepCoreTests/ClockEngineTests.swift',
+              'Tests/TimeStepCoreTests/KeypadTests.swift',
+              'TimeStep.xcodeproj/project.pbxproj',
+          }
+          with tarfile.open(fileobj=io.BytesIO(payload), mode='r:xz') as tar:
+              members = tar.getmembers()
+              names = {m.name for m in members}
+              if names != expected_files or any(not m.isfile() for m in members):
+                  raise SystemExit(f'Unexpected overlay contents: {names}')
+              tar.extractall('TimeStep_1.0.0_Build1_Source')
+          pbx = Path('TimeStep_1.0.0_Build1_Source/TimeStep.xcodeproj/project.pbxproj').read_text()
+          if pbx.count('CURRENT_PROJECT_VERSION = 3;') != 2 or pbx.count('PRODUCT_BUNDLE_IDENTIFIER = com.fireworkstars46.timestep;') != 2:
+              raise SystemExit('Build 3 version or bundle identity verification failed')
+          print('Verified and applied Build 3 keypad overlay:', digest)
+          PY
+
+      - name: Test production calculator core (XCTest)
+        working-directory: TimeStep_1.0.0_Build1_Source
+        shell: bash
+        run: |\n          set -o pipefail\n          swift test --no-parallel 2>&1 | tee "$GITHUB_WORKSPACE/TimeStep_Build3_Host_Tests.txt"
+
+      - name: Compile native iOS 16 application without signing
+        working-directory: TimeStep_1.0.0_Build1_Source
+        shell: bash
+        run: |
+          xcodebuild \
+            -project TimeStep.xcodeproj \
+            -scheme TimeStep \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/TimeStepDerivedData" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' \
+            build
+
+      - name: Verify identity and package unsigned IPA for Sideloadly
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/TimeStepDerivedData/Build/Products/Release-iphoneos/TimeStep.app"
+          test -d "$APP"
+          INFO="$APP/Info.plist"
+          BUNDLE=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$INFO")
+          VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$INFO")
+          BUILD=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$INFO")
+          MIN_IOS=$(/usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' "$INFO")
+          test "$BUNDLE" = 'com.fireworkstars46.timestep'
+          test "$VERSION" = '1.0.0'
+          test "$BUILD" = '3'
+          test "$MIN_IOS" = '16.0'
+          file "$APP/TimeStep" | tee TimeStep_Binary_Type.txt
+          file "$APP/TimeStep" | grep -q 'Mach-O'
+          mkdir -p "$RUNNER_TEMP/TimeStepIPA/Payload"
+          ditto "$APP" "$RUNNER_TEMP/TimeStepIPA/Payload/TimeStep.app"
+          (cd "$RUNNER_TEMP/TimeStepIPA" && /usr/bin/zip -qry "$GITHUB_WORKSPACE/TimeStep_1.0.0_Build3_UNSIGNED_Sideloadly.ipa" Payload)
+          unzip -t "$GITHUB_WORKSPACE/TimeStep_1.0.0_Build3_UNSIGNED_Sideloadly.ipa"
+          shasum -a 256 "$GITHUB_WORKSPACE/TimeStep_1.0.0_Build3_UNSIGNED_Sideloadly.ipa" > "$GITHUB_WORKSPACE/TimeStep_1.0.0_Build3_SHA256SUMS.txt"
+          cat > "$GITHUB_WORKSPACE/TimeStep_1.0.0_Build3_STATUS.txt" <<EOF
+          Time Step 1.0.0 Build 3 — unsigned iOS 16 IPA for local Sideloadly signing.
+          Bundle ID: $BUNDLE
+          Version: $VERSION
+          Build: $BUILD
+          Minimum iOS: $MIN_IOS
+          Cloud signing: DISABLED (intentionally); sign/install with user's free Sideloadly Apple ID on Windows.
+          On-device GUI, storage, and signing/update compatibility: NOT TESTED.
+          Final release status: NOT DONE until required manual checks and archive verification pass.
+          EOF
+
+      - name: Preserve full Build 3 source and host test evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p TimeStep_1.0.0_Build3_Source
+          rsync -a --exclude='.build' TimeStep_1.0.0_Build1_Source/ TimeStep_1.0.0_Build3_Source/
+          test -f TimeStep_1.0.0_Build3_Source/TimeStepCore/KeypadCalculator.swift
+          test -f TimeStep_1.0.0_Build3_Source/Tests/TimeStepCoreTests/KeypadTests.swift
+          cat > TimeStep_1.0.0_Build3_Source/BUILD3_STATUS.md <<EOF
+          # Time Step 1.0.0 Build 3
+          Targeted change: iOS-style dynamic C/AC clear key and visibly cleared entry.
+          Original bundle ID: com.fireworkstars46.timestep.
+          Keeps prior app storage identifiers and existing repeat-equals behavior.
+          iOS 16 deployment target retained.
+          Cloud compilation and host-side tests performed in the GitHub Actions run.
+          Actual device installation, iOS UI runtime and sign/update compatibility remain NOT TESTED.
+          This is an unsigned draft IPA for local Apple ID signing in Sideloadly.
+          EOF
+          zip -qry TimeStep_1.0.0_Build3_Source.zip TimeStep_1.0.0_Build3_Source
+          unzip -t TimeStep_1.0.0_Build3_Source.zip
+
+      - name: Upload IPA and verifiable build evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: TimeStep_1.0.0_Build3_UNSIGNED_Sideloadly
+          path: |
+            TimeStep_1.0.0_Build3_UNSIGNED_Sideloadly.ipa
+            TimeStep_1.0.0_Build3_SHA256SUMS.txt
+            TimeStep_1.0.0_Build3_STATUS.txt
+            TimeStep_Binary_Type.txt\n            TimeStep_Build3_Host_Tests.txt\n            TimeStep_1.0.0_Build3_Source.zip
+          if-no-files-found: error
+
+      - name: Preserve immutable unsigned IPA as a draft GitHub download
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEST_DIR='Projects/TimeStep/drafts/Build3/artifacts'
+          IPA='TimeStep_1.0.0_Build3_UNSIGNED_Sideloadly.ipa'
+          mkdir -p "$DEST_DIR"
+          if [ -e "$DEST_DIR/$IPA" ]; then
+            cmp "$IPA" "$DEST_DIR/$IPA" || { echo 'Existing Build 3 artifact differs; hard stop instead of overwriting.'; exit 1; }
+            echo 'Exact same IPA already preserved; no replacement required.'
+          else
+            cp "$IPA" "$DEST_DIR/$IPA"
+            cp TimeStep_1.0.0_Build3_SHA256SUMS.txt "$DEST_DIR/"
+            cp TimeStep_1.0.0_Build3_STATUS.txt "$DEST_DIR/"\n            cp TimeStep_1.0.0_Build3_Source.zip "$DEST_DIR/"\n            cp TimeStep_Build3_Host_Tests.txt "$DEST_DIR/"\n            cp TimeStep_Binary_Type.txt "$DEST_DIR/"
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add "$DEST_DIR"
+            git commit -m 'Preserve Time Step Build 3 unsigned IPA draft (not signed or released)'
+            git push origin HEAD:main
+          fi
