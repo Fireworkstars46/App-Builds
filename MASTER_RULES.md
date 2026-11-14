@@ -18,6 +18,14 @@ Project-specific requirements add to these rules and override only the specific 
 - Do not create a new build merely because a master rule changed. Audit the existing build first. Only create the next Build when an actual code/artifact correction or requested feature/change is required.
 - Do not claim work was performed, tested, archived, or verified when it was not.
 
+### App launcher icon requirement (cross-platform)
+- Every new installable app with a visible app launcher/Home Screen/start-menu identity (including iOS, Android, and desktop apps where applicable) must include a deliberate, nonblank, recognizable app icon before the app is considered ready for release, unless the user explicitly requests no icon or the app platform/type has no applicable launcher icon.
+- Give each distinct app its own fitting visual identity rather than accidentally using a blank, missing, generic/default placeholder, or another project's icon. Preserve an established project's existing intentional icon unless the user requests a change or a verified defect requires correction.
+- Provide the icon in the required native formats, sizes, resolutions, asset-catalog/resource references, and manifest/Info.plist/project configuration for every supported target/platform; ensure the icon assets are actually packaged into the produced binary/installer/IPA/APK.
+- As part of the pre-release static and packaging audit, verify required icon source/assets exist, are readable, nonblank, correctly wired to the app target, and appear in the final app package. Check the installed launcher/Home Screen icon on a real device where available; otherwise report on-device visual appearance as NOT TESTED, never PASS.
+- Treat a reported missing or blank icon as a release-blocking UI defect for apps with visible launcher identity. Correct it in the next legitimate Build, preserve unrelated app state, bundle/package ID, signing identity, and update compatibility, and add icon-packaging regression checks.
+- Adding this master rule alone does not require a new Build; an actual icon code/resource/artifact correction does.
+
 ## 2. Version and build numbering
 - Every downloadable revision must clearly identify both Version and Build.
 - Increment Build for every revised downloadable artifact or code revision that changes the released program/script behavior or contents.
@@ -419,6 +427,7 @@ Static checks do not replace runtime/Safe Self-Test verification for behavior th
 - Do not change bundle ID casually because it creates a separate app/install identity.
 - Preserve sideload/update behavior when that is part of the project.
 - Keep platform/version compatibility explicit, especially for older supported iPhones/iOS versions.
+- Provide a nonblank AppIcon asset catalog and configure Xcode to embed it so the installed app shows a proper Home Screen icon; verify package resources and on-device appearance according to the cross-platform icon rule.
 - Preserve the project’s established signing/re-signing workflow where possible.
 - For iOS/Apple-platform projects whose update/distribution identity depends on signing material controlled by the project/user, apply the Section 3 durable-backup + recovery-test hard gate to the signing certificate/private key and other non-regenerable update-critical credentials before release.
 - Preserve and record safe public identity metadata such as bundle ID, Team ID, certificate/public signing identity, and the intended provisioning/distribution strategy where applicable.
