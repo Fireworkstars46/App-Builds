@@ -1,0 +1,8 @@
+Time Step 1.0.0 Build 4 — unsigned iOS 16 IPA for local Sideloadly signing.
+Bundle ID: com.fireworkstars46.timestep
+Version: 1.0.0
+Build: 4
+Minimum iOS: 16.0
+Cloud signing: DISABLED (intentionally); sign/install with user's free Sideloadly Apple ID on Windows.
+On-device GUI, storage, and signing/update compatibility: NOT TESTED.
+Final release status: NOT DONE until required manual checks and archive verification pass.
