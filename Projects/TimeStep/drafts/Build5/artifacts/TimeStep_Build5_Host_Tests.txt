@@ -1,0 +1,80 @@
+Building for debugging...
+[0/7] /Users/runner/work/App-Builds/App-Builds/TimeStep_1.0.0_Build1_Source/.build/arm64-apple-macosx/debug/TimeStepCorePackageTests.derived/runner.swift
+[0/7] Write sources
+[4/7] Write swift-version--79AA4F9932D1E87A.txt
+[6/10] Compiling TimeStepCore ClockEngine.swift
+[7/10] Compiling TimeStepCore KeypadCalculator.swift
+[8/10] Emitting module TimeStepCore
+[9/11] Compiling TimeStepCore SafeSelfTest.swift
+[10/14] Compiling TimeStepCoreTests ClockEngineTests.swift
+[11/14] Emitting module TimeStepCoreTests
+[12/14] Compiling TimeStepCoreTests KeypadTests.swift
+[13/16] Compiling TimeStepCorePackageTests runner.swift
+[14/16] Emitting module TimeStepCorePackageTests
+[14/16] Write Objects.LinkFileList
+[15/16] Linking TimeStepCorePackageTests
+Build complete! (15.19s)
+Test Suite 'All tests' started at 2026-11-15 15:06:27.136.
+Test Suite 'TimeStepCorePackageTests.xctest' started at 2026-11-15 15:06:27.137.
+Test Suite 'ClockEngineTests' started at 2026-11-15 15:06:27.137.
+Test Case '-[TimeStepCoreTests.ClockEngineTests testFormatBothClockStyles]' started.
+Test Case '-[TimeStepCoreTests.ClockEngineTests testFormatBothClockStyles]' passed (0.002 seconds).
+Test Case '-[TimeStepCoreTests.ClockEngineTests testInvalidDurationDoesNotChangeState]' started.
+Test Case '-[TimeStepCoreTests.ClockEngineTests testInvalidDurationDoesNotChangeState]' passed (0.001 seconds).
+Test Case '-[TimeStepCoreTests.ClockEngineTests testOverflowDoesNotChangeState]' started.
+Test Case '-[TimeStepCoreTests.ClockEngineTests testOverflowDoesNotChangeState]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.ClockEngineTests testResetAndStartChange]' started.
+Test Case '-[TimeStepCoreTests.ClockEngineTests testResetAndStartChange]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.ClockEngineTests testSafeSelfTest]' started.
+Test Case '-[TimeStepCoreTests.ClockEngineTests testSafeSelfTest]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.ClockEngineTests testSubtractAcrossMidnight]' started.
+Test Case '-[TimeStepCoreTests.ClockEngineTests testSubtractAcrossMidnight]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.ClockEngineTests testUnlimitedManualRepeatsHaveNoPresetCount]' started.
+Test Case '-[TimeStepCoreTests.ClockEngineTests testUnlimitedManualRepeatsHaveNoPresetCount]' passed (0.001 seconds).
+Test Suite 'ClockEngineTests' passed at 2026-11-15 15:06:27.142.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.004 (0.004) seconds
+Test Suite 'KeypadTests' started at 2026-11-15 15:06:27.142.
+Test Case '-[TimeStepCoreTests.KeypadTests testACIsBlankAndEqualsDoesNotRestoreClearedResult]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testACIsBlankAndEqualsDoesNotRestoreClearedResult]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testACWhileEditingStartKeepsChosenStartTime]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testACWhileEditingStartKeepsChosenStartTime]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testAfterClearTypingAppearsInLargeDisplay]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testAfterClearTypingAppearsInLargeDisplay]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testBackspaceAndChangingSign]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testBackspaceAndChangingSign]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testBackspaceToEmptyIsActuallyBlank]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testBackspaceToEmptyIsActuallyBlank]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testBlankStateSurvivesReinitializationFromSavedState]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testBlankStateSurvivesReinitializationFromSavedState]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testCClearsEntryVisiblyWithoutLosingRepeat]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testCClearsEntryVisiblyWithoutLosingRepeat]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testClearingEntryDoesNotResetCalculation]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testClearingEntryDoesNotResetCalculation]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testClearInputPreservesResultAndRepeatOperation]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testClearInputPreservesResultAndRepeatOperation]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testClockShorthand]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testClockShorthand]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testInvalidInputDoesNotApplyOrOverwriteStep]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testInvalidInputDoesNotApplyOrOverwriteStep]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testIOSClearKeySwitchesCToAC]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testIOSClearKeySwitchesCToAC]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testKeypadRepeatsIndefinitely]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testKeypadRepeatsIndefinitely]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testResetKeepsDuration]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testResetKeepsDuration]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testResetShowsCompletelyBlankDisplay]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testResetShowsCompletelyBlankDisplay]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testSetStartingClockWithTimeAndPeriod]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testSetStartingClockWithTimeAndPeriod]' passed (0.000 seconds).
+Test Case '-[TimeStepCoreTests.KeypadTests testSubtractMinutesAndCrossMidnight]' started.
+Test Case '-[TimeStepCoreTests.KeypadTests testSubtractMinutesAndCrossMidnight]' passed (0.000 seconds).
+Test Suite 'KeypadTests' passed at 2026-11-15 15:06:27.144.
+	 Executed 17 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'TimeStepCorePackageTests.xctest' passed at 2026-11-15 15:06:27.144.
+	 Executed 24 tests, with 0 failures (0 unexpected) in 0.006 (0.007) seconds
+Test Suite 'All tests' passed at 2026-11-15 15:06:27.144.
+	 Executed 24 tests, with 0 failures (0 unexpected) in 0.006 (0.008) seconds
+◇ Test run started.
+↳ Testing Library Version: 124.4
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests passed after 0.001 seconds.

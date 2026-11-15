@@ -1,0 +1,1 @@
+/Users/runner/work/_temp/TimeStepDerivedData/Build/Products/Release-iphoneos/TimeStep.app/TimeStep: Mach-O 64-bit executable arm64
