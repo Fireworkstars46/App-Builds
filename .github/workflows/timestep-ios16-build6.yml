@@ -1,0 +1,338 @@
+name: Time Step iOS 16 Build 6 unsigned IPA (Sideloadly)
+
+on:
+  push:
+    paths:
+      - '.github/workflows/timestep-ios16-build6.yml'
+      - 'Projects/TimeStep/drafts/Build6/source.overlay.b64'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Time Step 1.0.0 Build 6 (unsigned)
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Restore original source and verify SHA-256
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, hashlib, tarfile
+          folder = Path('Projects/TimeStep/drafts/Build1')
+          parts = [folder / f'source.part{i:02}.b64' for i in (1, 2, 3)]
+          source = ''.join(p.read_text(encoding='utf-8') for p in parts)
+          data = base64.b64decode(source, validate=True)
+          digest = hashlib.sha256(data).hexdigest()
+          expected = 'b26ebf1373a1b449194a8dfb24c8a5926eddc580f2ec056413e8cc61d469058c'
+          if digest != expected:
+              raise SystemExit(f'SOURCE CHECKSUM MISMATCH: {digest} != {expected}')
+          archive = Path('TimeStep_Build1_OriginalSource.tar.xz')
+          archive.write_bytes(data)
+          with tarfile.open(archive, 'r:xz') as tar:
+              for member in tar.getmembers():
+                  target = Path(member.name)
+                  if target.is_absolute() or '..' in target.parts or member.issym() or member.islnk():
+                      raise SystemExit(f'Unsafe archive entry: {member.name}')
+              tar.extractall(path='.')
+          print('Verified original Build 1 source archive:', digest)
+          PY
+
+      - name: Apply targeted Build 3 keypad overlay and verify checksum
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, hashlib, io, tarfile
+          path = Path('Projects/TimeStep/drafts/Build3/source.overlay.b64')
+          payload = base64.b64decode(path.read_text(encoding='utf-8').strip(), validate=True)
+          digest = hashlib.sha256(payload).hexdigest()
+          expected = '6545672bfe3302d562c9d9bd364883477ade7df95bb95f9a588f0eda69bbbd18'
+          if digest != expected:
+              raise SystemExit(f'BUILD 3 OVERLAY SHA MISMATCH: {digest} != {expected}')
+          expected_files = {
+              'TimeStep/CalculatorView.swift',
+              'TimeStepCore/KeypadCalculator.swift',
+              'TimeStepCore/SafeSelfTest.swift',
+              'Tests/TimeStepCoreTests/ClockEngineTests.swift',
+              'Tests/TimeStepCoreTests/KeypadTests.swift',
+              'TimeStep.xcodeproj/project.pbxproj',
+          }
+          with tarfile.open(fileobj=io.BytesIO(payload), mode='r:xz') as tar:
+              members = tar.getmembers()
+              names = {m.name for m in members}
+              if names != expected_files or any(not m.isfile() for m in members):
+                  raise SystemExit(f'Unexpected overlay contents: {names}')
+              tar.extractall('TimeStep_1.0.0_Build1_Source')
+          pbx = Path('TimeStep_1.0.0_Build1_Source/TimeStep.xcodeproj/project.pbxproj').read_text()
+          if pbx.count('CURRENT_PROJECT_VERSION = 3;') != 2 or pbx.count('PRODUCT_BUNDLE_IDENTIFIER = com.fireworkstars46.timestep;') != 2:
+              raise SystemExit('Build 3 version or bundle identity verification failed')
+          print('Verified and applied Build 3 keypad overlay:', digest)
+          PY
+
+
+      - name: Apply Time Step Build 4 icon overlay (verify exact source)
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, hashlib, io, tarfile
+          p = Path('Projects/TimeStep/drafts/Build4/source.overlay.b64')
+          content = base64.b64decode(p.read_text(encoding='utf-8').strip(),validate=True)
+          digest = hashlib.sha256(content).hexdigest()
+          expected = '0dbf10f0fd6bd977321350191f192371208292e74c7058196b73360f8db03eae'
+          if digest != expected:
+              raise SystemExit(f'BUILD 4 SOURCE SHA MISMATCH: {digest} != {expected}')
+          wanted = {
+              'TimeStep.xcodeproj/project.pbxproj',
+              'TimeStep/Assets.xcassets/AppIcon.appiconset/Contents.json',
+              'TimeStep/Assets.xcassets/AppIcon.appiconset/IconArtwork.jpg',
+              'Scripts/PrepareAppIcon.sh',
+          }
+          with tarfile.open(fileobj=io.BytesIO(content), mode='r:xz') as tar:
+              members = tar.getmembers()
+              names = {m.name for m in members}
+              if names != wanted or any(not m.isfile() for m in members):
+                  raise SystemExit(f'Unexpected Build 4 overlay files: {names}')
+              tar.extractall('TimeStep_1.0.0_Build1_Source')
+          p = Path('TimeStep_1.0.0_Build1_Source/TimeStep.xcodeproj/project.pbxproj')
+          pbx = p.read_text()
+          if pbx.count('CURRENT_PROJECT_VERSION = 4;') != 2 or pbx.count('PRODUCT_BUNDLE_IDENTIFIER = com.fireworkstars46.timestep;') != 2 or pbx.count('ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;') != 2:
+              raise SystemExit('Build 4 version, bundle ID or AppIcon build settings are wrong')
+          jpg = Path('TimeStep_1.0.0_Build1_Source/TimeStep/Assets.xcassets/AppIcon.appiconset/IconArtwork.jpg').read_bytes()
+          if hashlib.sha256(jpg).hexdigest() != '6ccaa462fac8cfd931c808e903685d9739711d2bd6e35ca8cf0590d087fda504':
+              raise SystemExit('AppIcon source JPG digest mismatch')
+          print('PASS: Build 4 overlay identity, icon bytes and project configuration verified')
+          PY
+
+      - name: Generate and validate nine iPhone AppIcon images
+        working-directory: TimeStep_1.0.0_Build1_Source
+        shell: bash
+        run: |
+          bash Scripts/PrepareAppIcon.sh
+
+      - name: Apply Build 5 reset and icon source overlay with SHA-256 verification
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64,hashlib,io,tarfile
+          p=Path('Projects/TimeStep/drafts/Build5/source.overlay.b64')
+          b=base64.b64decode(p.read_text().strip(),validate=True)
+          assert hashlib.sha256(b).hexdigest()=='93cc232547cf6e3e18c637fbc1d93818bd9abe2e9dd94bb20110331e04ecc261','Build 5 source SHA mismatch'
+          wanted={'TimeStep/CalculatorView.swift','TimeStepCore/KeypadCalculator.swift',
+          'TimeStepCore/SafeSelfTest.swift','Tests/TimeStepCoreTests/ClockEngineTests.swift',
+          'Tests/TimeStepCoreTests/KeypadTests.swift','TimeStep.xcodeproj/project.pbxproj',
+          'Scripts/EmbedLegacyIcons.sh'}
+          with tarfile.open(fileobj=io.BytesIO(b),mode='r:xz') as t:
+              mem=t.getmembers()
+              assert {i.name for i in mem}==wanted and all(i.isfile() for i in mem),'Unexpected Build 5 files'
+              assert all(not Path(i.name).is_absolute() and '..' not in Path(i.name).parts for i in mem)
+              t.extractall('TimeStep_1.0.0_Build1_Source')
+          root=Path('TimeStep_1.0.0_Build1_Source')
+          pbx=(root/'TimeStep.xcodeproj/project.pbxproj').read_text()
+          assert pbx.count('CURRENT_PROJECT_VERSION = 5;')==2
+          assert pbx.count('PRODUCT_BUNDLE_IDENTIFIER = com.fireworkstars46.timestep;')==2
+          assert pbx.count('ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;')==2
+          assert pbx.count('CODE_SIGNING_ALLOWED = NO;')==2
+          ui=(root/'TimeStep/CalculatorView.swift').read_text()
+          assert all(s in ui for s in ['com.fireworkstars46.timestep.displayBlank','model.displayBlank','Build 5'])
+          core=(root/'TimeStepCore/KeypadCalculator.swift').read_text()
+          assert all(s in core for s in ['displayedTime12','displayedTime24','allCleared','displayBlank = true'])
+          print('PASS: Build 5 full source, version, unique bundle ID, unsigned signing and blank display')
+          PY
+
+      - name: Verify and apply Build 6 easy-entry overlay
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64, hashlib, io, tarfile
+          p = Path('Projects/TimeStep/drafts/Build6/source.overlay.b64')
+          payload = base64.b64decode(p.read_text(encoding='utf-8').strip(),validate=True)
+          digest = hashlib.sha256(payload).hexdigest()
+          expected_digest = '918153baff2efe6e329072dc3485da23ece474a222803d23580d8a8c5ae83cfb'
+          if digest != expected_digest:
+              raise SystemExit(f'Build 6 source checksum differs: {digest}')
+          wanted = {
+              'TimeStep/CalculatorView.swift',
+              'TimeStepCore/KeypadCalculator.swift',
+              'TimeStepCore/SafeSelfTest.swift',
+              'Tests/TimeStepCoreTests/ClockEngineTests.swift',
+              'Tests/TimeStepCoreTests/KeypadTests.swift',
+              'TimeStep.xcodeproj/project.pbxproj',
+              'README_BUILD6.md'
+          }
+          with tarfile.open(fileobj=io.BytesIO(payload), mode='r:xz') as tar:
+              members = tar.getmembers()
+              if {m.name for m in members} != wanted or any(not m.isfile() for m in members):
+                  raise SystemExit('Build 6 source manifest mismatch')
+              if any(Path(m.name).is_absolute() or '..' in Path(m.name).parts for m in members):
+                  raise SystemExit('Unsafe archive path')
+              tar.extractall('TimeStep_1.0.0_Build1_Source')
+          root = Path('TimeStep_1.0.0_Build1_Source')
+          pbx=(root/'TimeStep.xcodeproj/project.pbxproj').read_text()
+          assert pbx.count('CURRENT_PROJECT_VERSION = 6;') == 2
+          assert pbx.count('PRODUCT_BUNDLE_IDENTIFIER = com.fireworkstars46.timestep;') == 2
+          assert pbx.count('ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;') == 2
+          assert pbx.count('CODE_SIGNING_ALLOWED = NO;') == 2
+          assert pbx.count('IPHONEOS_DEPLOYMENT_TARGET = 16.0;') == 2
+          ui=(root/'TimeStep/CalculatorView.swift').read_text()
+          assert all(k in ui for k in [
+              'DatePicker("Start time"', 'Text("Hours")', 'Text("Minutes")',
+              'Button("Reset")', 'Calculate / Repeat',
+              'com.fireworkstars46.timestep.startMinute',
+              'com.fireworkstars46.timestep.totalMinute',
+              'com.fireworkstars46.timestep.entryUnit'])
+          core=(root/'TimeStepCore/KeypadCalculator.swift').read_text()
+          assert all(k in core for k in [
+              'case minutes', 'case hours', 'setStartingMinuteOfDay',
+              'allCleared', 'displayBlank', 'pressEquals'])
+          assert (root/'TimeStep/Assets.xcassets/AppIcon.appiconset/icon-1024.png').stat().st_size > 3000
+          assert (root/'Scripts/EmbedLegacyIcons.sh').is_file()
+          print('PASS: Build 6 identity, iOS minimum, icon sources, old storage keys and easy-entry controls')
+          PY
+
+      - name: Test production calculator core (XCTest)
+        working-directory: TimeStep_1.0.0_Build1_Source
+        shell: bash
+        run: |
+          set -o pipefail
+          swift test --no-parallel 2>&1 | tee "$GITHUB_WORKSPACE/TimeStep_Build6_Host_Tests.txt"
+
+      - name: Compile native iOS 16 application without signing
+        working-directory: TimeStep_1.0.0_Build1_Source
+        shell: bash
+        run: |
+          xcodebuild \
+            -project TimeStep.xcodeproj \
+            -scheme TimeStep \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/TimeStepDerivedData" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' \
+            build
+
+      - name: Embed actual legacy iPhone icons before IPA packaging
+        shell: bash
+        run: |
+          bash TimeStep_1.0.0_Build1_Source/Scripts/EmbedLegacyIcons.sh "$RUNNER_TEMP/TimeStepDerivedData/Build/Products/Release-iphoneos/TimeStep.app"
+
+      - name: Verify identity and package unsigned IPA for Sideloadly
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/TimeStepDerivedData/Build/Products/Release-iphoneos/TimeStep.app"
+          test -d "$APP"
+          INFO="$APP/Info.plist"
+          BUNDLE=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$INFO")
+          VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$INFO")
+          BUILD=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$INFO")
+          MIN_IOS=$(/usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' "$INFO")
+          test "$BUNDLE" = 'com.fireworkstars46.timestep'
+          test "$VERSION" = '1.0.0'
+          test "$BUILD" = '5'
+          test "$MIN_IOS" = '16.0'
+          file "$APP/TimeStep" | tee TimeStep_Binary_Type.txt
+          file "$APP/TimeStep" | grep -q 'Mach-O'
+          mkdir -p "$RUNNER_TEMP/TimeStepIPA/Payload"
+          ditto "$APP" "$RUNNER_TEMP/TimeStepIPA/Payload/TimeStep.app"
+          (cd "$RUNNER_TEMP/TimeStepIPA" && /usr/bin/zip -qry "$GITHUB_WORKSPACE/TimeStep_1.0.0_Build6_UNSIGNED_Sideloadly.ipa" Payload)
+          unzip -t "$GITHUB_WORKSPACE/TimeStep_1.0.0_Build6_UNSIGNED_Sideloadly.ipa"
+          shasum -a 256 "$GITHUB_WORKSPACE/TimeStep_1.0.0_Build6_UNSIGNED_Sideloadly.ipa" > "$GITHUB_WORKSPACE/TimeStep_1.0.0_Build6_SHA256SUMS.txt"
+          cat > "$GITHUB_WORKSPACE/TimeStep_1.0.0_Build6_STATUS.txt" <<EOF
+          Time Step 1.0.0 Build 6 — unsigned iOS 16 IPA for local Sideloadly signing.
+          Bundle ID: $BUNDLE
+          Version: $VERSION
+          Build: $BUILD
+          Minimum iOS: $MIN_IOS
+          Cloud signing: DISABLED (intentionally); sign/install with user's free Sideloadly Apple ID on Windows.
+          On-device GUI, storage, and signing/update compatibility: NOT TESTED.
+          Final release status: NOT DONE until required manual checks and archive verification pass.
+          EOF
+
+
+      - name: Verify compiled Home Screen icon is inside iOS app
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP="$RUNNER_TEMP/TimeStepDerivedData/Build/Products/Release-iphoneos/TimeStep.app"
+          test -s "$APP/Assets.car" || { echo "Compiled Assets.car missing"; exit 1; }
+          INFO="$APP/Info.plist"
+          test -s "$INFO"
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleIcons:CFBundlePrimaryIcon:CFBundleIconName' "$INFO" | grep -x 'AppIcon'
+          /usr/bin/plutil -p "$INFO" | grep -q 'AppIcon'
+          test -s "$APP/AppIcon60x60@2x.png"
+          test -s "$APP/AppIcon60x60@3x.png"
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleIcons:CFBundlePrimaryIcon:CFBundleIconFiles:0' "$INFO" | grep -x 'AppIcon60x60'
+          unzip -l "$GITHUB_WORKSPACE/TimeStep_1.0.0_Build6_UNSIGNED_Sideloadly.ipa" | grep -F 'Payload/TimeStep.app/AppIcon60x60@2x.png'
+          unzip -l "$GITHUB_WORKSPACE/TimeStep_1.0.0_Build6_UNSIGNED_Sideloadly.ipa" | grep -F 'Payload/TimeStep.app/AppIcon60x60@3x.png'
+          unzip -l "$GITHUB_WORKSPACE/TimeStep_1.0.0_Build6_UNSIGNED_Sideloadly.ipa" | grep -F 'Payload/TimeStep.app/Assets.car'
+          echo "PASS: AppIcon and legacy PNGs + plist references verified in final Build 6 IPA"
+
+      - name: Preserve full Build 6 source and host test evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p TimeStep_1.0.0_Build6_Source
+          rsync -a --exclude='.build' TimeStep_1.0.0_Build1_Source/ TimeStep_1.0.0_Build6_Source/
+          test -f TimeStep_1.0.0_Build6_Source/TimeStepCore/KeypadCalculator.swift
+          test -f TimeStep_1.0.0_Build6_Source/Tests/TimeStepCoreTests/KeypadTests.swift
+          test -s TimeStep_1.0.0_Build6_Source/TimeStep/Assets.xcassets/AppIcon.appiconset/icon-1024.png
+          test -s TimeStep_1.0.0_Build6_Source/README_BUILD6.md
+          cat > TimeStep_1.0.0_Build6_Source/BUILD5_STATUS.md <<EOF
+          # Time Step 1.0.0 Build 6
+          Targeted change: native start-time picker, Hours/Minutes selection, Add/Subtract, repeat equals; blank Reset and packaged app icon preserved.
+          Original bundle ID: com.fireworkstars46.timestep.
+          Keeps prior app storage identifiers and existing repeat-equals behavior.
+          iOS 16 deployment target retained.
+          Cloud compilation and host-side tests performed in the GitHub Actions run.
+          Actual device installation, iOS UI runtime and sign/update compatibility remain NOT TESTED.
+          This is an unsigned draft IPA for local Apple ID signing in Sideloadly.
+          EOF
+          zip -qry TimeStep_1.0.0_Build6_Source.zip TimeStep_1.0.0_Build6_Source
+          unzip -t TimeStep_1.0.0_Build6_Source.zip
+
+      - name: Upload IPA and verifiable build evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: TimeStep_1.0.0_Build6_UNSIGNED_Sideloadly
+          path: |
+            TimeStep_1.0.0_Build6_UNSIGNED_Sideloadly.ipa
+            TimeStep_1.0.0_Build6_SHA256SUMS.txt
+            TimeStep_1.0.0_Build6_STATUS.txt
+            TimeStep_Binary_Type.txt
+            TimeStep_Build6_Host_Tests.txt
+            TimeStep_1.0.0_Build6_Source.zip
+          if-no-files-found: error
+
+      - name: Preserve immutable unsigned IPA as a draft GitHub download
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEST_DIR='Projects/TimeStep/drafts/Build6/artifacts'
+          IPA='TimeStep_1.0.0_Build6_UNSIGNED_Sideloadly.ipa'
+          mkdir -p "$DEST_DIR"
+          if [ -e "$DEST_DIR/$IPA" ]; then
+            cmp "$IPA" "$DEST_DIR/$IPA" || { echo 'Existing Build 6 artifact differs; hard stop instead of overwriting.'; exit 1; }
+            echo 'Exact same IPA already preserved; no replacement required.'
+          else
+            cp "$IPA" "$DEST_DIR/$IPA"
+            cp TimeStep_1.0.0_Build6_SHA256SUMS.txt "$DEST_DIR/"
+            cp TimeStep_1.0.0_Build6_STATUS.txt "$DEST_DIR/"
+            cp TimeStep_1.0.0_Build6_Source.zip "$DEST_DIR/"
+            cp TimeStep_Build6_Host_Tests.txt "$DEST_DIR/"
+            cp TimeStep_Binary_Type.txt "$DEST_DIR/"
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add "$DEST_DIR"
+            git commit -m 'Preserve Time Step Build 6 unsigned IPA draft (not signed or released)'
+            git push origin HEAD:main
+          fi
