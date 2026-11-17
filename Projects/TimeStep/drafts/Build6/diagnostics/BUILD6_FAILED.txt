@@ -1,0 +1,10 @@
+Time Step 1.0.0 Build 6 — cloud build FAILED or blocked.
+This file is a diagnostic, NOT a completed or installable release.
+Inspect the matching GitHub Actions run for complete details.
+
+Xcode compiler diagnostics (selected lines):
+Swift test diagnostics (selected lines):
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.007 (0.008) seconds
+	 Executed 25 tests, with 0 failures (0 unexpected) in 0.003 (0.004) seconds
+	 Executed 32 tests, with 0 failures (0 unexpected) in 0.011 (0.012) seconds
+	 Executed 32 tests, with 0 failures (0 unexpected) in 0.011 (0.014) seconds
