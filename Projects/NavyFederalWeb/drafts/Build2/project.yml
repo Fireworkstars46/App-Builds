@@ -1,0 +1,30 @@
+name: BankWebAccess
+options:
+  deploymentTarget:
+    iOS: "16.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+targets:
+  BankWebAccess:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: BankWebAccess
+    settings:
+      base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGNING_ALLOWED: "NO"
+        CURRENT_PROJECT_VERSION: "2"
+        GENERATE_INFOPLIST_FILE: "YES"
+        INFOPLIST_KEY_CFBundleDisplayName: "Navy Federal"
+        INFOPLIST_KEY_CFBundleName: "Navy Federal Credit Union"
+        INFOPLIST_KEY_LSRequiresIPhoneOS: "YES"
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: "YES"
+        INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
+        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+        MARKETING_VERSION: "1.0"
+        PRODUCT_BUNDLE_IDENTIFIER: com.fireworkstars46.bankwebaccess
+        SUPPORTS_MACCATALYST: "NO"
+        TARGETED_DEVICE_FAMILY: "1"
