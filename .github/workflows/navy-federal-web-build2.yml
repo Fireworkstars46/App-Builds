@@ -1,0 +1,78 @@
+name: Navy Federal Web v1.0 Build 2 - Unsigned iOS Candidate
+
+on:
+  push:
+    branches:
+      - wip/navy-federal-web-build2
+    paths:
+      - 'Projects/NavyFederalWeb/drafts/Build2/**'
+      - '.github/workflows/navy-federal-web-build2.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  ios-unsigned-candidate:
+    runs-on: macos-15
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: Projects/NavyFederalWeb/drafts/Build2
+    steps:
+      - name: Check out exact working branch revision
+        uses: actions/checkout@v4
+      - name: Inspect Apple toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+      - name: Prepare official app icon from Apple's verified listing
+        run: |
+          python3 scripts/create_app_icon.py
+          test -s BankWebAccess/Assets.xcassets/AppIcon.appiconset/icon-1024.png
+          test -s BankWebAccess/Assets.xcassets/AppIcon.appiconset/official_icon_provenance.json
+      - name: Install XcodeGen and generate Xcode project
+        run: |
+          brew install xcodegen
+          xcodegen generate --spec project.yml
+          xcodebuild -list -project BankWebAccess.xcodeproj
+      - name: Compile unsigned iOS ARM64 candidate
+        run: |
+          set -euo pipefail
+          xcodebuild -project BankWebAccess.xcodeproj -scheme BankWebAccess -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath "$PWD/DerivedData" CODE_SIGNING_ALLOWED=NO build | tee xcodebuild.log
+      - name: Audit actual app binary, icon packaging and create IPA
+        run: |
+          set -euo pipefail
+          APP="$PWD/DerivedData/Build/Products/Release-iphoneos/BankWebAccess.app"
+          test -d "$APP" && test -s "$APP/BankWebAccess" && test -s "$APP/Assets.car"
+          file "$APP/BankWebAccess" | tee binary-architecture.txt
+          file "$APP/BankWebAccess" | grep -qi arm64
+          PLIST="$APP/Info.plist"
+          test "$(plutil -extract CFBundleIdentifier raw -o - "$PLIST")" = "com.fireworkstars46.bankwebaccess"
+          test "$(plutil -extract CFBundleVersion raw -o - "$PLIST")" = "2"
+          test "$(plutil -extract CFBundleShortVersionString raw -o - "$PLIST")" = "1.0"
+          test "$(plutil -extract CFBundleDisplayName raw -o - "$PLIST")" = "Navy Federal"
+          plutil -p "$PLIST" | grep -q 'AppIcon'
+          if [ -e "$APP/embedded.mobileprovision" ]; then echo "Unexpected signing profile" >&2; exit 1; fi
+          mkdir -p dist/Payload
+          ditto "$APP" dist/Payload/BankWebAccess.app
+          (cd dist && zip -qry NavyFederal-v1.0-Build2-unsigned.ipa Payload)
+          unzip -t dist/NavyFederal-v1.0-Build2-unsigned.ipa | tail -2
+          test -s dist/NavyFederal-v1.0-Build2-unsigned.ipa
+          cp -r BankWebAccess/Assets.xcassets/AppIcon.appiconset dist/IconAssets
+          (zip -qr dist/NavyFederal-v1.0-Build2-SOURCE.zip BankWebAccess project.yml scripts README.md RELEASE_STATUS.md -x '*.DS_Store')
+          cp binary-architecture.txt dist/
+          cp xcodebuild.log dist/ || true
+          (cd dist && shasum -a 256 NavyFederal-v1.0-Build2-unsigned.ipa NavyFederal-v1.0-Build2-SOURCE.zip > SHA256SUMS.txt)
+          ls -lh dist/
+      - name: Upload unsigned candidate and source with audits
+        uses: actions/upload-artifact@v4
+        with:
+          name: NavyFederal-v1.0-Build2-unsigned-candidate
+          path: |
+            Projects/NavyFederalWeb/drafts/Build2/dist/NavyFederal-v1.0-Build2-unsigned.ipa
+            Projects/NavyFederalWeb/drafts/Build2/dist/NavyFederal-v1.0-Build2-SOURCE.zip
+            Projects/NavyFederalWeb/drafts/Build2/dist/SHA256SUMS.txt
+            Projects/NavyFederalWeb/drafts/Build2/dist/binary-architecture.txt
+            Projects/NavyFederalWeb/drafts/Build2/dist/xcodebuild.log
+          if-no-files-found: error
+          retention-days: 30
